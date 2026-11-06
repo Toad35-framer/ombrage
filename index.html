@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ombrage — Simulation d’ombrage de brise-soleil à lames</title>
+<meta name="description" content="Calcul de la course du soleil et simulation 3D de l’ombre portée d’un brise-soleil à lames sur une fenêtre. Outil gratuit, dans le navigateur, données IGN Géoplateforme.">
+<meta name="author" content="Jean Pineau">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2212%22%20fill%3D%22%231F4E79%22/%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%229%22%20fill%3D%22%23FFD54F%22/%3E%3Cg%20stroke%3D%22%23FFD54F%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%3E%3Cline%20x1%3D%2220%22%20y1%3D%224%22%20x2%3D%2220%22%20y2%3D%227%22/%3E%3Cline%20x1%3D%224%22%20y1%3D%2220%22%20x2%3D%227%22%20y2%3D%2220%22/%3E%3Cline%20x1%3D%229%22%20y1%3D%229%22%20x2%3D%2211%22%20y2%3D%2211%22/%3E%3C/g%3E%3Crect%20x%3D%2240%22%20y%3D%2210%22%20width%3D%226%22%20height%3D%2246%22%20fill%3D%22%23DCD8CF%22/%3E%3Cg%20fill%3D%22%23ffffff%22%3E%3Crect%20x%3D%2222%22%20y%3D%2234%22%20width%3D%2216%22%20height%3D%224%22%20rx%3D%221%22%20transform%3D%22rotate%28-15%2030%2036%29%22/%3E%3Crect%20x%3D%2222%22%20y%3D%2242%22%20width%3D%2216%22%20height%3D%224%22%20rx%3D%221%22%20transform%3D%22rotate%28-15%2030%2044%29%22/%3E%3Crect%20x%3D%2222%22%20y%3D%2250%22%20width%3D%2216%22%20height%3D%224%22%20rx%3D%221%22%20transform%3D%22rotate%28-15%2030%2052%29%22/%3E%3C/g%3E%3C/svg%3E">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout : charte Alti-Vent — en-tête bleu, cartes numérotées ; saisies à gauche, 3D + coupe puis optimisation et analyse à droite */
+:root{
+  --bg:#fafaf7; --card:#ffffff; --text:#1a1a1a; --text2:#5a5a5a; --text3:#9a9a9a; --border:#e0e0e0; --formbg:#F2F7FB;
+  --color-info:#1F4E79; --color-success:#1D9E75; --color-warning:#EF9F27; --color-danger:#E24B4A; --color-help:#6A40A8;
+  --color-info-bg:#EAF1F8; --color-success-bg:#EAF6F1; --color-warning-bg:#FDF4E3; --color-danger-bg:#FCE9E9; --color-help-bg:#F2EBFB;
+  --teal:#2E75B6; --sunline:#D98613; --yellow:#FFD54F;
+  --f:Calibri,Carlito,"Segoe UI",Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{font-family:var(--f);background:var(--bg);color:var(--text);margin:0;line-height:1.5;font-size:14px}
+.wrap{max-width:1500px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button,input,select,textarea{font-family:inherit}
+:focus-visible{outline:2px solid var(--color-info);outline-offset:1px}
+
+/* en-tête */
+header.top{background:var(--color-info);color:#fff}
+header.top .wrap{padding-block:1.3rem;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+header.top h1{margin:0 0 4px;font-size:22px;font-weight:500;text-wrap:balance}
+header.top h1 .brand{color:var(--yellow);font-weight:700}
+header.top p{margin:0;font-size:13px;opacity:.9}
+.guide-btn{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.6);border-radius:6px;padding:7px 14px;font-size:13px;cursor:pointer;white-space:nowrap}
+.guide-btn:hover{background:rgba(255,255,255,.12)}
+.disclaimer{background:#FFF8E1;border-left:4px solid #F59E0B;color:#5C4400;padding:10px 18px;font-size:13px;display:flex;gap:10px;align-items:flex-start;border-radius:0 0 6px 6px}
+.disclaimer b{color:#B45309}
+
+/* grille */
+.layout{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:16px;padding-block:1.4rem;align-items:start}
+@media (max-width:1000px){.layout{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+
+/* cartes */
+.card{background:var(--card);border:.5px solid var(--border);border-radius:8px;padding:16px;min-width:0}
+.card h2{margin:0 0 12px;font-size:16px;font-weight:500;color:var(--color-info);display:flex;align-items:center;gap:10px}
+.step-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--color-info);color:#fff;font-size:13px;font-weight:700;flex-shrink:0}
+.sub-t{font-size:13px;font-weight:600;color:var(--color-info);margin:14px 0 8px;display:flex;align-items:center;gap:8px}
+.sub-t::after{content:"";flex:1;border-top:1px dashed var(--border)}
+
+/* champs */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.field{min-width:0;display:flex;flex-direction:column}
+.field.full{grid-column:1/-1}
+.field label{font-size:12px;color:var(--text2);margin-bottom:4px}
+.field label .u{color:var(--text3)}
+input,select{width:100%;padding:8px 10px;font-size:14px;border:.5px solid var(--border);border-radius:6px;background:#fff;color:var(--text)}
+input[type=number]{font-variant-numeric:tabular-nums}
+input:focus,select:focus{outline:2px solid var(--color-info);outline-offset:-1px}
+.hint{font-size:11px;color:var(--text2);font-style:italic;margin-top:3px;line-height:1.35}
+.linked{grid-column:1/-1;background:var(--formbg);border-radius:6px;padding:10px 12px 12px;display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.linked .lt{grid-column:1/-1;font-size:11px;color:var(--color-info);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.linked .three{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+
+button.b{padding:8px 14px;font-size:14px;border:.5px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;transition:all .15s;color:var(--text)}
+button.b:hover:not(:disabled){background:var(--formbg);border-color:var(--teal)}
+button.b:disabled{opacity:.5;cursor:not-allowed}
+button.b.primary{background:var(--color-info);color:#fff;border-color:var(--color-info)}
+button.b.primary:hover{background:#163759;border-color:#163759}
+button.b.sm{padding:5px 10px;font-size:12.5px}
+button.b.active{background:var(--color-warning);color:#fff;border-color:var(--color-warning)}
+button.b.opt{border-color:var(--color-info);color:var(--color-info);font-weight:600}
+button.b.opt:hover{background:var(--color-info);color:#fff}
+
+/* site */
+.paste-label{display:block;font-size:13px;font-weight:600;color:var(--color-info);margin-bottom:6px}
+.paste-input{padding:11px 13px;font-size:15px;border:2px solid var(--color-info);border-radius:6px}
+.paste-input:focus{outline:none;box-shadow:0 0 0 3px rgba(31,78,121,.15)}
+.addr-wrap{position:relative;margin-bottom:12px}
+.addr-list{position:absolute;left:0;right:0;top:100%;z-index:30;background:#fff;border:.5px solid var(--border);border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.12);max-height:240px;overflow:auto}
+.addr-item{padding:7px 10px;font-size:13px;cursor:pointer}
+.addr-item:hover,.addr-item:focus{background:var(--formbg);outline:none}
+.addr-item.empty{color:var(--text2);cursor:default;font-style:italic}
+.feedback{font-size:12px;margin-top:6px;min-height:16px;color:var(--text2)}
+.ok{color:var(--color-success)} .warn{color:#B86E00} .err{color:var(--color-danger)}
+details.manual{margin:6px 0 12px}
+details.manual summary{cursor:pointer;font-size:12px;color:var(--text2);padding:4px 0;display:inline-block}
+details.manual summary:hover,details.manual[open] summary{color:var(--color-info)}
+.mapbox{position:relative;height:280px;border-radius:6px;overflow:hidden;background:#dfe6ea;border:.5px solid var(--border)}
+.mapbox canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.mapbox.pick canvas{cursor:crosshair}
+.mapbox.pick{outline:2px dashed var(--color-warning);outline-offset:2px}
+.mapzoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:4px}
+.mapzoom button{width:30px;height:30px;padding:0;border:.5px solid var(--border);border-radius:5px;background:#fff;font-size:17px;line-height:1;cursor:pointer}
+.mapzoom button:hover{background:var(--formbg)}
+.map-tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.map-msg{font-size:12px;color:var(--text2);margin-top:6px;min-height:16px}
+.selection{background:var(--color-info-bg);border-left:3px solid var(--color-info);padding:6px 12px;margin-top:8px;border-radius:0 4px 4px 0;font-size:12.5px;line-height:1.4;color:var(--color-info)}
+.selection[hidden]{display:none}
+.dialrow{display:flex;gap:12px;align-items:center;grid-column:1/-1}
+.dialrow svg{flex:0 0 96px;height:96px}
+.dialrow p{margin:0;font-size:12px;color:var(--text2)}
+textarea{width:100%;min-height:70px;border:.5px solid var(--border);border-radius:6px;font-family:Consolas,ui-monospace,monospace;font-size:12px;padding:6px;margin-top:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* simulation */
+#status{font-size:13px;color:var(--text2);margin:0 0 10px;padding:7px 12px;background:var(--formbg);border-left:3px solid var(--teal);border-radius:4px}
+.stage{position:relative;height:min(58vh,560px);min-height:320px;border-radius:6px;overflow:hidden;background:#EAF0F5;border:.5px solid var(--border)}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.hud{position:absolute;left:10px;top:10px;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 20px);pointer-events:none}
+.chip{background:rgba(255,255,255,.92);border:.5px solid var(--border);border-radius:4px;padding:3px 8px;font-size:12.5px;font-variant-numeric:tabular-nums}
+.chip b{font-weight:600;color:var(--text2);margin-right:5px;font-size:11.5px}
+.chip.hot{border-color:var(--color-warning);background:var(--color-warning-bg);color:#8a5200}
+.views{position:absolute;right:10px;bottom:10px;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.views button{background:rgba(255,255,255,.94)}
+.views button[aria-pressed="true"]{background:var(--color-info);color:#fff;border-color:var(--color-info)}
+.nogl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--text2)}
+.timebar{margin-top:10px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px 12px;align-items:center}
+.clock{font-size:24px;font-weight:600;color:var(--color-info);font-variant-numeric:tabular-nums;min-width:66px}
+.timebar input[type=range]{padding:0;accent-color:var(--color-warning)}
+.timebar .ctl{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.timebar .ctl input,.timebar .ctl select{width:auto;padding:5px 8px;font-size:13px}
+.timebar .sep{width:1px;height:22px;background:var(--border)}
+.lbl{font-size:12px;color:var(--text2)}
+
+/* coupe & graphiques */
+.svgbox{overflow-x:auto}
+.svgbox svg{display:block;width:100%;height:auto}
+#coupe svg{max-height:560px;width:auto;max-width:100%;margin:0 auto}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--text2);align-items:center}
+.legend i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:5px}
+.grad{display:inline-block;width:80px;height:8px;vertical-align:middle;background:linear-gradient(90deg,var(--color-info-bg),var(--color-warning));margin:0 5px;border-radius:2px}
+.sw{display:inline-block;width:12px;height:8px;vertical-align:middle;background:#eeeeea;border:.5px solid var(--border);margin-right:5px}
+.ax{stroke:#ececec;stroke-width:1}
+.axt{fill:var(--text2);font-size:10.5px;font-family:var(--f)}
+.c-wall{fill:url(#hatch);stroke:var(--text);stroke-width:1.2}
+.c-hatch{stroke:#9a9a9a;stroke-width:.8}
+.c-glass{stroke:var(--teal);stroke-width:4}
+.c-slat{fill:#2b3640}
+.c-cons{fill:#e8ecef;stroke:#b9c2c9;stroke-width:1}
+.c-axis{stroke:var(--text3);stroke-width:1;stroke-dasharray:6 4;fill:none}
+.c-ray{stroke:var(--sunline);stroke-width:1.4}
+.c-rayoff{stroke:var(--sunline);stroke-width:1;stroke-dasharray:2 4;opacity:.5}
+.c-dot{fill:var(--color-warning)}
+.c-dim{stroke:var(--text2);stroke-width:1;fill:none}
+.c-t{fill:var(--text2);font-family:var(--f)}
+.c-tb{fill:var(--color-info);font-family:var(--f);font-weight:700}
+.c-tsun{fill:var(--sunline);font-family:var(--f);font-weight:600}
+.cell{cursor:pointer}
+.cell:hover{stroke:var(--text);stroke-width:1}
+
+/* optimisation */
+.objectifs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.prio{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;font-size:12.5px;color:var(--text2);margin:12px 0}
+.prio input{padding:0;accent-color:var(--color-info)}
+.opt-btns{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.optres{margin-top:12px;border:.5px solid var(--border);border-left:3px solid var(--color-success);background:var(--color-success-bg);border-radius:0 6px 6px 0;padding:10px 12px;display:flex;flex-direction:column;gap:5px;font-size:13.5px}
+.optres[hidden]{display:none}
+.optres .head{font-weight:600;color:#14694F}
+.num{font-variant-numeric:tabular-nums}
+
+/* analyse */
+.an-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+.panel{display:flex;flex-direction:column;gap:9px;min-width:0}
+.panel-title{font-size:13px;font-weight:600;color:var(--color-info)}
+.big{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.big .n{font-size:46px;font-weight:700;line-height:1;color:var(--color-warning);font-variant-numeric:tabular-nums}
+.big .t{font-size:13px;color:var(--text2);max-width:24ch}
+.meter{height:8px;background:var(--color-info-bg);border-radius:4px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--color-warning);width:0;transition:width .15s}
+.note{font-size:12px;color:var(--text2);margin:0}
+.refs{display:flex;flex-direction:column;gap:8px}
+.ref{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 10px;align-items:center;font-size:13px}
+.ref .v{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.ref .meter{grid-column:2/4;height:6px}
+.pill{font-size:11px;font-weight:700;padding:1px 8px;border-radius:10px;white-space:nowrap}
+.pill.s{background:var(--color-warning-bg);color:#8a5200}
+.pill.w{background:var(--color-info-bg);color:var(--color-info)}
+.state{font-size:11px;padding:1px 7px;border-radius:10px;font-weight:600}
+.state.g{background:var(--color-success-bg);color:#14694F}
+.state.a{background:var(--color-warning-bg);color:#8a5200}
+.state.r{background:var(--color-danger-bg);color:#B3302F}
+.score{display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--border);padding-top:8px;gap:8px}
+.score .n{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* pied de page */
+footer{padding-block:1rem 1.5rem;font-size:11px;color:var(--text3);text-align:center;border-top:.5px solid var(--border);margin-top:1rem}
+footer .warnline{margin-top:6px;font-style:italic;color:#8a4a1f}
+.footer-license{margin-top:14px;padding-top:10px;border-top:1px dashed var(--border);display:flex;flex-direction:column;align-items:center;gap:8px}
+.cc-link{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--text2);padding:4px 8px;border-radius:4px;flex-wrap:wrap;justify-content:center}
+.cc-link:hover{background:var(--formbg);color:var(--color-info)}
+.cc-logo{height:24px;width:auto;flex-shrink:0}
+.cc-text{font-size:11px;line-height:1.4}
+.cc-text b{color:var(--text);font-weight:600}
+.linkbtn{background:none;border:0;color:var(--color-info);text-decoration:underline;cursor:pointer;font-size:12px;padding:2px}
+
+/* carrousel */
+.onboard-overlay{position:fixed;inset:0;z-index:9999;background:rgba(31,78,121,.55);display:flex;align-items:center;justify-content:center;animation:fadeIn .25s ease;padding:16px}
+.onboard-overlay.closing{animation:fadeOut .25s ease forwards}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{to{opacity:0}}
+.onboard-card{background:#fff;border-radius:12px;padding:32px 28px;max-width:540px;width:100%;text-align:center;box-shadow:0 12px 48px rgba(0,0,0,.25);position:relative;animation:cardSlideIn .3s ease;max-height:calc(100vh - 32px);overflow:auto}
+@keyframes cardSlideIn{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:none}}
+.onboard-skip{position:absolute;top:10px;right:12px;background:none;border:none;font-size:26px;cursor:pointer;color:var(--text3);padding:0;line-height:1;width:32px;height:32px}
+.onboard-skip:hover{color:var(--color-danger)}
+.onboard-icon{font-size:46px;margin-bottom:12px;line-height:1}
+.onboard-title{font-size:20px;font-weight:600;color:var(--color-info);margin-bottom:12px}
+.onboard-body{font-size:14px;line-height:1.55;margin-bottom:22px;min-height:84px;text-align:left}
+.onboard-body b{color:var(--color-info)}
+.onboard-progress{display:flex;justify-content:center;gap:6px;margin-bottom:18px}
+.onb-dot{width:8px;height:8px;border-radius:50%;background:rgba(31,78,121,.2);transition:background .2s,transform .2s;border:0;padding:0;cursor:pointer}
+.onb-dot.active{background:var(--color-info);transform:scale(1.3)}
+.onboard-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.onboard-actions button{min-width:130px}
+@media (prefers-reduced-motion:reduce){.onboard-overlay,.onboard-card{animation:none}.meter i{transition:none}}
+@media (max-width:440px){.fgrid,.linked{grid-template-columns:1fr}.linked .three{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div>
+      <h1><span class="brand">Ombrage</span> — Simulation d’ombrage de brise-soleil à lames</h1>
+      <p>Course du soleil (formules NOAA / Meeus) — adresses et photo aérienne IGN Géoplateforme — J.Pineau + Claude · v1.0.0</p>
+    </div>
+    <button class="guide-btn" id="guide-btn" type="button">? Revoir le guide</button>
+  </div>
+</header>
+<div class="wrap">
+  <div class="disclaimer"><span aria-hidden="true">⚠</span><span><b>Avertissement :</b> Cet outil est fourni à des fins pédagogiques et d’assistance au pré-dimensionnement. Les résultats doivent être vérifiés par un professionnel qualifié.</span></div>
+</div>
+
+<main class="wrap layout">
+  <div class="col">
+    <section class="card" aria-labelledby="h-site">
+      <h2 id="h-site"><span class="step-badge">1</span>Site</h2>
+      <div class="addr-wrap">
+        <label for="addr" class="paste-label">🔎 Recherche par adresse</label>
+        <input id="addr" type="text" class="paste-input" placeholder="Rue, ville… ex : 12 rue de la Paix, Rennes" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="addr-list">
+        <div id="addr-list" class="addr-list" role="listbox" hidden></div>
+      </div>
+      <label for="paste" class="paste-label">📍 Coordonnées GPS du site</label>
+      <input id="paste" type="text" class="paste-input" placeholder="Collez vos coordonnées : 48.1173, -1.6778" autocomplete="off">
+      <div id="paste-fb" class="feedback" aria-live="polite"></div>
+      <details class="manual">
+        <summary>ou saisir manuellement la latitude et la longitude</summary>
+        <div class="fgrid" style="margin-top:8px">
+          <div class="field"><label for="f-lat">Latitude <span class="u">(°)</span></label><input id="f-lat" type="number" step="0.000001" inputmode="decimal"></div>
+          <div class="field"><label for="f-lon">Longitude <span class="u">(°)</span></label><input id="f-lon" type="number" step="0.000001" inputmode="decimal"></div>
+        </div>
+      </details>
+      <div class="sub-t">Photo aérienne et tracé du mur</div>
+      <div class="mapbox" id="mapbox">
+        <canvas id="map" aria-label="Photo aérienne du site"></canvas>
+        <div class="mapzoom"><button type="button" id="zin" aria-label="Zoomer">+</button><button type="button" id="zout" aria-label="Dézoomer">−</button></div>
+      </div>
+      <div class="map-tools">
+        <button class="b sm" id="m-wall" type="button">📏 Tracer le mur</button>
+        <button class="b sm" id="m-flip" type="button">⇄ Inverser l’extérieur</button>
+        <button class="b sm" id="m-move" type="button">📍 Déplacer le point</button>
+        <button class="b sm" id="m-clear" type="button">Effacer le tracé</button>
+      </div>
+      <div class="map-msg" id="map-msg" aria-live="polite"></div>
+      <div class="selection" id="wall-info" hidden></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-fac">
+      <h2 id="h-fac"><span class="step-badge">2</span>Façade et fenêtre</h2>
+      <div class="fgrid" id="fields-facade"></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-bs">
+      <h2 id="h-bs"><span class="step-badge">3</span>Brise-soleil</h2>
+      <div class="sub-t" style="margin-top:0">Support</div>
+      <div class="fgrid" id="fields-support"></div>
+      <div class="sub-t">Lames</div>
+      <div class="fgrid" id="fields-lames"></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-cfg">
+      <h2 id="h-cfg">Réglages enregistrés</h2>
+      <p class="note">Les réglages sont gardés dans ce navigateur. Pour les transmettre, copie-les puis colle-les sur un autre poste.</p>
+      <div class="row" style="margin-top:8px">
+        <button id="cfg-copy" class="b sm" type="button">Copier les réglages</button>
+        <button id="cfg-reset" class="b sm" type="button">Valeurs d’exemple</button>
+      </div>
+      <textarea id="cfg-txt" placeholder="Colle ici des réglages copiés…" aria-label="Réglages à importer"></textarea>
+      <div class="row" style="margin-top:6px"><button id="cfg-load" class="b sm" type="button">Charger ces réglages</button></div>
+      <p id="cfg-msg" class="feedback"></p>
+    </section>
+  </div>
+
+  <div class="col">
+    <section class="card" aria-labelledby="h-3d">
+      <h2 id="h-3d"><span class="step-badge">4</span>Simulation 3D</h2>
+      <div id="status"></div>
+      <div class="stage" id="stage">
+        <div class="hud" id="hud"></div>
+        <div class="views" role="group" aria-label="Point de vue">
+          <button class="b sm" data-view="persp" aria-pressed="true" type="button">Perspective</button>
+          <button class="b sm" data-view="face" aria-pressed="false" type="button">Face</button>
+          <button class="b sm" data-view="cote" aria-pressed="false" type="button">Côté</button>
+          <button class="b sm" data-view="sun" aria-pressed="false" type="button">Vue du soleil</button>
+        </div>
+      </div>
+      <div class="timebar">
+        <div class="clock" id="clock">14:00</div>
+        <input id="t-slider" type="range" min="0" max="1439" step="1" aria-label="Heure">
+        <button id="play" class="b primary" aria-pressed="false" type="button">▶ Lecture</button>
+        <div class="ctl">
+          <input id="t-date" type="date" aria-label="Date">
+          <button class="b sm" data-preset="ete" type="button">21 juin</button>
+          <button class="b sm" data-preset="equi" type="button">Équinoxe</button>
+          <button class="b sm" data-preset="hiver" type="button">21 déc.</button>
+          <button class="b sm" data-preset="now" type="button">Maintenant</button>
+          <span class="sep" aria-hidden="true"></span>
+          <label class="lbl" for="t-mode">Défilement</label>
+          <select id="t-mode"><option value="h">heures</option><option value="d">jours, même heure</option></select>
+          <label class="lbl" for="t-speed">Vitesse</label>
+          <select id="t-speed"></select>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-coupe">
+      <h2 id="h-coupe"><span class="step-badge">5</span>Coupe verticale du brise-soleil</h2>
+      <p class="note" style="margin:-6px 0 8px">Au milieu de la fenêtre, rayons projetés selon l’angle de profil.</p>
+      <div class="svgbox" id="coupe"></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-opt">
+      <h2 id="h-opt"><span class="step-badge">6</span>Optimisation</h2>
+      <div class="objectifs">
+        <div class="field"><label for="o-sum">Jour de référence été</label><input id="o-sum" type="date"></div>
+        <div class="field"><label for="o-win">Jour de référence hiver</label><input id="o-win" type="date"></div>
+      </div>
+      <div class="prio"><span>Apports d’hiver</span><input id="o-prio" type="range" min="0" max="100" step="5" aria-label="Priorité entre apports d’hiver et protection d’été"><span>Protection d’été</span></div>
+      <div class="opt-btns">
+        <button class="b opt" data-opt="lt" type="button">Inclinaison des lames</button>
+        <button class="b opt" data-opt="pente" type="button">Inclinaison du support</button>
+        <button class="b opt" data-opt="D" type="button">Longueur du support</button>
+        <button class="b primary" data-opt="all" type="button">Tout optimiser</button>
+      </div>
+      <div class="optres" id="optres" hidden></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-an">
+      <h2 id="h-an"><span class="step-badge">7</span>Analyse de l’ensoleillement</h2>
+      <div class="an-grid">
+        <div class="panel">
+          <div class="panel-title">Vitrage au soleil à cet instant</div>
+          <div class="big"><span class="n" id="b-pct">—</span><span class="t" id="b-pct-t">de la surface vitrée au soleil</span></div>
+          <div class="meter"><i id="b-bar"></i></div>
+          <p class="note" id="b-day"></p>
+          <div class="refs" id="b-refs"></div>
+          <div class="score"><span>Indice d’efficacité <span class="state" id="b-state"></span></span><span class="n" id="b-score">—</span></div>
+          <p class="note">Part du rayonnement direct reçu par le vitrage sur la journée, par ciel clair, comparée à une fenêtre sans brise-soleil. Le but : peu en été, beaucoup en hiver.</p>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Profil de la journée</div>
+          <div class="legend"><span><i style="background:var(--text)"></i>Date affichée</span><span><i style="background:var(--sunline)"></i>Réf. été</span><span><i style="background:var(--color-info)"></i>Réf. hiver</span></div>
+          <div class="svgbox" id="daychart"></div>
+          <p class="note">Surface vitrée au soleil, en %, heure par heure. Les courbes s’arrêtent quand le soleil ne frappe plus la façade.</p>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <div class="panel-title">Carte annuelle</div>
+        <p class="note">Le 21 de chaque mois, de 4 h à 22 h. Clique une case pour l’afficher.</p>
+        <div class="svgbox" id="heat"></div>
+        <div class="legend"><span>0 %<span class="grad"></span>100 % au soleil</span><span><span class="sw"></span>pas de soleil sur la façade</span></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="wrap">
+  <div>Position du soleil : formules NOAA / J. Meeus · Rayonnement direct par ciel clair (modèle de Meinel) · Adresses et photo aérienne © IGN — Géoplateforme</div>
+  <div class="warnline">⚠ Cet outil est fourni à des fins pédagogiques et d’assistance au pré-dimensionnement. Les résultats doivent être vérifiés par un professionnel qualifié.</div>
+  <div class="footer-license">
+    <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr" target="_blank" rel="noopener" class="cc-link" aria-label="Licence Creative Commons BY-NC-ND 4.0 (ouvre dans un nouvel onglet)">
+      <svg class="cc-logo" viewBox="0 0 152 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g font-family="Arial, Helvetica, sans-serif" font-weight="700">
+          <circle cx="16" cy="16" r="15" fill="#fff" stroke="#1F4E79" stroke-width="1.4"/>
+          <text x="16" y="21" font-size="14" text-anchor="middle" fill="#1F4E79">cc</text>
+          <circle cx="52" cy="16" r="15" fill="#fff" stroke="#1F4E79" stroke-width="1.4"/>
+          <circle cx="52" cy="11" r="2.4" fill="#1F4E79"/>
+          <path d="M46 24 L46 18 Q46 14 52 14 Q58 14 58 18 L58 24 M49 24 L49 28 M55 24 L55 28" stroke="#1F4E79" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="88" cy="16" r="15" fill="#fff" stroke="#1F4E79" stroke-width="1.4"/>
+          <text x="88" y="22" font-size="15" text-anchor="middle" fill="#1F4E79">$</text>
+          <line x1="78" y1="6" x2="98" y2="26" stroke="#1F4E79" stroke-width="2"/>
+          <circle cx="124" cy="16" r="15" fill="#fff" stroke="#1F4E79" stroke-width="1.4"/>
+          <line x1="116" y1="13" x2="132" y2="13" stroke="#1F4E79" stroke-width="2.4"/>
+          <line x1="116" y1="19" x2="132" y2="19" stroke="#1F4E79" stroke-width="2.4"/>
+        </g>
+      </svg>
+      <span class="cc-text">Licence Creative Commons <b>BY-NC-ND 4.0</b> — Attribution, Pas d’utilisation commerciale, Pas de modification · © 2026 Jean Pineau</span>
+    </a>
+    <button class="linkbtn" id="guide-btn2" type="button">Revoir le guide de démarrage</button>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const rad=Math.PI/180, deg=180/Math.PI;
+const nf0=new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0});
+const nf1=new Intl.NumberFormat('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1});
+const nf2=new Intl.NumberFormat('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const nf5=new Intl.NumberFormat('fr-FR',{minimumFractionDigits:5,maximumFractionDigits:5});
+const pad=n=>String(n).padStart(2,'0');
+const hhmm=m=>{m=Math.round(m);m=((m%1440)+1440)%1440;return pad(Math.floor(m/60))+':'+pad(m%60)};
+const YEAR=new Date().getFullYear();
+const GPF='https://data.geopf.fr';
+
+/* ---------- état ---------- */
+const DEF={
+  place:'Exemple — Rennes centre', lat:48.11173, lon:-1.67957,
+  azim:180, W:1200, H:1350, A:900, L:2250, reveal:0,
+  Ha:2400, band:150, pente:0, dg:200, dd:200, D:800, cw:40, ch:80,
+  N:6, lw:100, le:25, lt:15,
+  date:YEAR+'-06-21', minutes:14*60,
+  sumDate:YEAR+'-06-21', winDate:YEAR+'-12-21', prio:50,
+  mode:'h', speed:30, wall:null
+};
+const KEY='ombrage-v2';
+let S=load()||{...DEF};
+function load(){try{const t=localStorage.getItem(KEY)||localStorage.getItem('ombrage-v1');if(!t)return null;return {...DEF,...JSON.parse(t)}}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+/* ---------- position du soleil (NOAA / Meeus) ---------- */
+function sunPos(ms,lat,lon){
+  const jd=ms/86400000+2440587.5, T=(jd-2451545)/36525;
+  const L0=((280.46646+T*(36000.76983+T*0.0003032))%360+360)%360;
+  const M=(357.52911+T*(35999.05029-0.0001537*T))*rad;
+  const e=0.016708634-T*(0.000042037+0.0000001267*T);
+  const C=Math.sin(M)*(1.914602-T*(0.004817+0.000014*T))+Math.sin(2*M)*(0.019993-0.000101*T)+Math.sin(3*M)*0.000289;
+  const om=(125.04-1934.136*T)*rad;
+  const lam=(L0+C-0.00569-0.00478*Math.sin(om))*rad;
+  const eps0=23+(26+(21.448-T*(46.815+T*(0.00059-T*0.001813)))/60)/60;
+  const eps=(eps0+0.00256*Math.cos(om))*rad;
+  const dec=Math.asin(Math.sin(eps)*Math.sin(lam));
+  const y=Math.tan(eps/2)**2, L0r=L0*rad;
+  const eot=4*deg*(y*Math.sin(2*L0r)-2*e*Math.sin(M)+4*e*y*Math.sin(M)*Math.cos(2*L0r)-0.5*y*y*Math.sin(4*L0r)-1.25*e*e*Math.sin(2*M));
+  const mUTC=((ms/60000)%1440+1440)%1440;
+  let tst=(mUTC+eot+4*lon)%1440; if(tst<0)tst+=1440;
+  const ha=(tst/4-180)*rad, la=lat*rad;
+  let cz=Math.sin(la)*Math.sin(dec)+Math.cos(la)*Math.cos(dec)*Math.cos(ha);
+  cz=Math.max(-1,Math.min(1,cz));
+  let el=90-Math.acos(cz)*deg;
+  if(el>-1) el+=1.02/Math.tan((el+10.3/(el+5.11))*rad)/60;
+  let az=Math.atan2(Math.sin(ha),Math.cos(ha)*Math.sin(la)-Math.tan(dec)*Math.cos(la))*deg+180;
+  return {az:(az+360)%360,el,dec:dec*deg};
+}
+/* repère façade : x à droite vu de l'extérieur, y vers le haut, z sortant */
+function toLocal(az,el,fa){const g=(az-fa)*rad,h=el*rad;return {x:-Math.cos(h)*Math.sin(g),y:Math.sin(h),z:Math.cos(h)*Math.cos(g)}}
+function msOf(ds,min){const [y,m,d]=ds.split('-').map(Number);min=Math.max(0,Math.min(1439.99,min));return new Date(y,m-1,d,Math.floor(min/60),Math.floor(min%60),Math.round((min%1)*60)).getTime()}
+function dni(el){if(el<=0)return 0;const z=90-el,am=1/(Math.cos(z*rad)+0.50572*Math.pow(96.07995-z,-1.6364));return 1353*Math.pow(0.7,Math.pow(am,0.678))}
+function sunAt(T,ds,min){const p=sunPos(msOf(ds,min),T.lat,T.lon);return {...p,s:toLocal(p.az,p.el,T.azim)}}
+
+/* ---------- géométrie (mm) ---------- */
+function clean(T){
+  const o={...T};
+  o.W=Math.max(10,+o.W||0); o.A=+o.A||0; o.L=Math.max(o.A+10,+o.L||0);
+  o.reveal=Math.max(0,+o.reveal||0); o.D=Math.max(10,+o.D||0);
+  o.N=Math.max(1,Math.min(200,Math.round(+o.N||1))); o.lw=Math.max(1,+o.lw||1); o.le=Math.max(1,+o.le||1);
+  o.cw=Math.max(5,+o.cw||40); o.ch=Math.max(5,+o.ch||80);
+  o.dg=+o.dg||0; o.dd=+o.dd||0; o.pente=+o.pente||0; o.lt=+o.lt||0; o.Ha=+o.Ha||0;
+  return o;
+}
+function geom(T0){
+  const T=clean(T0), b=T.pente*rad, phi=(T.lt-T.pente)*rad;
+  const x0=-T.dg, x1=T.W+T.dd, Lx=Math.max(10,x1-x0), cx=(x0+x1)/2, boxes=[];
+  for(let i=0;i<T.N;i++){const t=T.D*(i+0.5)/T.N;
+    boxes.push({k:'slat',c:[cx,T.Ha-t*Math.sin(b),t*Math.cos(b)],a:[[1,0,0],[0,Math.sin(phi),Math.cos(phi)],[0,Math.cos(phi),-Math.sin(phi)]],h:[Lx/2,T.lw/2,T.le/2]})}
+  const cw=Math.min(T.cw,Lx/2);
+  for(const xc of [x0+cw/2,x1-cw/2]) boxes.push({k:'cons',c:[xc,T.Ha-T.D/2*Math.sin(b),T.D/2*Math.cos(b)],a:[[1,0,0],[0,-Math.sin(b),Math.cos(b)],[0,Math.cos(b),Math.sin(b)]],h:[cw/2,T.D/2,T.ch/2]});
+  return {T,boxes,b,phi,x0,x1,Lx,cx,cw,win:{x0:0,x1:T.W,y0:T.A,y1:T.L,r:T.reveal}};
+}
+function hitBox(B,p,d){
+  let tmin=-Infinity,tmax=Infinity;
+  for(let k=0;k<3;k++){const a=B.a[k],hk=B.h[k];
+    const e=a[0]*(p[0]-B.c[0])+a[1]*(p[1]-B.c[1])+a[2]*(p[2]-B.c[2]), f=a[0]*d[0]+a[1]*d[1]+a[2]*d[2];
+    if(Math.abs(f)>1e-12){let t1=(-hk-e)/f,t2=(hk-e)/f;if(t1>t2){const q=t1;t1=t2;t2=q}if(t1>tmin)tmin=t1;if(t2<tmax)tmax=t2;if(tmin>tmax)return Infinity}
+    else if(Math.abs(e)>hk)return Infinity}
+  if(tmax<1e-6)return Infinity; return Math.max(tmin,0);
+}
+function isLit(G,p,d){
+  const w=G.win;
+  if(w.r>0){const t=-p[2]/d[2],x=p[0]+d[0]*t,y=p[1]+d[1]*t;if(x<w.x0||x>w.x1||y<w.y0||y>w.y1)return false}
+  for(const B of G.boxes)if(hitBox(B,p,d)!==Infinity)return false;
+  return true;
+}
+function litFraction(G,s,n){
+  if(s.y<=0.0005||s.z<=0.0005)return null;
+  const d=[s.x,s.y,s.z],w=G.win,z0=-w.r+0.5;let lit=0;
+  for(let i=0;i<n;i++){const x=w.x0+(w.x1-w.x0)*(i+0.5)/n;for(let j=0;j<n;j++){const y=w.y0+(w.y1-w.y0)*(j+0.5)/n;if(isLit(G,[x,y,z0],d))lit++}}
+  return lit/(n*n);
+}
+function dayStats(G,ds,step,n){
+  let sw=0,sf=0,first=null,last=null;
+  for(let m=step/2;m<1440;m+=step){const p=sunAt(G.T,ds,m),s=p.s;if(p.el<=0||s.z<=0)continue;
+    if(first===null)first=m;last=m;const w=dni(p.el)*s.z,f=litFraction(G,s,n);if(f===null)continue;sw+=w;sf+=w*f}
+  return {pass:sw>0?sf/sw:null,possible:sw*step/60/1000,got:sf*step/60/1000,first,last};
+}
+function scoreOf(ps,pw,prio){const k=prio/100;if(ps===null&&pw===null)return null;if(pw===null)return 1-ps;if(ps===null)return pw;return (1-k)*pw+k*(1-ps)}
+
+/* ---------- champs ---------- */
+const FIELDS={
+  facade:[
+    {dial:1},
+    {k:'azim',l:'Orientation de la façade',u:'°',step:0.5,full:1,h:'Direction vers laquelle regarde la façade, depuis le nord, sens horaire : 180° = plein sud, 90° = est. Se remplit aussi en traçant le mur sur la photo.'},
+    {k:'W',l:'Largeur de la fenêtre',u:'mm',step:10},
+    {k:'reveal',l:'Retrait de la menuiserie',u:'mm',step:10},
+    {hint:'Le retrait (profondeur du tableau) ajoute l’ombre de l’embrasure. 0 = menuiserie au nu.'},
+    {g:'Liés : hauteur = linteau − allège',three:['H','A','L']}
+  ],
+  support:[
+    {g:'Liés : accroche = linteau + bandeau',two:['Ha','band']},
+    {k:'pente',l:'Inclinaison du support',u:'°',step:0.5},
+    {k:'D',l:'Longueur (avancée)',u:'mm',step:10},
+    {hint:'0° = de niveau, positif = descend vers l’extérieur. La longueur se mesure le long du support depuis le nu de façade.'},
+    {k:'dg',l:'Débord à gauche',u:'mm',step:10},
+    {k:'dd',l:'Débord à droite',u:'mm',step:10},
+    {hint:'Gauche et droite vues depuis l’extérieur.'},
+    {k:'cw',l:'Largeur des consoles',u:'mm',step:5},
+    {k:'ch',l:'Hauteur des consoles',u:'mm',step:5},
+    {hint:'Deux consoles, une à chaque extrémité du support.'}
+  ],
+  lames:[
+    {k:'N',l:'Nombre de lames',u:'u',step:1},
+    {k:'lt',l:'Inclinaison sur le support',u:'°',step:0.5},
+    {k:'lw',l:'Largeur des lames',u:'mm',step:5},
+    {k:'le',l:'Épaisseur des lames',u:'mm',step:1},
+    {hint:'Inclinaison positive = bord extérieur relevé. Les lames sont réparties à pas égal sur la longueur du support.'}
+  ]
+};
+const LBL={H:['Hauteur fenêtre','mm',10],A:['Altimétrie allège','mm',10],L:['Altimétrie linteau','mm',10],Ha:['Altimétrie d’accroche','mm',10],band:['Bandeau linteau → accroche','mm',10]};
+const fieldHTML=(k,l,u,step,full)=>`<div class="field${full?' full':''}"><label for="f-${k}">${l} <span class="u">(${u})</span></label><input id="f-${k}" data-k="${k}" type="number" inputmode="decimal" step="${step}"></div>`;
+function renderFields(){
+  for(const [sec,arr] of Object.entries(FIELDS)){
+    let h='';
+    for(const f of arr){
+      if(f.dial)h+=`<div class="dialrow"><svg id="dial" viewBox="0 0 112 112" aria-label="Orientation de la façade"></svg><p id="dial-t"></p></div>`;
+      else if(f.hint)h+=`<div class="hint full" style="grid-column:1/-1;margin-top:-4px">${f.hint}</div>`;
+      else if(f.g){const ks=f.three||f.two;h+=`<div class="linked"><div class="lt">${f.g}</div>${f.three?'<div class="three">':''}${ks.map(k=>fieldHTML(k,...LBL[k])).join('')}${f.three?'</div>':''}</div>`}
+      else h+=fieldHTML(f.k,f.l,f.u,f.step,f.full)+(f.h?`<div class="hint" style="grid-column:1/-1;margin-top:-6px">${f.h}</div>`:'');
+    }
+    document.getElementById('fields-'+sec).innerHTML=h;
+  }
+  $$('input[data-k]').forEach(inp=>{
+    inp.addEventListener('input',()=>{const v=parseFloat(inp.value);if(isNaN(v))return;setParam(inp.dataset.k,v,inp)});
+    inp.addEventListener('change',()=>syncFields());
+  });
+}
+function setParam(k,v,src){
+  S[k]=v;
+  if(k==='azim')S.azim=((v%360)+360)%360;
+  if(k==='H'){S.L=S.A+v;S.Ha=S.L+S.band}
+  else if(k==='A'){S.L=S.A+S.H;S.Ha=S.L+S.band}
+  else if(k==='L'){S.H=S.L-S.A;S.Ha=S.L+S.band}
+  else if(k==='Ha'){S.band=S.Ha-S.L}
+  else if(k==='band'){S.Ha=S.L+S.band}
+  syncFields(src);changed();
+}
+function fmtField(k,v){const dec=['azim','pente','lt'].includes(k)?1:0;return String(Math.round(v*Math.pow(10,dec))/Math.pow(10,dec))}
+function syncFields(except){
+  $$('input[data-k]').forEach(inp=>{if(inp!==except)inp.value=fmtField(inp.dataset.k,S[inp.dataset.k])});
+  if(except!==$('#f-lat'))$('#f-lat').value=S.lat;
+  if(except!==$('#f-lon'))$('#f-lon').value=S.lon;
+}
+
+/* ---------- site : adresse, GPS ---------- */
+function validateCoords(lat,lon){
+  const fb=$('#paste-fb');
+  if(isNaN(lat)||isNaN(lon)||Math.abs(lat)>90||Math.abs(lon)>180){fb.className='feedback err';fb.textContent='✗ Coordonnées non reconnues. Format attendu : 48.1173, -1.6778';return false}
+  if(lat>41&&lat<51.5&&lon>-5.6&&lon<10){fb.className='feedback ok';fb.textContent='✓ Coordonnées en France métropolitaine — photo aérienne IGN disponible'}
+  else{fb.className='feedback warn';fb.textContent='⚠ Hors France métropolitaine : le calcul solaire fonctionne, la photo IGN peut manquer'}
+  return true;
+}
+function setSite(lat,lon,label,recenter){
+  const moved=S.wall&&distM(S.lat,S.lon,lat,lon)>300;
+  S.lat=+(+lat).toFixed(6);S.lon=+(+lon).toFixed(6);if(label)S.place=label;
+  if(moved)S.wall=null;
+  $('#paste').value=S.lat+', '+S.lon;validateCoords(S.lat,S.lon);
+  syncFields();if(recenter)mapCenter(S.lat,S.lon);
+  changed();
+}
+function parseGPS(t){
+  t=t.trim();if(!t)return null;let a,b;
+  if(t.includes(';')){[a,b]=t.split(';').map(x=>parseFloat(x.replace(',','.')))}
+  else{const m=t.match(/(-?\d+(?:\.\d+)?)\s*[,\s]\s*(-?\d+(?:\.\d+)?)/);if(!m)return null;a=parseFloat(m[1]);b=parseFloat(m[2])}
+  if(isNaN(a)||isNaN(b))return null;return [a,b];
+}
+const Geo=(()=>{
+  const inp=$('#addr'),list=$('#addr-list');let T=null,prog=false;
+  const hide=()=>{list.hidden=true;list.innerHTML='';inp.setAttribute('aria-expanded','false')};
+  const show=()=>{list.hidden=false;inp.setAttribute('aria-expanded','true')};
+  async function search(q){
+    try{
+      const r=await fetch(GPF+'/geocodage/search?q='+encodeURIComponent(q)+'&limit=6&index=address');
+      if(!r.ok)throw new Error(r.status);
+      const fs=((await r.json()).features||[]).filter(f=>f.geometry&&f.geometry.coordinates);
+      if(!fs.length){list.innerHTML='<div class="addr-item empty">Aucun résultat — précise la rue ou la ville</div>';show();return}
+      list.innerHTML='';
+      fs.forEach(f=>{const d=document.createElement('div');d.className='addr-item';d.tabIndex=0;d.setAttribute('role','option');
+        const p=f.properties||{};d.textContent=p.label||((p.name||'')+', '+(p.city||''));
+        const pick=()=>{const [lon,lat]=f.geometry.coordinates;prog=true;inp.value=d.textContent;prog=false;hide();mapZoom(19);setSite(lat,lon,d.textContent,true);flash('Site placé par adresse : '+d.textContent)};
+        d.addEventListener('click',pick);d.addEventListener('keydown',e=>{if(e.key==='Enter')pick()});list.appendChild(d)});
+      show();
+    }catch(e){list.innerHTML='<div class="addr-item empty">Le Géoportail ne répond pas. L’aperçu en ligne bloque les appels externes : ouvre la version locale du fichier, ou colle des coordonnées GPS.</div>';show()}
+  }
+  inp.addEventListener('input',()=>{if(prog)return;clearTimeout(T);const q=inp.value.trim();if(q.length<3){hide();return}T=setTimeout(()=>search(q),350)});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const f=list.querySelector('.addr-item:not(.empty)');if(f)f.click();else if(inp.value.trim().length>=3)search(inp.value.trim())}
+    if(e.key==='Escape')hide();if(e.key==='ArrowDown'){const f=list.querySelector('.addr-item:not(.empty)');if(f){e.preventDefault();f.focus()}}});
+  document.addEventListener('click',e=>{if(!list.contains(e.target)&&e.target!==inp)hide()});
+  async function reverse(lat,lon){
+    try{const r=await fetch(GPF+'/geocodage/reverse?lon='+lon+'&lat='+lat+'&limit=1&index=address');if(!r.ok)return;
+      const f=((await r.json()).features||[])[0];if(f&&f.properties&&f.properties.label){S.place=f.properties.label;prog=true;inp.value=S.place;prog=false;updateStatus();save()}}catch(e){}
+  }
+  return {reverse};
+})();
+function flash(t){const m=$('#map-msg');m.className='map-msg ok';m.textContent=t}
+
+/* ---------- carte : photo aérienne IGN (WMTS) ---------- */
+const MAP={z:18,lat:S.lat,lon:S.lon,mode:'none',pts:[],hover:null,tiles:new Map(),tms:'PM',tmsTried:false,ok:0,fail:0,w:300,h:280,dpr:1,need:true,ptr:new Map()};
+const cv=$('#map'),cx=cv.getContext('2d');
+function wpx(lat,lon,z){const n=256*Math.pow(2,z),s=Math.sin(Math.max(-85,Math.min(85,lat))*rad);return {x:n*(lon+180)/360,y:n*(0.5-Math.log((1+s)/(1-s))/(4*Math.PI))}}
+function wgeo(x,y,z){const n=256*Math.pow(2,z),m=Math.PI*(1-2*y/n);return {lat:Math.atan(Math.sinh(m))*deg,lon:x/n*360-180}}
+function s2g(sx,sy){const c=wpx(MAP.lat,MAP.lon,MAP.z);return wgeo(c.x+sx-MAP.w/2,c.y+sy-MAP.h/2,MAP.z)}
+function g2s(lat,lon){const c=wpx(MAP.lat,MAP.lon,MAP.z),p=wpx(lat,lon,MAP.z);return {x:p.x-c.x+MAP.w/2,y:p.y-c.y+MAP.h/2}}
+function distM(a,b,c,d){const R=6371000,dl=(c-a)*rad,dn=(d-b)*rad,h=Math.sin(dl/2)**2+Math.cos(a*rad)*Math.cos(c*rad)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function mapCenter(lat,lon){MAP.lat=lat;MAP.lon=lon;MAP.need=true}
+function mapZoom(z,ax,ay){
+  z=Math.max(4,Math.min(21,z));
+  if(ax===undefined){MAP.z=z;MAP.need=true;return}
+  const g=s2g(ax,ay);MAP.z=z;const p=wpx(g.lat,g.lon,z),c=wgeo(p.x-(ax-MAP.w/2),p.y-(ay-MAP.h/2),z);MAP.lat=c.lat;MAP.lon=c.lon;MAP.need=true;
+}
+function tileURL(z,x,y){return GPF+'/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET='+MAP.tms+'&TILEMATRIX='+z+'&TILEROW='+y+'&TILECOL='+x}
+function tile(z,x,y){
+  const k=MAP.tms+'/'+z+'/'+x+'/'+y;let t=MAP.tiles.get(k);if(t)return t;
+  if(MAP.tiles.size>400)MAP.tiles.clear();
+  const img=new Image();t={img,st:0};MAP.tiles.set(k,t);
+  img.onload=()=>{t.st=1;MAP.ok++;MAP.need=true;mapNotice()};
+  img.onerror=()=>{t.st=-1;MAP.fail++;
+    if(MAP.ok===0&&!MAP.tmsTried&&MAP.fail>=2){MAP.tmsTried=true;MAP.tms='PM_0_19';MAP.tiles.clear();MAP.fail=0}
+    MAP.need=true;mapNotice()};
+  img.src=tileURL(z,x,y);return t;
+}
+function mapNotice(){
+  const m=$('#map-msg');if(MAP.mode!=='none')return;
+  if(MAP.ok===0&&MAP.fail>=4&&MAP.tmsTried){m.className='map-msg warn';m.textContent='Photo aérienne indisponible ici : l’aperçu en ligne bloque les serveurs IGN. Ouvre la version locale du fichier. Le tracé du mur reste possible sur la grille.'}
+}
+function resizeMap(){const r=cv.getBoundingClientRect();MAP.w=Math.max(50,r.width);MAP.h=Math.max(50,r.height);MAP.dpr=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(MAP.w*MAP.dpr);cv.height=Math.round(MAP.h*MAP.dpr);MAP.need=true}
+function drawMap(){
+  MAP.need=false;const {w,h}=MAP;cx.setTransform(MAP.dpr,0,0,MAP.dpr,0,0);
+  cx.fillStyle='#dfe6ea';cx.fillRect(0,0,w,h);
+  const tz=Math.max(1,Math.min(19,Math.round(MAP.z))),sc=Math.pow(2,MAP.z-tz),c=wpx(MAP.lat,MAP.lon,tz),n=Math.pow(2,tz);
+  const tlx=c.x-(w/2)/sc,tly=c.y-(h/2)/sc,size=256*sc;
+  // grille de repli
+  cx.strokeStyle='rgba(31,78,121,.12)';cx.lineWidth=1;
+  for(let gx=Math.floor(tlx/64)*64;gx<tlx+w/sc;gx+=64){const sx=(gx-tlx)*sc;cx.beginPath();cx.moveTo(sx,0);cx.lineTo(sx,h);cx.stroke()}
+  for(let gy=Math.floor(tly/64)*64;gy<tly+h/sc;gy+=64){const sy=(gy-tly)*sc;cx.beginPath();cx.moveTo(0,sy);cx.lineTo(w,sy);cx.stroke()}
+  for(let tx=Math.floor(tlx/256);tx<=Math.floor((tlx+w/sc)/256);tx++)for(let ty=Math.floor(tly/256);ty<=Math.floor((tly+h/sc)/256);ty++){
+    if(ty<0||ty>=n)continue;const t=tile(tz,((tx%n)+n)%n,ty);
+    if(t.st===1)cx.drawImage(t.img,Math.floor((tx*256-tlx)*sc),Math.floor((ty*256-tly)*sc),Math.ceil(size)+1,Math.ceil(size)+1);
+  }
+  // point GPS
+  const P=g2s(S.lat,S.lon);
+  cx.lineWidth=3;cx.strokeStyle='#fff';cx.fillStyle='#1F4E79';
+  cx.beginPath();cx.arc(P.x,P.y,6,0,Math.PI*2);cx.fill();cx.stroke();
+  // mur
+  let mid=P;
+  const seg=(a,b)=>{cx.lineCap='round';cx.strokeStyle='rgba(0,0,0,.55)';cx.lineWidth=7;cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke();cx.strokeStyle='#FFD54F';cx.lineWidth=4;cx.stroke();
+    for(const q of [a,b]){cx.fillStyle='#FFD54F';cx.strokeStyle='#1a1a1a';cx.lineWidth=1.5;cx.beginPath();cx.arc(q.x,q.y,5,0,Math.PI*2);cx.fill();cx.stroke()}};
+  if(S.wall){const a=g2s(S.wall.a[0],S.wall.a[1]),b=g2s(S.wall.b[0],S.wall.b[1]);seg(a,b);mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2}}
+  if(MAP.mode==='wall'&&MAP.pts.length===1){const a=g2s(MAP.pts[0][0],MAP.pts[0][1]);seg(a,MAP.hover||a)}
+  // flèche façade (extérieur)
+  const arrow=(o,az,len,col,dash,label)=>{const dx=Math.sin(az*rad),dy=-Math.cos(az*rad),e={x:o.x+dx*len,y:o.y+dy*len};
+    cx.setLineDash(dash||[]);cx.lineCap='butt';cx.strokeStyle='rgba(0,0,0,.5)';cx.lineWidth=5;cx.beginPath();cx.moveTo(o.x,o.y);cx.lineTo(e.x,e.y);cx.stroke();
+    cx.strokeStyle=col;cx.lineWidth=2.5;cx.stroke();cx.setLineDash([]);
+    const hx=-dx,hy=-dy,px=-dy,py=dx;cx.fillStyle=col;cx.strokeStyle='rgba(0,0,0,.5)';cx.lineWidth=1;cx.beginPath();cx.moveTo(e.x+dx*4,e.y+dy*4);cx.lineTo(e.x+hx*9+px*6,e.y+hy*9+py*6);cx.lineTo(e.x+hx*9-px*6,e.y+hy*9-py*6);cx.closePath();cx.fill();cx.stroke();
+    if(label){cx.font='600 12px Calibri, Arial, sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.lineWidth=3;cx.strokeStyle='rgba(0,0,0,.65)';cx.strokeText(label,e.x+dx*16,e.y+dy*16);cx.fillStyle='#fff';cx.fillText(label,e.x+dx*16,e.y+dy*16)}};
+  if(!(MAP.mode==='wall'&&MAP.pts.length===1)){
+    const p=curSun();
+    if(p.el>0)arrow(mid,p.az,38,'#EF9F27',[5,4],'☀ '+hhmm(S.minutes));
+    arrow(mid,S.azim,70,'#7FC4FF',null,'ext.');
+  }
+  // échelle
+  const mpp=156543.03392*Math.cos(MAP.lat*rad)/Math.pow(2,MAP.z);let L=1;
+  for(const v of [1,2,5,10,20,50,100,200,500,1000,2000,5000])if(v/mpp<=110)L=v;
+  const bw=L/mpp;cx.fillStyle='rgba(255,255,255,.85)';cx.fillRect(8,h-24,bw+44,16);cx.fillStyle='#1a1a1a';cx.fillRect(12,h-14,bw,3);
+  cx.font='11px Calibri, Arial, sans-serif';cx.textAlign='left';cx.textBaseline='middle';cx.fillText(L>=1000?(L/1000)+' km':L+' m',16+bw,h-15);
+  cx.textAlign='right';cx.fillStyle='rgba(255,255,255,.9)';cx.fillText('© IGN',w-6,h-10);
+  // nord
+  cx.textAlign='center';cx.font='700 12px Calibri, Arial, sans-serif';cx.lineWidth=3;cx.strokeStyle='rgba(0,0,0,.6)';cx.strokeText('N ↑',22,16);cx.fillStyle='#fff';cx.fillText('N ↑',22,16);
+}
+function setMode(m){
+  MAP.mode=m;MAP.pts=[];MAP.hover=null;MAP.need=true;
+  $('#mapbox').classList.toggle('pick',m!=='none');
+  $('#m-wall').classList.toggle('active',m==='wall');$('#m-move').classList.toggle('active',m==='move');
+  const msg=$('#map-msg');msg.className='map-msg';
+  msg.textContent=m==='wall'?'Clique le premier point du mur, sur le nu de la façade. Échap pour annuler.':m==='move'?'Clique sur la photo pour placer le site.':'';
+  if(m==='none')mapNotice();
+}
+function wallDone(a,b){
+  const pa=wpx(a[0],a[1],22),pb=wpx(b[0],b[1],22),len=distM(a[0],a[1],b[0],b[1]);
+  if(len<0.3){setMode('none');const m=$('#map-msg');m.className='map-msg err';m.textContent='Les deux points sont trop proches. Zoome et recommence.';return}
+  const bear=(Math.atan2(pb.x-pa.x,-(pb.y-pa.y))*deg+360)%360;
+  const n1=(bear+90)%360,n2=(bear+270)%360,dif=(x,y)=>Math.abs(((x-y+540)%360)-180);
+  S.wall={a,b};S.azim=+(dif(n1,S.azim)<=dif(n2,S.azim)?n1:n2).toFixed(1);
+  setMode('none');syncFields();changed();
+  flash('Mur tracé : orientation de la façade mise à jour. Vérifie que la flèche « ext. » pointe vers l’extérieur, sinon clique « Inverser l’extérieur ».');
+}
+function wallInfo(){
+  const el=$('#wall-info');
+  if(!S.wall){el.hidden=true;return}
+  const a=S.wall.a,b=S.wall.b,pa=wpx(a[0],a[1],22),pb=wpx(b[0],b[1],22);
+  let bear=(Math.atan2(pb.x-pa.x,-(pb.y-pa.y))*deg+360)%360;if(bear>=180)bear-=180;
+  el.hidden=false;el.innerHTML=`Mur tracé : ${nf1.format(distM(a[0],a[1],b[0],b[1]))} m, axe à ${nf1.format(bear)}° du nord · façade orientée <b>${nf1.format(S.azim)}° (${cardinal(S.azim)})</b>`;
+}
+function wireMap(){
+  new ResizeObserver(resizeMap).observe($('#mapbox'));resizeMap();
+  const pos=e=>{const r=cv.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top}};
+  let drag=null,pinch=null;
+  cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);MAP.ptr.set(e.pointerId,pos(e));
+    if(MAP.ptr.size===2){const [p1,p2]=[...MAP.ptr.values()];pinch={d:Math.hypot(p1.x-p2.x,p1.y-p2.y),z:MAP.z};drag=null}
+    else{const p=pos(e);drag={x:p.x,y:p.y,sx:p.x,sy:p.y,moved:false}}});
+  cv.addEventListener('pointermove',e=>{const p=pos(e);
+    if(MAP.ptr.has(e.pointerId))MAP.ptr.set(e.pointerId,p);
+    if(pinch&&MAP.ptr.size===2){const [p1,p2]=[...MAP.ptr.values()];const d=Math.hypot(p1.x-p2.x,p1.y-p2.y);mapZoom(pinch.z+Math.log2(d/Math.max(1,pinch.d)),(p1.x+p2.x)/2,(p1.y+p2.y)/2);return}
+    if(drag){if(Math.hypot(p.x-drag.sx,p.y-drag.sy)>4)drag.moved=true;
+      if(drag.moved){const c=wpx(MAP.lat,MAP.lon,MAP.z),g=wgeo(c.x-(p.x-drag.x),c.y-(p.y-drag.y),MAP.z);MAP.lat=g.lat;MAP.lon=g.lon;drag.x=p.x;drag.y=p.y;MAP.need=true}}
+    if(MAP.mode==='wall'&&MAP.pts.length===1){MAP.hover=p;MAP.need=true}});
+  const up=e=>{MAP.ptr.delete(e.pointerId);if(pinch){if(MAP.ptr.size<2)pinch=null;drag=null;return}
+    if(drag&&!drag.moved){const g=s2g(drag.sx,drag.sy);
+      if(MAP.mode==='move'){setMode('none');S.place='Point placé sur la carte';setSite(g.lat,g.lon,null,false);Geo.reverse(S.lat,S.lon);flash('Site déplacé.')}
+      else if(MAP.mode==='wall'){MAP.pts.push([g.lat,g.lon]);if(MAP.pts.length===1){$('#map-msg').textContent='Clique le second point du mur.';MAP.hover={x:drag.sx,y:drag.sy}}else wallDone(MAP.pts[0],MAP.pts[1])}}
+    drag=null};
+  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  cv.addEventListener('wheel',e=>{e.preventDefault();const p=pos(e);mapZoom(MAP.z-Math.max(-1,Math.min(1,e.deltaY*0.003)),p.x,p.y)},{passive:false});
+  $('#zin').addEventListener('click',()=>mapZoom(Math.round(MAP.z)+1));
+  $('#zout').addEventListener('click',()=>mapZoom(Math.round(MAP.z)-1));
+  $('#m-wall').addEventListener('click',()=>setMode(MAP.mode==='wall'?'none':'wall'));
+  $('#m-move').addEventListener('click',()=>setMode(MAP.mode==='move'?'none':'move'));
+  $('#m-flip').addEventListener('click',()=>{S.azim=+((S.azim+180)%360).toFixed(1);syncFields();changed();flash('Côté extérieur inversé.')});
+  $('#m-clear').addEventListener('click',()=>{S.wall=null;setMode('none');changed()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&MAP.mode!=='none')setMode('none')});
+}
+
+/* ---------- 3D ---------- */
+const G3={ok:false};
+const COL={sky:'#EAF0F5',wall:'#DCD8CF',ground:'#C9CFC4',glass:'#8FB6D0',slat:'#4C5A66',sun:'#EF9F27',ink:'#1F4E79'};
+function init3D(){
+  const host=$('#stage');
+  if(typeof THREE==='undefined'||!THREE.OrbitControls){host.insertAdjacentHTML('beforeend','<div class="nogl">Le moteur 3D n’a pas pu se charger (connexion internet nécessaire à l’ouverture). Les calculs, la coupe et l’analyse restent disponibles.</div>');return}
+  try{
+    const r=new THREE.WebGLRenderer({antialias:true});r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+    r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;host.prepend(r.domElement);
+    const scene=new THREE.Scene();scene.background=new THREE.Color(COL.sky);
+    const cam=new THREE.PerspectiveCamera(38,1,0.05,300);
+    const ctl=new THREE.OrbitControls(cam,r.domElement);ctl.enableDamping=true;ctl.dampingFactor=0.12;ctl.maxPolarAngle=Math.PI*0.495;
+    const hemi=new THREE.HemisphereLight(0xffffff,0x8a8a80,0.55);scene.add(hemi);scene.add(new THREE.AmbientLight(0xffffff,0.12));
+    const sun=new THREE.DirectionalLight(0xfff0d8,1.3);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.bias=-0.0003;sun.shadow.normalBias=0.015;
+    scene.add(sun);scene.add(sun.target);
+    const M={wall:new THREE.MeshStandardMaterial({color:COL.wall,roughness:.95}),ground:new THREE.MeshStandardMaterial({color:COL.ground,roughness:1}),
+      glass:new THREE.MeshStandardMaterial({color:COL.glass,roughness:.35,metalness:.05}),slat:new THREE.MeshStandardMaterial({color:COL.slat,roughness:.6,metalness:.25}),
+      frame:new THREE.MeshStandardMaterial({color:COL.slat,roughness:.7}),sun:new THREE.MeshBasicMaterial({color:COL.sun}),line:new THREE.LineDashedMaterial({color:COL.sun,dashSize:.12,gapSize:.08})};
+    const sunMesh=new THREE.Mesh(new THREE.SphereGeometry(0.13,24,16),M.sun);scene.add(sunMesh);
+    const sunLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3(0,1,0)]),M.line);scene.add(sunLine);
+    Object.assign(G3,{ok:true,r,scene,cam,ctl,hemi,sun,M,sunMesh,sunLine,group:null,view:'persp'});
+    new ResizeObserver(resize3D).observe(host);resize3D();
+  }catch(e){host.insertAdjacentHTML('beforeend','<div class="nogl">La 3D n’est pas disponible sur cet appareil (WebGL). Les calculs, la coupe et l’analyse restent disponibles.</div>')}
+}
+function resize3D(){if(!G3.ok)return;const h=$('#stage');G3.r.setSize(h.clientWidth,h.clientHeight,false);G3.cam.aspect=h.clientWidth/Math.max(1,h.clientHeight);G3.cam.updateProjectionMatrix()}
+function textSprite(txt,color){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.fillStyle=color;x.font='700 84px Calibri, Arial, sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(txt,64,68);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false}));sp.scale.set(.45,.45,1);return sp}
+function winCenter(){const T=clean(S);return new THREE.Vector3(T.W/2/1000,(T.A+Math.max(T.L,T.Ha))/2/1000,0)}
+function buildModel(){
+  if(!G3.ok)return;const {scene,M}=G3;
+  if(G3.group){scene.remove(G3.group);G3.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material&&o.material.map){o.material.map.dispose();o.material.dispose()}})}
+  const grp=new THREE.Group(),G=geom(S),T=G.T,k=0.001,th=T.reveal+250;
+  const xmin=Math.min(G.x0,0)-1400,xmax=Math.max(G.x1,T.W)+1400,tipY=T.Ha-T.D*Math.sin(G.b),ytop=Math.max(T.Ha,T.L,tipY)+900;
+  const box=(x0,x1,y0,y1,z0,z1,mat,cast=true)=>{if(x1-x0<=.5||y1-y0<=.5||z1-z0<=.5)return;const m=new THREE.Mesh(new THREE.BoxGeometry((x1-x0)*k,(y1-y0)*k,(z1-z0)*k),mat);
+    m.position.set((x0+x1)/2*k,(y0+y1)/2*k,(z0+z1)/2*k);m.castShadow=cast;m.receiveShadow=true;grp.add(m)};
+  box(xmin,0,0,ytop,-th,0,M.wall);box(T.W,xmax,0,ytop,-th,0,M.wall);box(0,T.W,0,T.A,-th,0,M.wall);box(0,T.W,T.L,ytop,-th,0,M.wall);
+  box(0,T.W,T.A,T.L,-T.reveal-24,-T.reveal-4,M.glass);
+  const fw=45;
+  box(0,fw,T.A,T.L,-T.reveal-50,-T.reveal-2,M.frame,false);box(T.W-fw,T.W,T.A,T.L,-T.reveal-50,-T.reveal-2,M.frame,false);
+  box(0,T.W,T.A,T.A+fw,-T.reveal-50,-T.reveal-2,M.frame,false);box(0,T.W,T.L-fw,T.L,-T.reveal-50,-T.reveal-2,M.frame,false);
+  box(G.x0,G.x1,T.Ha-35,T.Ha+35,0,12,M.slat,false);
+  for(const B of G.boxes){const m=new THREE.Mesh(B.k==='slat'?new THREE.BoxGeometry(G.Lx*k,T.le*k,T.lw*k):new THREE.BoxGeometry(G.cw*k,T.ch*k,T.D*k),M.slat);
+    m.position.set(B.c[0]*k,B.c[1]*k,B.c[2]*k);m.rotation.x=B.k==='slat'?-G.phi:G.b;m.castShadow=true;m.receiveShadow=true;grp.add(m)}
+  const gr=new THREE.Mesh(new THREE.PlaneGeometry(80,80),M.ground);gr.rotation.x=-Math.PI/2;gr.receiveShadow=true;grp.add(gr);
+  // nord : direction du nord dans le repère façade
+  const a=T.azim*rad,nd=new THREE.Vector3(Math.sin(a),0,Math.cos(a)),org=new THREE.Vector3(T.W/2*k,.01,2.4);
+  grp.add(new THREE.ArrowHelper(nd,org,1.1,0x1F4E79,.26,.16));
+  const lab=textSprite('N',COL.ink);lab.position.copy(org.clone().add(nd.clone().multiplyScalar(1.4)));lab.position.y=.15;grp.add(lab);
+  scene.add(grp);G3.group=grp;G3.extent=Math.max(G.Lx,ytop-T.A,T.D)*k;
+  if(!G3.placed){setView(G3.view);G3.placed=true}
+  updateSun3D();
+}
+function updateSun3D(){
+  if(!G3.ok)return;const p=curSun(),s=p.s,c=winCenter(),v=new THREE.Vector3(s.x,s.y,s.z).normalize(),up=p.el>0;
+  G3.sun.intensity=up?1.5*(.35+.65*Math.min(1,s.y*2.5)):0;G3.hemi.intensity=up?.55:.25;
+  G3.sun.position.copy(c.clone().add(v.clone().multiplyScalar(14)));G3.sun.target.position.copy(c);
+  const half=(G3.extent||3)*.9+1.2,sc=G3.sun.shadow.camera;sc.left=-half;sc.right=half;sc.top=half;sc.bottom=-half;sc.near=1;sc.far=40;sc.updateProjectionMatrix();
+  const sp=c.clone().add(v.clone().multiplyScalar(5.5));G3.sunMesh.position.copy(sp);G3.sunMesh.visible=up;
+  G3.sunLine.geometry.setFromPoints([sp,c]);G3.sunLine.computeLineDistances();G3.sunLine.visible=up&&s.z>0;
+  if(G3.view==='sun'&&up)setView('sun',true);
+}
+function setView(mode,keep){
+  if(!G3.ok)return;G3.view=mode;const c=winCenter(),d=1.5+(G3.extent||2.5)*1.25;let p;
+  if(mode==='face')p=new THREE.Vector3(0,0,d*1.25);
+  else if(mode==='cote')p=new THREE.Vector3(d*1.2,.15,d*.35);
+  else if(mode==='sun'){const s=curSun().s;p=s.y>0?new THREE.Vector3(s.x,s.y,s.z).normalize().multiplyScalar(d*1.3):new THREE.Vector3(0,0,d*1.25)}
+  else p=new THREE.Vector3(d*.75,d*.35,d*1.05);
+  G3.cam.position.copy(c.clone().add(p));G3.ctl.target.copy(c);G3.ctl.update();
+  if(!keep)$$('.views button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===mode?'true':'false'));
+}
+
+/* ---------- affichages instantanés ---------- */
+function curSun(){return sunAt(S,S.date,S.minutes)}
+function cardinal(a){const n=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];return n[Math.round(((a%360)+360)%360/22.5)%16]}
+function dateFr(ds,o){const [y,m,d]=ds.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('fr-FR',o||{day:'numeric',month:'short',year:'numeric'})}
+function updateStatus(){$('#status').innerHTML=`<b>${S.place||'Site'}</b> · ${nf5.format(S.lat)}, ${nf5.format(S.lon)} · façade ${nf1.format(S.azim)}° (${cardinal(S.azim)}) · ${dateFr(S.date)} à ${hhmm(S.minutes)}`}
+function updateHUD(){
+  const p=curSun(),s=p.s,G=geom(S),f=litFraction(G,s,26);
+  const prof=s.z>0?Math.atan2(s.y,s.z)*deg:null,inc=Math.acos(Math.max(-1,Math.min(1,s.z)))*deg;
+  $('#hud').innerHTML=`<span class="chip"><b>Azimut</b>${nf1.format(p.az)}°</span><span class="chip"><b>Hauteur</b>${nf1.format(p.el)}°</span>`+
+    (p.el>0&&s.z>0?`<span class="chip"><b>Profil</b>${nf1.format(prof)}°</span><span class="chip"><b>Incidence</b>${nf1.format(inc)}°</span>`:'')+
+    `<span class="chip hot"><b>Vitrage au soleil</b>${f===null?'—':nf0.format(f*100)+' %'}</span>`;
+  if(f===null){$('#b-pct').textContent='—';$('#b-pct-t').textContent=p.el<=0?'Soleil sous l’horizon':'Le soleil ne frappe pas cette façade à cette heure';$('#b-bar').style.width='0%'}
+  else{$('#b-pct').textContent=nf0.format(f*100)+' %';$('#b-pct-t').textContent='de la surface vitrée au soleil';$('#b-bar').style.width=(f*100)+'%'}
+  $('#clock').textContent=hhmm(S.minutes);drawDial(p);updateStatus();MAP.need=true;
+}
+function drawDial(p){
+  const c=56,R=42,a=S.azim*rad,pt=(g,r)=>[c+r*Math.sin(g),c-r*Math.cos(g)];
+  const [nx,ny]=pt(a,R-6),[w1x,w1y]=pt(a-Math.PI/2,24),[w2x,w2y]=pt(a+Math.PI/2,24);
+  let sun='';if(p.el>0){const [sx,sy]=pt(p.az*rad,R*(1-p.el/90)*.92+3);sun=`<circle cx="${sx}" cy="${sy}" r="5" fill="#EF9F27" stroke="#fff"/>`}
+  $('#dial').innerHTML=`<defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0L10,5L0,10z" fill="#1F4E79"/></marker></defs><circle cx="${c}" cy="${c}" r="${R}" fill="#F2F7FB" stroke="#c8d6e3"/>`+
+    ['N','E','S','O'].map((t,i)=>{const [x,y]=pt(i*Math.PI/2,R+8);return `<text x="${x}" y="${y+4}" text-anchor="middle" font-size="11" font-weight="700" font-family="Calibri, Arial, sans-serif" fill="${i===0?'#1F4E79':'#5a5a5a'}">${t}</text>`}).join('')+
+    `<line x1="${w1x}" y1="${w1y}" x2="${w2x}" y2="${w2y}" stroke="#1a1a1a" stroke-width="5"/><line x1="${c}" y1="${c}" x2="${nx}" y2="${ny}" stroke="#1F4E79" stroke-width="1.6" marker-end="url(#arr)"/>`+sun;
+  $('#dial-t').innerHTML=`Façade orientée <b>${cardinal(S.azim)}</b>. Le trait noir est le mur, la flèche sa normale vers l’extérieur.`+(p.el>0?` Le point orange est le soleil à ${hhmm(S.minutes)}.`:'');
+}
+
+/* ---------- coupe ---------- */
+function drawCoupe(){
+  const G=geom(S),T=G.T,p=curSun(),s=p.s,r=T.reveal,th=r+250,b=G.b;
+  const tipY=T.Ha-T.D*Math.sin(b),tipZ=T.D*Math.cos(b);
+  const ymax=Math.max(T.Ha,T.L,tipY)+T.lw+520,ymin=Math.min(T.A,tipY-T.lw)-380,zmin=-th-820,zmax=Math.max(tipZ+T.lw,500)+560;
+  const W=zmax-zmin,H=ymax-ymin,fs=Math.max(W,H)/30,Y=y=>-y,ns='vector-effect="non-scaling-stroke"';
+  let o=`<svg viewBox="${zmin} ${-ymax} ${W} ${H}" role="img" aria-label="Coupe verticale du brise-soleil"><defs><pattern id="hatch" patternUnits="userSpaceOnUse" width="${fs*.7}" height="${fs*.7}" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="${fs*.7}" class="c-hatch" ${ns}/></pattern></defs>`;
+  o+=`<rect x="${zmin}" y="${-ymax}" width="${W}" height="${H}" fill="#ffffff"/>`;
+  o+=`<rect x="${-th}" y="${Y(T.A)}" width="${th}" height="${T.A-ymin}" class="c-wall" ${ns}/><rect x="${-th}" y="${-ymax}" width="${th}" height="${ymax-T.L}" class="c-wall" ${ns}/>`;
+  o+=`<line x1="${-r-12}" y1="${Y(T.A)}" x2="${-r-12}" y2="${Y(T.L)}" class="c-glass" ${ns}/>`;
+  const nb=[Math.cos(b),Math.sin(b)],hc=T.ch/2;
+  const cons=[[T.Ha+hc*nb[0],hc*nb[1]],[T.Ha-hc*nb[0],-hc*nb[1]],[tipY-hc*nb[0],tipZ-hc*nb[1]],[tipY+hc*nb[0],tipZ+hc*nb[1]]];
+  o+=`<polygon points="${cons.map(q=>q[1]+','+Y(q[0])).join(' ')}" class="c-cons" ${ns}/><line x1="0" y1="${Y(T.Ha)}" x2="${tipZ}" y2="${Y(tipY)}" class="c-axis" ${ns}/>`;
+  for(const B of G.boxes){if(B.k!=='slat')continue;const v=B.a[1],w=B.a[2],hw=B.h[1],ht=B.h[2];
+    const pts=[[1,1],[1,-1],[-1,-1],[-1,1]].map(([a,c])=>[B.c[1]+a*hw*v[1]+c*ht*w[1],B.c[2]+a*hw*v[2]+c*ht*w[2]]);
+    o+=`<polygon points="${pts.map(q=>q[1]+','+Y(q[0])).join(' ')}" class="c-slat"/>`}
+  o+=`<circle cx="0" cy="${Y(T.Ha)}" r="${fs*.18}" fill="#fff" stroke="#1a1a1a" ${ns}/>`;
+  let prof=null;
+  if(p.el>0&&s.z>0){
+    const len=Math.hypot(s.y,s.z),d=[0,s.y/len,s.z/len],BIG=(W+H)*2;prof=Math.atan2(s.y,s.z)*deg;
+    for(let j=0;j<9;j++){const y=T.A+(T.L-T.A)*(j+.5)/9,P=[G.cx,y,-r+.5];let t0=Infinity;
+      if(r>0){const tz=r/d[2],yy=y+d[1]*tz;if(yy>T.L)t0=(T.L-y)/d[1]}
+      for(const B of G.boxes){if(B.k!=='slat')continue;const t=hitBox(B,P,d);if(t<t0)t0=t}
+      const far=[P[1]+d[1]*BIG,P[2]+d[2]*BIG];
+      if(t0===Infinity)o+=`<line x1="${far[1]}" y1="${Y(far[0])}" x2="${P[2]-12}" y2="${Y(P[1])}" class="c-ray" ${ns}/><circle cx="${-r-12}" cy="${Y(y)}" r="${fs*.16}" class="c-dot"/>`;
+      else{const hp=[P[1]+d[1]*t0,P[2]+d[2]*t0];o+=`<line x1="${far[1]}" y1="${Y(far[0])}" x2="${hp[1]}" y2="${Y(hp[0])}" class="c-ray" ${ns}/><line x1="${hp[1]}" y1="${Y(hp[0])}" x2="${P[2]-12}" y2="${Y(P[1])}" class="c-rayoff" ${ns}/>`}}
+  }
+  const zl=-th-90;
+  const alt=(y,lab)=>{const t=fs*.32;return `<path d="M${zl-t},${Y(y)-t*1.4} L${zl+t},${Y(y)-t*1.4} L${zl},${Y(y)} Z" fill="#1F4E79"/><line x1="${zl}" y1="${Y(y)}" x2="${-th}" y2="${Y(y)}" class="c-dim" ${ns}/><text x="${zl-fs*.5}" y="${Y(y)+fs*.1}" text-anchor="end" class="c-t" font-size="${fs*.64}">${lab} +${nf0.format(y)}</text>`};
+  o+=alt(T.A,'Allège')+alt(T.L,'Linteau')+alt(T.Ha,'Accroche');
+  const yd=Math.max(T.Ha,tipY)+T.lw+fs*1.3;
+  o+=`<line x1="0" y1="${Y(yd)}" x2="${tipZ}" y2="${Y(yd)}" class="c-dim" ${ns}/><line x1="0" y1="${Y(yd)-fs*.35}" x2="0" y2="${Y(yd)+fs*.35}" class="c-dim" ${ns}/><line x1="${tipZ}" y1="${Y(yd)-fs*.35}" x2="${tipZ}" y2="${Y(yd)+fs*.35}" class="c-dim" ${ns}/>`+
+     `<text x="${tipZ/2}" y="${Y(yd)-fs*.35}" text-anchor="middle" class="c-t" font-size="${fs*.64}">${nf0.format(T.D)}${T.pente?' (pente '+nf1.format(T.pente)+'°)':''}</text>`;
+  o+=`<text x="${-th-fs*.4}" y="${-ymin-fs*.4}" text-anchor="end" class="c-tb" font-size="${fs*.72}">INT.</text><text x="${fs*.4}" y="${-ymin-fs*.4}" class="c-tb" font-size="${fs*.72}">EXT.</text>`;
+  o+=`<text x="${zmax-fs*.4}" y="${-ymax+fs*1}" text-anchor="end" class="c-tsun" font-size="${fs*.68}">${prof===null?'pas de soleil direct':'☀ angle de profil '+nf1.format(prof)+'°'}</text>`;
+  o+=`<text x="${zmax-fs*.4}" y="${-ymax+fs*1.9}" text-anchor="end" class="c-t" font-size="${fs*.58}">lames à ${nf1.format(T.lt-T.pente)}° de l’horizontale</text></svg>`;
+  $('#coupe').innerHTML=o;
+}
+
+/* ---------- analyse ---------- */
+function refLabel(ds){return dateFr(ds,{day:'numeric',month:'short'})}
+function stateOf(v,goodHigh){if(v===null)return ['','—'];const x=goodHigh?v:1-v;return x>=.7?['g','bon']:x>=.45?['a','moyen']:['r','faible']}
+function updateRefs(){
+  const G=geom(S),sum=dayStats(G,S.sumDate,15,14),win=dayStats(G,S.winDate,15,14),cur=dayStats(G,S.date,10,10);
+  const row=(tag,cls,lab,st,goodHigh)=>{
+    if(st.pass===null)return `<div class="ref"><span class="pill ${cls}">${tag}</span><span>${lab} · pas de soleil sur la façade</span><span class="v">—</span></div>`;
+    const [sc,sl]=stateOf(st.pass,goodHigh);
+    return `<div class="ref"><span class="pill ${cls}">${tag}</span><span>${lab} : <b class="num">${nf0.format(st.pass*100)} %</b> passe <span class="state ${sc}">${goodHigh?'apports':'protection'} ${sl}</span></span><span class="v" title="Énergie directe reçue sur le vitrage, ciel clair">${nf2.format(st.got)} / ${nf2.format(st.possible)} kWh/m²</span><div class="meter"><i style="width:${st.pass*100}%;background:${cls==='s'?'#EF9F27':'#1F4E79'}"></i></div></div>`};
+  $('#b-refs').innerHTML=row('Été','s',refLabel(S.sumDate),sum,false)+row('Hiver','w',refLabel(S.winDate),win,true);
+  const sc=scoreOf(sum.pass,win.pass,S.prio),[c,l]=stateOf(sc,true);
+  $('#b-score').textContent=sc===null?'—':nf0.format(sc*100)+' / 100';$('#b-state').className='state '+c;$('#b-state').textContent=sc===null?'':l;
+  $('#b-score').style.color=c==='g'?'#14694F':c==='a'?'#8a5200':c==='r'?'#B3302F':'';
+  $('#b-day').textContent=cur.first===null?`Le ${refLabel(S.date)}, le soleil ne frappe jamais cette façade.`:`Le ${refLabel(S.date)}, le soleil frappe la façade de ${hhmm(cur.first-5)} à ${hhmm(cur.last+5)} ; ${cur.pass===null?'—':nf0.format(cur.pass*100)+' %'} du rayonnement direct atteint le vitrage.`;
+}
+function daySeries(G,ds,step,n){const out=[];for(let m=240;m<=1320;m+=step){const s=sunAt(G.T,ds,m);out.push([m,(s.el>0&&s.s.z>0)?litFraction(G,s.s,n):null])}return out}
+function drawDay(){
+  const G=geom(S),Wd=640,Hd=230,l=38,r=10,t=10,b=24,X=m=>l+(m-240)/1080*(Wd-l-r),Yv=v=>t+(1-v)*(Hd-t-b);
+  let o=`<svg viewBox="0 0 ${Wd} ${Hd}" role="img" aria-label="Ensoleillement du vitrage au fil de la journée">`;
+  for(const v of [0,.25,.5,.75,1])o+=`<line x1="${l}" x2="${Wd-r}" y1="${Yv(v)}" y2="${Yv(v)}" class="ax"/><text x="${l-6}" y="${Yv(v)+3.5}" text-anchor="end" class="axt">${v*100}</text>`;
+  for(let h=4;h<=22;h+=2)o+=`<text x="${X(h*60)}" y="${Hd-6}" text-anchor="middle" class="axt">${h}h</text>`;
+  const path=ser=>{let d='',pen=false;for(const [m,v] of ser){if(v===null){pen=false;continue}d+=(pen?'L':'M')+X(m).toFixed(1)+','+Yv(v).toFixed(1);pen=true}return d};
+  o+=`<path d="${path(daySeries(G,S.winDate,10,12))}" fill="none" stroke="#1F4E79" stroke-width="2" stroke-dasharray="2 3"/>`;
+  o+=`<path d="${path(daySeries(G,S.sumDate,10,12))}" fill="none" stroke="#D98613" stroke-width="2" stroke-dasharray="6 4"/>`;
+  o+=`<path d="${path(daySeries(G,S.date,10,12))}" fill="none" stroke="#1a1a1a" stroke-width="2"/>`;
+  const xm=X(Math.max(240,Math.min(1320,S.minutes)));
+  o+=`<line id="day-mark" x1="${xm}" x2="${xm}" y1="${t}" y2="${Hd-b}" stroke="#EF9F27" stroke-width="1.5"/></svg>`;
+  $('#daychart').innerHTML=o;
+}
+function moveDayMark(){const m=$('#day-mark');if(!m)return;const x=38+(Math.max(240,Math.min(1320,S.minutes))-240)/1080*592;m.setAttribute('x1',x);m.setAttribute('x2',x)}
+const MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+function drawHeat(){
+  const G=geom(S),yr=S.date.slice(0,4),Wd=640,Hd=290,l=40,t=4,r=4,b=20,cols=36,cw=(Wd-l-r)/cols,chh=(Hd-t-b)/12;
+  let o=`<svg viewBox="0 0 ${Wd} ${Hd}" role="img" aria-label="Carte annuelle d’ensoleillement du vitrage">`;
+  for(let mo=0;mo<12;mo++){const ds=`${yr}-${pad(mo+1)}-21`;
+    o+=`<text x="${l-6}" y="${t+mo*chh+chh/2+3.5}" text-anchor="end" class="axt">${MOIS[mo]}</text>`;
+    for(let c=0;c<cols;c++){const m=240+c*30+15,p=sunAt(G.T,ds,m),f=(p.el>0&&p.s.z>0)?litFraction(G,p.s,10):null;
+      const fill=f===null?'#eeeeea':`color-mix(in srgb, #EF9F27 ${Math.round(f*100)}%, #EAF1F8)`;
+      o+=`<rect class="cell" data-d="${ds}" data-m="${m}" x="${(l+c*cw).toFixed(2)}" y="${(t+mo*chh).toFixed(2)}" width="${(cw-1).toFixed(2)}" height="${(chh-1).toFixed(2)}" rx="1.5" style="fill:${fill}"><title>21 ${MOIS[mo]} ${hhmm(m)} : ${f===null?'pas de soleil sur la façade':nf0.format(f*100)+' % au soleil'}</title></rect>`}}
+  for(let h=4;h<=22;h+=2)o+=`<text x="${l+(h-4)*2*cw}" y="${Hd-5}" text-anchor="middle" class="axt">${h}h</text>`;
+  const cm=+S.date.slice(5,7)-1,cc=Math.floor((S.minutes-240)/30);
+  if(cc>=0&&cc<cols)o+=`<rect x="${l+cc*cw-1}" y="${t+cm*chh-1}" width="${cw+1}" height="${chh+1}" fill="none" stroke="#1F4E79" stroke-width="2" pointer-events="none"/>`;
+  $('#heat').innerHTML=o+'</svg>';
+  $$('#heat .cell').forEach(c=>c.addEventListener('click',()=>{S.date=c.dataset.d;S.minutes=+c.dataset.m-15;timeChanged(true)}));
+}
+
+/* ---------- optimisation ---------- */
+const OPT={
+  lt:{label:'Inclinaison des lames',from:-60,to:80,step:2.5,fmt:v=>nf1.format(v)+'°'},
+  pente:{label:'Inclinaison du support',from:-30,to:60,step:2.5,fmt:v=>nf1.format(v)+'°'},
+  D:{label:'Longueur du support',from:100,to:2500,step:50,fmt:v=>nf0.format(v)+' mm'}
+};
+function evalT(T){const G=geom(T),ps=dayStats(G,T.sumDate,20,12).pass,pw=dayStats(G,T.winDate,20,12).pass;return {ps,pw,sc:scoreOf(ps,pw,T.prio)}}
+function sweep(key,base){
+  const o=OPT[key],res=[];for(let v=o.from;v<=o.to+1e-9;v+=o.step)res.push({v,...evalT({...base,[key]:v})});
+  const valid=res.filter(x=>x.sc!==null);if(!valid.length)return null;
+  const best=Math.max(...valid.map(x=>x.sc)),near=valid.filter(x=>x.sc>=best-.003);
+  const pick=key==='D'?near.reduce((a,x)=>x.v<a.v?x:a):near.reduce((a,x)=>Math.abs(x.v-base[key])<Math.abs(a.v-base[key])?x:a);
+  return {res,pick};
+}
+let undoState=null;
+function runOpt(key){
+  const box=$('#optres');box.hidden=false;box.innerHTML='<span class="note">Calcul en cours…</span>';
+  setTimeout(()=>{
+    const before={...S},e0=evalT(S),keys=key==='all'?['D','pente','lt','D','lt']:[key];let last=null;
+    for(const k of keys){const r=sweep(k,S);if(!r){box.innerHTML='<span class="note">Aucun soleil sur la façade aux jours de référence : rien à optimiser.</span>';return}S[k]=r.pick.v;last={k,r}}
+    const e1=evalT(S);undoState=before;syncFields();changed();
+    const pc=v=>v===null?'—':nf0.format(v*100)+' %';
+    const lines=(key==='all'?['D','pente','lt']:[key]).map(k=>`<div>${OPT[k].label} : <span class="num">${OPT[k].fmt(before[k])} → <b>${OPT[k].fmt(S[k])}</b></span></div>`).join('');
+    box.innerHTML=`<div class="head">✓ ${key==='all'?'Réglage combiné appliqué':OPT[key].label+' optimisée'}</div>${lines}
+      <div>Été : <span class="num">${pc(e0.ps)} → ${pc(e1.ps)}</span> passe · Hiver : <span class="num">${pc(e0.pw)} → ${pc(e1.pw)}</span> passe</div>
+      <div>Indice : <span class="num">${e0.sc===null?'—':nf0.format(e0.sc*100)} → <b>${e1.sc===null?'—':nf0.format(e1.sc*100)}</b></span></div>
+      ${key==='all'?'':spark(last.r,OPT[key])}
+      <div class="row"><button class="b sm" id="opt-undo" type="button">Revenir aux valeurs précédentes</button></div>`;
+    $('#opt-undo').addEventListener('click',()=>{if(!undoState)return;S={...undoState};undoState=null;syncFields();changed();box.hidden=true});
+  },30);
+}
+function spark(r,o){
+  const Wd=560,Hd=90,l=4,rr=4,t=8,b=18,v=r.res.filter(x=>x.sc!==null);
+  const mn=Math.min(...v.map(x=>x.sc)),mx=Math.max(...v.map(x=>x.sc)),rg=Math.max(1e-6,mx-mn);
+  const X=x=>l+(x-o.from)/(o.to-o.from)*(Wd-l-rr),Yv=s=>t+(1-(s-mn)/rg)*(Hd-t-b),px=X(r.pick.v);
+  const d=v.map((x,i)=>(i?'L':'M')+X(x.v).toFixed(1)+','+Yv(x.sc).toFixed(1)).join('');
+  return `<div class="svgbox"><svg viewBox="0 0 ${Wd} ${Hd}" role="img" aria-label="Indice selon la valeur testée"><path d="${d}" fill="none" stroke="#5a5a5a" stroke-width="1.5"/><line x1="${px}" x2="${px}" y1="${t}" y2="${Hd-b}" stroke="#1D9E75"/><circle cx="${px}" cy="${Yv(r.pick.sc)}" r="4" fill="#1D9E75"/><text x="${l}" y="${Hd-4}" class="axt">${o.fmt(o.from)}</text><text x="${Wd-rr}" y="${Hd-4}" text-anchor="end" class="axt">${o.fmt(o.to)}</text><text x="${Math.min(Wd-80,Math.max(60,px))}" y="${Hd-4}" text-anchor="middle" class="axt" style="fill:#14694F;font-weight:700">${o.fmt(r.pick.v)}</text></svg></div><p class="note">Indice obtenu pour chaque valeur testée, les autres réglages restant fixes.</p>`;
+}
+
+/* ---------- temps & animation ---------- */
+const SPEEDS={h:[[5,'5 min/s'],[15,'15 min/s'],[30,'30 min/s'],[60,'1 h/s'],[120,'2 h/s'],[240,'4 h/s']],d:[[1,'1 j/s'],[3,'3 j/s'],[7,'1 sem./s'],[15,'15 j/s'],[30,'1 mois/s']]};
+function fillSpeeds(){const sel=$('#t-speed'),list=SPEEDS[S.mode];sel.innerHTML=list.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');if(!list.some(x=>x[0]==S.speed))S.speed=list[Math.min(2,list.length-1)][0];sel.value=S.speed}
+let playing=false,acc=0,lastT=0,heavyT=null,lastLight=0;
+function timeChanged(full){
+  $('#t-slider').value=Math.round(S.minutes);$('#t-date').value=S.date;
+  updateSun3D();updateHUD();
+  if(full)scheduleHeavy();else moveDayMark();
+  const now=performance.now();if(!playing||now-lastLight>90){drawCoupe();lastLight=now}
+  save();
+}
+function addDays(ds,n){const [y,m,d]=ds.split('-').map(Number),D=new Date(y,m-1,d+n);return D.getFullYear()+'-'+pad(D.getMonth()+1)+'-'+pad(D.getDate())}
+function loop(t){
+  const dt=lastT?Math.min(.1,(t-lastT)/1000):0;lastT=t;
+  if(playing){if(S.mode==='h'){S.minutes+=S.speed*dt;if(S.minutes>=1440)S.minutes-=1440;timeChanged(false)}
+    else{acc+=S.speed*dt;if(acc>=1){const n=Math.floor(acc);acc-=n;S.date=addDays(S.date,n);timeChanged(false);scheduleHeavy(400)}}}
+  if(G3.ok){G3.ctl.update();G3.r.render(G3.scene,G3.cam)}
+  if(MAP.need)drawMap();
+  requestAnimationFrame(loop);
+}
+function scheduleHeavy(ms){clearTimeout(heavyT);heavyT=setTimeout(()=>{updateRefs();drawDay();drawHeat()},ms||180)}
+function changed(){buildModel();updateHUD();drawCoupe();wallInfo();scheduleHeavy();save()}
+
+/* ---------- carrousel de démarrage ---------- */
+const ONB_KEY='ombrage_onboarded';
+const STEPS=[
+  {icon:'🌤',title:'Bienvenue dans Ombrage',body:'Cet outil calcule la <b>position du soleil</b> pour un lieu, une date et une heure, puis simule l’<b>ombre portée d’un brise-soleil à lames</b> sur une fenêtre.<br><br>Objectif : <b>bloquer le soleil d’été</b> et <b>laisser entrer celui d’hiver</b>. Voici en quelques étapes comment l’utiliser.'},
+  {icon:'📍',title:'Étape 1 — Trouver le site',body:'Tape une <b>adresse</b> (recherche Géoportail IGN) ou <b>colle des coordonnées GPS</b>. La photo aérienne IGN se centre sur le site.<br><br>Le bouton <b>Déplacer le point</b> permet de cliquer l’emplacement exact du bâtiment.'},
+  {icon:'📏',title:'Tracer le mur',body:'Clique <b>Tracer le mur</b>, puis deux points le long du <b>nu de la façade</b> sur la photo. L’orientation par rapport au nord se remplit toute seule.<br><br>La flèche bleue <b>« ext. »</b> montre le côté extérieur : si elle pointe vers le bâtiment, clique <b>Inverser l’extérieur</b>.'},
+  {icon:'🪟',title:'Étape 2 — Façade et fenêtre',body:'Toutes les cotes sont en <b>millimètres</b>. Hauteur, allège et linteau sont <b>liés</b> : modifier l’un met à jour les autres.<br><br>Le <b>retrait de la menuiserie</b> ajoute l’ombre de l’embrasure.'},
+  {icon:'🔩',title:'Étape 3 — Brise-soleil',body:'Décris le <b>support</b> (altimétrie d’accroche, inclinaison, débords, longueur, consoles) puis les <b>lames</b> (nombre, largeur, épaisseur, inclinaison).<br><br>Les lames sont réparties à pas égal sur la longueur du support.'},
+  {icon:'🎬',title:'Étapes 4 et 5 — Simuler',body:'La <b>3D</b> montre les ombres portées à la date et l’heure choisies. Fais tourner la vue à la souris, ou choisis <b>Face</b>, <b>Côté</b>, <b>Vue du soleil</b>.<br><br><b>Lecture</b> fait défiler les heures ou les jours. La <b>coupe</b> montre les rayons qui passent (orange plein) et ceux qui sont arrêtés.'},
+  {icon:'🎯',title:'Étapes 6 et 7 — Optimiser et analyser',body:'Choisis tes <b>jours de référence</b> été et hiver et règle la <b>priorité</b>. Les boutons cherchent la meilleure <b>inclinaison des lames</b>, <b>inclinaison du support</b> ou <b>longueur du support</b>.<br><br>L’<b>analyse</b> donne le pourcentage de vitrage au soleil, le profil de la journée et une carte annuelle.'},
+  {icon:'✓',title:'Bonne route !',body:'Tu peux réafficher ce guide à tout moment avec le bouton <b>Revoir le guide</b>, en haut ou en bas de page.<br><br><i>Rappel : les résultats doivent toujours être vérifiés par un professionnel qualifié.</i><br><br><small>Licence Creative Commons <b>BY-NC-ND 4.0</b> · © 2026 Jean Pineau</small>'}
+];
+function showGuide(){
+  if($('.onboard-overlay'))return;let i=0;
+  const ov=document.createElement('div');ov.className='onboard-overlay';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','onb-title');
+  ov.innerHTML=`<div class="onboard-card"><button class="onboard-skip" type="button" title="Passer le guide" aria-label="Passer le guide">×</button><div class="onboard-icon" id="onb-icon" aria-hidden="true"></div><div class="onboard-title" id="onb-title"></div><div class="onboard-body" id="onb-body"></div><div class="onboard-progress" id="onb-prog"></div><div class="onboard-actions"><button class="b" id="onb-prev" type="button">◂ Précédent</button><button class="b primary" id="onb-next" type="button">Suivant ▸</button></div></div>`;
+  document.body.appendChild(ov);
+  const render=()=>{const s=STEPS[i];$('#onb-icon').textContent=s.icon;$('#onb-title').textContent=s.title;$('#onb-body').innerHTML=s.body;
+    $('#onb-prev').disabled=i===0;$('#onb-next').textContent=i===STEPS.length-1?'OK, c’est compris ✓':'Suivant ▸';
+    $('#onb-prog').innerHTML=STEPS.map((_,k)=>`<button class="onb-dot${k===i?' active':''}" data-k="${k}" type="button" aria-label="Écran ${k+1}"></button>`).join('');
+    $$('#onb-prog .onb-dot').forEach(d=>d.addEventListener('click',()=>{i=+d.dataset.k;render()}))};
+  const close=()=>{ov.classList.add('closing');setTimeout(()=>ov.remove(),250);try{localStorage.setItem(ONB_KEY,'true')}catch(e){}document.removeEventListener('keydown',key)};
+  const key=e=>{if(e.key==='Escape')close();if(e.key==='ArrowRight'&&i<STEPS.length-1){i++;render()}if(e.key==='ArrowLeft'&&i>0){i--;render()}};
+  ov.querySelector('.onboard-skip').addEventListener('click',close);
+  $('#onb-prev').addEventListener('click',()=>{if(i>0){i--;render()}});
+  $('#onb-next').addEventListener('click',()=>{if(i<STEPS.length-1){i++;render()}else close()});
+  ov.addEventListener('click',e=>{if(e.target===ov)close()});
+  document.addEventListener('keydown',key);render();$('#onb-next').focus();
+}
+function maybeGuide(){let seen=false;try{seen=localStorage.getItem(ONB_KEY)==='true'}catch(e){}if(!seen)showGuide()}
+
+/* ---------- branchements ---------- */
+function wire(){
+  $('#paste').addEventListener('input',e=>{const g=parseGPS(e.target.value);if(!g){if(e.target.value.trim())validateCoords(NaN,NaN);return}
+    if(validateCoords(g[0],g[1])){S.place='Coordonnées saisies';mapZoom(19);setSite(g[0],g[1],null,true);Geo.reverse(S.lat,S.lon)}});
+  for(const id of ['lat','lon'])$('#f-'+id).addEventListener('change',e=>{const v=parseFloat(e.target.value);if(isNaN(v))return;const la=id==='lat'?v:S.lat,lo=id==='lon'?v:S.lon;
+    if(validateCoords(la,lo)){S.place='Coordonnées saisies';setSite(la,lo,null,true);Geo.reverse(S.lat,S.lon)}});
+  $('#t-slider').addEventListener('input',e=>{S.minutes=+e.target.value;timeChanged(false)});
+  $('#t-slider').addEventListener('change',()=>scheduleHeavy());
+  $('#t-date').addEventListener('change',e=>{if(e.target.value){S.date=e.target.value;timeChanged(true)}});
+  $$('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const y=S.date.slice(0,4),p=b.dataset.preset;
+    if(p==='ete')S.date=y+'-06-21';else if(p==='hiver')S.date=y+'-12-21';else if(p==='equi')S.date=y+'-03-20';
+    else{const n=new Date();S.date=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate());S.minutes=n.getHours()*60+n.getMinutes()}
+    timeChanged(true)}));
+  $('#play').addEventListener('click',()=>{playing=!playing;$('#play').textContent=playing?'❚❚ Pause':'▶ Lecture';$('#play').setAttribute('aria-pressed',playing);if(!playing){drawCoupe();scheduleHeavy()}});
+  $('#t-mode').addEventListener('change',e=>{S.mode=e.target.value;acc=0;fillSpeeds();save()});
+  $('#t-speed').addEventListener('change',e=>{S.speed=+e.target.value;save()});
+  $$('.views button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+  $('#o-sum').addEventListener('change',e=>{if(e.target.value){S.sumDate=e.target.value;scheduleHeavy();save()}});
+  $('#o-win').addEventListener('change',e=>{if(e.target.value){S.winDate=e.target.value;scheduleHeavy();save()}});
+  $('#o-prio').addEventListener('input',e=>{S.prio=+e.target.value;scheduleHeavy(120);save()});
+  $$('[data-opt]').forEach(b=>b.addEventListener('click',()=>runOpt(b.dataset.opt)));
+  $('#cfg-copy').addEventListener('click',()=>{const txt=JSON.stringify(S,null,1);
+    const done=()=>{$('#cfg-msg').className='feedback ok';$('#cfg-msg').textContent='✓ Réglages copiés dans le presse-papiers.'};
+    const fb=()=>{$('#cfg-txt').value=txt;$('#cfg-txt').select();$('#cfg-msg').className='feedback warn';$('#cfg-msg').textContent='Copie automatique refusée : le texte est sélectionné ci-dessus, copie-le à la main.'};
+    try{navigator.clipboard.writeText(txt).then(done,fb)}catch(e){fb()}});
+  $('#cfg-load').addEventListener('click',()=>{try{const o=JSON.parse($('#cfg-txt').value);if(typeof o!=='object'||o===null)throw 0;S={...DEF,...o};initValues();mapCenter(S.lat,S.lon);changed();timeChanged(true);$('#cfg-msg').className='feedback ok';$('#cfg-msg').textContent='✓ Réglages chargés.'}
+    catch(e){$('#cfg-msg').className='feedback err';$('#cfg-msg').textContent='Ce texte n’est pas un jeu de réglages valide. Colle exactement ce que donne « Copier les réglages ».'}});
+  $('#cfg-reset').addEventListener('click',()=>{S={...DEF};initValues();mapCenter(S.lat,S.lon);changed();timeChanged(true);$('#cfg-msg').className='feedback ok';$('#cfg-msg').textContent='✓ Valeurs d’exemple rétablies.'});
+  $('#guide-btn').addEventListener('click',showGuide);$('#guide-btn2').addEventListener('click',showGuide);
+}
+function initValues(){
+  syncFields();$('#o-sum').value=S.sumDate;$('#o-win').value=S.winDate;$('#o-prio').value=S.prio;
+  $('#t-mode').value=S.mode;fillSpeeds();$('#t-slider').value=Math.round(S.minutes);$('#t-date').value=S.date;
+  $('#paste').value=S.lat+', '+S.lon;validateCoords(S.lat,S.lon);if(S.place&&!/^Exemple|^Coordonnées|^Point/.test(S.place))$('#addr').value=S.place;
+}
+
+renderFields();initValues();wire();wireMap();init3D();
+buildModel();updateHUD();drawCoupe();wallInfo();updateRefs();drawDay();drawHeat();
+requestAnimationFrame(loop);
+maybeGuide();
+})();
+</script>
+</body>
+</html>
