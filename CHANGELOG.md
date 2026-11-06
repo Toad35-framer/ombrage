@@ -1,5 +1,55 @@
 # Changelog Ombrage
 
+## v1.2.0 — Novembre 2026 — Réglages dans les exports
+
+### Note de synthèse DOCX / PDF
+- Nouvelle case **« Inclure les réglages enregistrés »**, cochée par
+  défaut : ajoute une section « Réglages enregistrés » entre
+  « Illustrations » et « Méthode et limites »
+- Le bloc reprend tous les réglages de l'étude (site, façade, fenêtre,
+  support, lames, dates, chantier, indice) en texte à espacement fixe,
+  prêt à être copié-collé
+- Mode d'emploi rappelé en tête de section
+
+### Réglages enregistrés
+- « Charger ces réglages » accepte maintenant un texte copié depuis un
+  PDF ou un DOCX : le bloc est retrouvé automatiquement, même si le
+  texte collé contient d'autres lignes ou des retours à la ligne en trop
+
+## v1.1.0 — Novembre 2026 — Exports DOCX, PDF et DXF
+
+### Nouveaux champs
+- **Nom du chantier** (étape 1) et **indice de la fenêtre** (étape 2,
+  repère de menuiserie extérieure, ex. MEX 12), gardés avec les réglages
+- Indice affiché en pastille dans l'étape 2 et dans la barre d'état
+
+### Note de synthèse DOCX / PDF
+- Document A4 portrait aux couleurs d'Alti-Vent : bandeau bleu avec le
+  nom du chantier en titre, l'adresse et les coordonnées GPS en
+  sous-titre ; pastilles indice MEX / orientation / date de l'étude
+- Tableaux de toutes les données (site, menuiserie, support, lames)
+- Résultats : instant simulé, jours de référence été / hiver avec
+  appréciation colorée, indice d'efficacité, dernière optimisation
+- Illustrations : photo aérienne avec tracé du mur, vue 3D, coupe,
+  profil de la journée, carte annuelle
+- Méthode, limites, avertissement et licence ; en-tête et pied de page
+  numérotés sur chaque page
+- DOCX écrit directement au format Office Open XML (JSZip), PDF créé
+  avec jsPDF, sans serveur
+
+### Plan DXF
+- Vue de face, profil et vue en plan avec flèche du nord, disposés en
+  projection
+- Dessin en vraie grandeur (1 unité = 1 mm), échelle 1/1 à 1/50 pour la
+  taille des textes, cotes et hachures
+- Case « Avec les cotes » ; un calque par famille d'éléments ; cartouche
+- Format DXF R12 (AC1009) pour la compatibilité la plus large
+
+### Divers
+- Tuiles IGN chargées en mode CORS pour pouvoir être reprises dans les
+  exports
+- Guide de démarrage : nouvel écran « Exporter »
+
 ## v1.0.0 — Novembre 2026 — Première version publique
 
 Outil web de calcul de la course du soleil et de simulation de l'ombre

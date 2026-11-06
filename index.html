@@ -193,6 +193,19 @@ footer .warnline{margin-top:6px;font-style:italic;color:#8a4a1f}
 .cc-text b{color:var(--text);font-weight:600}
 .linkbtn{background:none;border:0;color:var(--color-info);text-decoration:underline;cursor:pointer;font-size:12px;padding:2px}
 
+/* exports */
+.exp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px}
+.exp-box{border:.5px solid var(--border);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--formbg)}
+.exp-box .panel-title{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.exp-box .panel-title small{font-weight:400;color:var(--text2)}
+.exp-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.exp-row select{width:auto;padding:6px 8px}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
+.chk input{width:16px;height:16px;padding:0;accent-color:var(--color-info)}
+.exp-msg{font-size:12.5px;min-height:18px;margin:8px 0 0;color:var(--text2)}
+.mex-chip{display:inline-block;margin-left:auto;font-size:12px;font-weight:700;color:var(--color-info);background:var(--color-info-bg);border-radius:10px;padding:1px 10px}
+.mex-chip:empty{display:none}
+
 /* carrousel */
 .onboard-overlay{position:fixed;inset:0;z-index:9999;background:rgba(31,78,121,.55);display:flex;align-items:center;justify-content:center;animation:fadeIn .25s ease;padding:16px}
 .onboard-overlay.closing{animation:fadeOut .25s ease forwards}
@@ -221,7 +234,7 @@ footer .warnline{margin-top:6px;font-style:italic;color:#8a4a1f}
   <div class="wrap">
     <div>
       <h1><span class="brand">Ombrage</span> — Simulation d’ombrage de brise-soleil à lames</h1>
-      <p>Course du soleil (formules NOAA / Meeus) — adresses et photo aérienne IGN Géoplateforme — J.Pineau + Claude · v1.0.0</p>
+      <p>Course du soleil (formules NOAA / Meeus) — adresses et photo aérienne IGN Géoplateforme — J.Pineau + Claude · v1.2.0</p>
     </div>
     <button class="guide-btn" id="guide-btn" type="button">? Revoir le guide</button>
   </div>
@@ -234,6 +247,7 @@ footer .warnline{margin-top:6px;font-style:italic;color:#8a4a1f}
   <div class="col">
     <section class="card" aria-labelledby="h-site">
       <h2 id="h-site"><span class="step-badge">1</span>Site</h2>
+      <div class="field" style="margin-bottom:12px"><label for="f-chantier" class="paste-label">🏗 Nom du chantier</label><input id="f-chantier" type="text" class="paste-input" placeholder="ex : Résidence Les Pins — Bâtiment B" autocomplete="off"></div>
       <div class="addr-wrap">
         <label for="addr" class="paste-label">🔎 Recherche par adresse</label>
         <input id="addr" type="text" class="paste-input" placeholder="Rue, ville… ex : 12 rue de la Paix, Rennes" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="addr-list">
@@ -265,7 +279,8 @@ footer .warnline{margin-top:6px;font-style:italic;color:#8a4a1f}
     </section>
 
     <section class="card" aria-labelledby="h-fac">
-      <h2 id="h-fac"><span class="step-badge">2</span>Façade et fenêtre</h2>
+      <h2 id="h-fac"><span class="step-badge">2</span>Façade et fenêtre <span class="mex-chip" id="mex-chip"></span></h2>
+      <div class="field" style="margin-bottom:12px"><label for="f-mex">Indice de la fenêtre <span class="u">(repère de menuiserie extérieure)</span></label><input id="f-mex" type="text" placeholder="ex : MEX 12" autocomplete="off"></div>
       <div class="fgrid" id="fields-facade"></div>
     </section>
 
@@ -370,6 +385,33 @@ footer .warnline{margin-top:6px;font-style:italic;color:#8a4a1f}
         <div class="legend"><span>0 %<span class="grad"></span>100 % au soleil</span><span><span class="sw"></span>pas de soleil sur la façade</span></div>
       </div>
     </section>
+
+    <section class="card" aria-labelledby="h-exp">
+      <h2 id="h-exp"><span class="step-badge">8</span>Exports</h2>
+      <div class="exp-grid">
+        <div class="exp-box">
+          <div class="panel-title">Note de synthèse <small>A4 portrait</small></div>
+          <p class="note">Chantier, adresse, coordonnées, indice de la menuiserie, toutes les données saisies, les résultats et les illustrations (3D, coupe, profil, carte annuelle).</p>
+          <label class="chk"><input type="checkbox" id="x-cfg"> Inclure les réglages enregistrés</label>
+          <p class="hint" style="margin-top:-6px">Bloc de texte à recopier dans « Réglages enregistrés » → « Charger ces réglages » pour retrouver ou vérifier l’étude.</p>
+          <div class="exp-row">
+            <button class="b primary" id="x-docx" type="button">Exporter en DOCX</button>
+            <button class="b" id="x-pdf" type="button">Exporter en PDF</button>
+          </div>
+        </div>
+        <div class="exp-box">
+          <div class="panel-title">Plan DAO <small>DXF</small></div>
+          <p class="note">Vue de face, profil et vue en plan du brise-soleil, en vraie grandeur (1 unité = 1 mm). L’échelle règle la taille des textes et des cotes à l’impression.</p>
+          <div class="exp-row">
+            <label class="lbl" for="x-scale">Échelle</label>
+            <select id="x-scale"><option value="1">1/1</option><option value="10">1/10</option><option value="20">1/20</option><option value="25">1/25</option><option value="50">1/50</option></select>
+            <label class="chk"><input type="checkbox" id="x-dims"> Avec les cotes</label>
+          </div>
+          <div class="exp-row"><button class="b primary" id="x-dxf" type="button">Exporter en DXF</button></div>
+        </div>
+      </div>
+      <p class="exp-msg" id="x-msg" aria-live="polite">Les fichiers se téléchargent depuis la version locale ou en ligne (GitHub Pages). L’aperçu sur claude.ai bloque les téléchargements.</p>
+    </section>
   </div>
 </main>
 
@@ -401,6 +443,8 @@ footer .warnline{margin-top:6px;font-style:italic;color:#8a4a1f}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (function(){
 "use strict";
@@ -423,8 +467,10 @@ const DEF={
   N:6, lw:100, le:25, lt:15,
   date:YEAR+'-06-21', minutes:14*60,
   sumDate:YEAR+'-06-21', winDate:YEAR+'-12-21', prio:50,
-  mode:'h', speed:30, wall:null
+  mode:'h', speed:30, wall:null,
+  chantier:'', mex:'', xScale:20, xDims:true, xCfg:true
 };
+const VERSION='1.2.0';
 const KEY='ombrage-v2';
 let S=load()||{...DEF};
 function load(){try{const t=localStorage.getItem(KEY)||localStorage.getItem('ombrage-v1');if(!t)return null;return {...DEF,...JSON.parse(t)}}catch(e){return null}}
@@ -642,7 +688,7 @@ function tileURL(z,x,y){return GPF+'/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1
 function tile(z,x,y){
   const k=MAP.tms+'/'+z+'/'+x+'/'+y;let t=MAP.tiles.get(k);if(t)return t;
   if(MAP.tiles.size>400)MAP.tiles.clear();
-  const img=new Image();t={img,st:0};MAP.tiles.set(k,t);
+  const img=new Image();img.crossOrigin='anonymous';t={img,st:0};MAP.tiles.set(k,t);
   img.onload=()=>{t.st=1;MAP.ok++;MAP.need=true;mapNotice()};
   img.onerror=()=>{t.st=-1;MAP.fail++;
     if(MAP.ok===0&&!MAP.tmsTried&&MAP.fail>=2){MAP.tmsTried=true;MAP.tms='PM_0_19';MAP.tiles.clear();MAP.fail=0}
@@ -825,7 +871,7 @@ function setView(mode,keep){
 function curSun(){return sunAt(S,S.date,S.minutes)}
 function cardinal(a){const n=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];return n[Math.round(((a%360)+360)%360/22.5)%16]}
 function dateFr(ds,o){const [y,m,d]=ds.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('fr-FR',o||{day:'numeric',month:'short',year:'numeric'})}
-function updateStatus(){$('#status').innerHTML=`<b>${S.place||'Site'}</b> · ${nf5.format(S.lat)}, ${nf5.format(S.lon)} · façade ${nf1.format(S.azim)}° (${cardinal(S.azim)}) · ${dateFr(S.date)} à ${hhmm(S.minutes)}`}
+function updateStatus(){$('#status').innerHTML=(S.chantier?`<b>${XE(S.chantier)}</b>${S.mex?' · '+XE(S.mex):''} — `:'')+`${XE(S.place||'Site')} ·${nf5.format(S.lat)}, ${nf5.format(S.lon)} · façade ${nf1.format(S.azim)}° (${cardinal(S.azim)}) · ${dateFr(S.date)} à ${hhmm(S.minutes)}`}
 function updateHUD(){
   const p=curSun(),s=p.s,G=geom(S),f=litFraction(G,s,26);
   const prof=s.z>0?Math.atan2(s.y,s.z)*deg:null,inc=Math.acos(Math.max(-1,Math.min(1,s.z)))*deg;
@@ -922,7 +968,7 @@ function drawHeat(){
   for(let mo=0;mo<12;mo++){const ds=`${yr}-${pad(mo+1)}-21`;
     o+=`<text x="${l-6}" y="${t+mo*chh+chh/2+3.5}" text-anchor="end" class="axt">${MOIS[mo]}</text>`;
     for(let c=0;c<cols;c++){const m=240+c*30+15,p=sunAt(G.T,ds,m),f=(p.el>0&&p.s.z>0)?litFraction(G,p.s,10):null;
-      const fill=f===null?'#eeeeea':`color-mix(in srgb, #EF9F27 ${Math.round(f*100)}%, #EAF1F8)`;
+      const fill=f===null?'#eeeeea':`rgb(${[[0xEF,0xEA],[0x9F,0xF1],[0x27,0xF8]].map(([a,b])=>Math.round(b+(a-b)*f)).join(',')})`;
       o+=`<rect class="cell" data-d="${ds}" data-m="${m}" x="${(l+c*cw).toFixed(2)}" y="${(t+mo*chh).toFixed(2)}" width="${(cw-1).toFixed(2)}" height="${(chh-1).toFixed(2)}" rx="1.5" style="fill:${fill}"><title>21 ${MOIS[mo]} ${hhmm(m)} : ${f===null?'pas de soleil sur la façade':nf0.format(f*100)+' % au soleil'}</title></rect>`}}
   for(let h=4;h<=22;h+=2)o+=`<text x="${l+(h-4)*2*cw}" y="${Hd-5}" text-anchor="middle" class="axt">${h}h</text>`;
   const cm=+S.date.slice(5,7)-1,cc=Math.floor((S.minutes-240)/30);
@@ -945,7 +991,7 @@ function sweep(key,base){
   const pick=key==='D'?near.reduce((a,x)=>x.v<a.v?x:a):near.reduce((a,x)=>Math.abs(x.v-base[key])<Math.abs(a.v-base[key])?x:a);
   return {res,pick};
 }
-let undoState=null;
+let undoState=null,lastOpt=null;
 function runOpt(key){
   const box=$('#optres');box.hidden=false;box.innerHTML='<span class="note">Calcul en cours…</span>';
   setTimeout(()=>{
@@ -953,6 +999,10 @@ function runOpt(key){
     for(const k of keys){const r=sweep(k,S);if(!r){box.innerHTML='<span class="note">Aucun soleil sur la façade aux jours de référence : rien à optimiser.</span>';return}S[k]=r.pick.v;last={k,r}}
     const e1=evalT(S);undoState=before;syncFields();changed();
     const pc=v=>v===null?'—':nf0.format(v*100)+' %';
+    lastOpt={title:key==='all'?'Réglage combiné':OPT[key].label,
+      lines:(key==='all'?['D','pente','lt']:[key]).map(k=>[OPT[k].label,OPT[k].fmt(before[k])+' → '+OPT[k].fmt(S[k])]).concat([
+        ['Passage été',pc(e0.ps)+' → '+pc(e1.ps)],['Passage hiver',pc(e0.pw)+' → '+pc(e1.pw)],
+        ['Indice',(e0.sc===null?'—':nf0.format(e0.sc*100))+' → '+(e1.sc===null?'—':nf0.format(e1.sc*100))+' / 100']])};
     const lines=(key==='all'?['D','pente','lt']:[key]).map(k=>`<div>${OPT[k].label} : <span class="num">${OPT[k].fmt(before[k])} → <b>${OPT[k].fmt(S[k])}</b></span></div>`).join('');
     box.innerHTML=`<div class="head">✓ ${key==='all'?'Réglage combiné appliqué':OPT[key].label+' optimisée'}</div>${lines}
       <div>Été : <span class="num">${pc(e0.ps)} → ${pc(e1.ps)}</span> passe · Hiver : <span class="num">${pc(e0.pw)} → ${pc(e1.pw)}</span> passe</div>
@@ -993,6 +1043,307 @@ function loop(t){
 function scheduleHeavy(ms){clearTimeout(heavyT);heavyT=setTimeout(()=>{updateRefs();drawDay();drawHeat()},ms||180)}
 function changed(){buildModel();updateHUD();drawCoupe();wallInfo();scheduleHeavy();save()}
 
+/* ---------- exports : données communes ---------- */
+const hasAddr=()=>S.place&&!/^(Exemple|Coordonnées|Point placé|Site)/.test(S.place);
+const slug=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60);
+function fileBase(){return [slug(S.chantier),slug(S.mex),'ombrage'].filter(Boolean).join('_')}
+function xmsg(t,cls){const m=$('#x-msg');m.className='exp-msg '+(cls||'');m.textContent=t}
+function download(data,name,type){
+  const blob=data instanceof Blob?data:new Blob([data],{type});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},1500);
+}
+const gpsTxt=()=>`${S.lat.toFixed(5)}, ${S.lon.toFixed(5)} (${nf5.format(Math.abs(S.lat))}° ${S.lat>=0?'N':'S'} – ${nf5.format(Math.abs(S.lon))}° ${S.lon>=0?'E':'O'})`;
+function reportData(){
+  clearTimeout(heavyT);updateRefs();drawDay();drawHeat();drawCoupe();
+  const G=geom(S),T=G.T,p=curSun(),s=p.s,f=litFraction(G,s,26);
+  const sum=dayStats(G,S.sumDate,15,14),win=dayStats(G,S.winDate,15,14),sc=scoreOf(sum.pass,win.pass,S.prio);
+  const mm=v=>nf0.format(v)+' mm',dg=v=>nf1.format(v)+'°',pc=v=>v===null?'—':nf0.format(v*100)+' %',lv=v=>(v>=0?'+':'')+nf0.format(v)+' mm';
+  const long={day:'numeric',month:'long',year:'numeric'};
+  const tipZ=T.D*Math.cos(G.b),tipY=T.Ha-T.D*Math.sin(G.b),prof=s.z>0&&p.el>0?Math.atan2(s.y,s.z)*deg:null;
+  const site=[['Adresse',hasAddr()?S.place:'—'],['Coordonnées GPS (WGS84)',gpsTxt()],['Orientation de la façade',`${dg(S.azim)} (${cardinal(S.azim)}), comptée depuis le nord dans le sens horaire`]];
+  if(S.wall){const a=S.wall.a,b=S.wall.b,pa=wpx(a[0],a[1],22),pb=wpx(b[0],b[1],22);let br=(Math.atan2(pb.x-pa.x,-(pb.y-pa.y))*deg+360)%360;if(br>=180)br-=180;
+    site.push(['Mur tracé sur la photo aérienne',`${nf1.format(distM(a[0],a[1],b[0],b[1]))} m, axe à ${dg(br)} du nord`])}
+  site.push(['Date et heure simulées',`${dateFr(S.date,long)} à ${hhmm(S.minutes)} (heure légale)`]);
+  const fen=[['Indice de la menuiserie',S.mex||'—'],['Largeur',mm(T.W)],['Hauteur',mm(T.L-T.A)],['Altimétrie allège',lv(T.A)],['Altimétrie linteau',lv(T.L)],['Retrait de la menuiserie (tableau)',mm(T.reveal)]];
+  const sup=[['Altimétrie d’accroche',lv(T.Ha)],['Bandeau linteau → accroche',mm(T.Ha-T.L)],
+    ['Inclinaison du support',dg(T.pente)+(T.pente>0?' (descend vers l’extérieur)':T.pente<0?' (monte vers l’extérieur)':' (de niveau)')],
+    ['Longueur le long du support',mm(T.D)],['Avancée horizontale / altimétrie en about',`${mm(tipZ)} / ${lv(tipY)}`],
+    ['Débords gauche / droite (vus de l’extérieur)',`${mm(T.dg)} / ${mm(T.dd)}`],['Longueur hors tout',mm(G.Lx)],['Consoles (2, une à chaque extrémité)',`${nf0.format(G.cw)} × ${nf0.format(T.ch)} mm`]];
+  const lam=[['Nombre de lames',nf0.format(T.N)],['Largeur × épaisseur',`${nf0.format(T.lw)} × ${nf0.format(T.le)} mm`],['Inclinaison sur le support',dg(T.lt)+' (positif = bord extérieur relevé)'],
+    ['Inclinaison par rapport à l’horizontale',dg(T.lt-T.pente)],['Entraxe des lames (le long du support)',mm(T.D/T.N)]];
+  const inst=[['Azimut / hauteur du soleil',`${dg(p.az)} / ${dg(p.el)}`],['Angle de profil sur la façade',prof===null?'pas de soleil direct sur la façade':dg(prof)],['Surface vitrée au soleil',pc(f)]];
+  const ref=st=>st.pass===null?'Pas de soleil sur la façade ce jour-là':`${pc(st.pass)} du rayonnement direct atteint le vitrage · ${nf2.format(st.got)} / ${nf2.format(st.possible)} kWh/m² · soleil sur la façade de ${hhmm(st.first-7.5)} à ${hhmm(st.last+7.5)}`;
+  const [scC,scL]=stateOf(sc,true);
+  const res=[['Été — '+dateFr(S.sumDate,long),ref(sum),sum.pass===null?'':stateOf(sum.pass,false)[0]],['Hiver — '+dateFr(S.winDate,long),ref(win),win.pass===null?'':stateOf(win.pass,true)[0]],
+    ['Priorité retenue',`${100-S.prio} % apports d’hiver / ${S.prio} % protection d’été`],['Indice d’efficacité',sc===null?'—':`${nf0.format(sc*100)} / 100 (${scL})`,scC]];
+  return {title:S.chantier||'Chantier sans nom',addr:hasAddr()?S.place:'',gps:gpsTxt(),mex:S.mex||'—',orient:`${dg(S.azim)} (${cardinal(S.azim)})`,
+    dateEtude:new Date().toLocaleDateString('fr-FR',long),site,fen,sup,lam,inst,res,opt:lastOpt,simLabel:`${dateFr(S.date,long)} à ${hhmm(S.minutes)}`};
+}
+const METHODE=['Position du soleil calculée avec les formules NOAA d’après J. Meeus (Astronomical Algorithms), avec correction de réfraction atmosphérique.',
+  'Rayonnement direct par ciel clair (modèle de Meinel, masse d’air de Kasten-Young), pondéré par l’incidence sur la façade. Le rayonnement diffus et réfléchi n’est pas pris en compte.',
+  'Ombre calculée par lancer de rayons depuis une grille de points du vitrage vers le soleil : lames, consoles et embrasure. Les masques lointains (bâtiments voisins, relief, végétation) ne sont pas modélisés.',
+  'Le pourcentage indiqué est la part du rayonnement direct reçu par le vitrage, comparée à la même fenêtre sans brise-soleil.'];
+const DISCL='Cet outil est fourni à des fins pédagogiques et d’assistance au pré-dimensionnement. Les résultats doivent être vérifiés par un professionnel qualifié. Aucun calcul de structure (charges, vent, fixations) n’est effectué.';
+const CFG_INTRO='Pour retrouver, retravailler ou vérifier cette étude dans Ombrage : copier tout le bloc ci-dessous, de la première à la dernière ligne, le coller dans la carte « Réglages enregistrés », puis cliquer « Charger ces réglages ».';
+function cfgLines(max){const out=[];for(const l of JSON.stringify(S,null,1).split('\n')){for(let i=0;i<l.length;i+=max)out.push(l.slice(i,i+max));if(!l.length)out.push('')}return out}
+function parseCfg(t){t=String(t||'');const m=t.search(/\{\s*"/),b=t.lastIndexOf('}');if(m<0||b<m)throw new Error('vide');t=t.slice(m,b+1);
+  try{return JSON.parse(t)}catch(e){return JSON.parse(t.replace(/\r?\n/g,''))}}
+const LICENCE='Licence Creative Commons BY-NC-ND 4.0 — Attribution, Pas d’utilisation commerciale, Pas de modification · © 2026 Jean Pineau';
+
+/* ---------- exports : images ---------- */
+const SVGCSS=`.ax{stroke:#ececec;stroke-width:1}.axt{fill:#5a5a5a;font-size:10.5px;font-family:Calibri,Carlito,Arial,sans-serif}.c-wall{fill:url(#hatch);stroke:#1a1a1a;stroke-width:1.2}.c-hatch{stroke:#9a9a9a;stroke-width:.8}.c-glass{stroke:#2E75B6;stroke-width:4}.c-slat{fill:#2b3640}.c-cons{fill:#e8ecef;stroke:#b9c2c9;stroke-width:1}.c-axis{stroke:#9a9a9a;stroke-width:1;stroke-dasharray:6 4;fill:none}.c-ray{stroke:#D98613;stroke-width:1.4}.c-rayoff{stroke:#D98613;stroke-width:1;stroke-dasharray:2 4;opacity:.5}.c-dot{fill:#EF9F27}.c-dim{stroke:#5a5a5a;stroke-width:1;fill:none}.c-t{fill:#5a5a5a;font-family:Calibri,Carlito,Arial,sans-serif}.c-tb{fill:#1F4E79;font-family:Calibri,Carlito,Arial,sans-serif;font-weight:700}.c-tsun{fill:#D98613;font-family:Calibri,Carlito,Arial,sans-serif;font-weight:600}`;
+function svgToPng(svg,wpx){return new Promise(res=>{try{
+  if(!svg)return res(null);const vb=svg.viewBox.baseVal,w=wpx,h=Math.round(wpx*vb.height/vb.width);
+  const c=svg.cloneNode(true);c.setAttribute('xmlns','http://www.w3.org/2000/svg');c.setAttribute('width',w);c.setAttribute('height',h);
+  c.querySelectorAll('title').forEach(t=>t.remove());
+  const st=document.createElementNS('http://www.w3.org/2000/svg','style');st.textContent=SVGCSS;c.insertBefore(st,c.firstChild);
+  const img=new Image();
+  img.onload=()=>{try{const k=document.createElement('canvas');k.width=w;k.height=h;const x=k.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h);res({url:k.toDataURL('image/png'),w,h})}catch(e){res(null)}};
+  img.onerror=()=>res(null);img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(c));
+}catch(e){res(null)}})}
+function cap3D(){if(!G3.ok)return null;try{G3.r.render(G3.scene,G3.cam);const c=G3.r.domElement;return {url:c.toDataURL('image/png'),w:c.width,h:c.height}}catch(e){return null}}
+function capMap(){try{drawMap();return {url:cv.toDataURL('image/png'),w:cv.width,h:cv.height,photo:MAP.ok>0}}catch(e){return null}}
+async function captures(){
+  return {map:capMap(),v3d:cap3D(),coupe:await svgToPng($('#coupe svg'),1100),day:await svgToPng($('#daychart svg'),1400),heat:await svgToPng($('#heat svg'),1400)};
+}
+const b64=u=>u.slice(u.indexOf(',')+1);
+
+/* ---------- export DOCX (OOXML écrit à la main, zippé par JSZip) ---------- */
+const XE=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const NS='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
+function wr(t,o={}){const sz=o.sz||21,fn=o.mono?'Consolas':'Calibri';return `<w:r><w:rPr><w:rFonts w:ascii="${fn}" w:hAnsi="${fn}" w:cs="${fn}"/>${o.b?'<w:b/>':''}${o.i?'<w:i/>':''}${o.color?`<w:color w:val="${o.color}"/>`:''}<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/>${o.shd?`<w:shd w:val="clear" w:color="auto" w:fill="${o.shd}"/>`:''}</w:rPr><w:t xml:space="preserve">${XE(t)}</w:t></w:r>`}
+function wp(runs,o={}){let p='';if(o.keep)p+='<w:keepNext/>';if(o.pb)p+='<w:pageBreakBefore/>';if(o.bdr)p+=o.bdr;if(o.shd)p+=`<w:shd w:val="clear" w:color="auto" w:fill="${o.shd}"/>`;
+  p+=`<w:spacing w:before="${o.before||0}" w:after="${o.after===undefined?80:o.after}" w:line="${o.line||264}" w:lineRule="auto"/>`;if(o.ind)p+=o.ind;if(o.jc)p+=`<w:jc w:val="${o.jc}"/>`;
+  return `<w:p><w:pPr>${p}</w:pPr>${Array.isArray(runs)?runs.join(''):runs}</w:p>`}
+const BRD=c=>['top','left','bottom','right','insideH','insideV'].map(s=>`<w:${s} w:val="${c?'single':'nil'}" w:sz="4" w:space="0" w:color="${c||'auto'}"/>`).join('');
+function wtc(w,content,o={}){return `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${o.shd?`<w:shd w:val="clear" w:color="auto" w:fill="${o.shd}"/>`:''}${o.mar?`<w:tcMar><w:top w:w="${o.mar}" w:type="dxa"/><w:left w:w="${o.mar*1.5}" w:type="dxa"/><w:bottom w:w="${o.mar}" w:type="dxa"/><w:right w:w="${o.mar*1.5}" w:type="dxa"/></w:tcMar>`:''}<w:vAlign w:val="center"/></w:tcPr>${content}</w:tc>`}
+function wtbl(rows,widths,o={}){const tw=widths.reduce((a,b)=>a+b,0);
+  return `<w:tbl><w:tblPr><w:tblW w:w="${tw}" w:type="dxa"/><w:tblBorders>${BRD(o.border===undefined?'E0E0E0':o.border)}</w:tblBorders><w:tblLayout w:type="fixed"/><w:tblCellMar><w:top w:w="50" w:type="dxa"/><w:left w:w="100" w:type="dxa"/><w:bottom w:w="50" w:type="dxa"/><w:right w:w="100" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${widths.map(w=>`<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>${rows.map(r=>`<w:tr><w:trPr><w:cantSplit/></w:trPr>${r}</w:tr>`).join('')}</w:tbl>`}
+const SEMC={g:'14694F',a:'8A5200',r:'B3302F'};
+function wkv(rows){return wtbl(rows.map(([k,v,c])=>wtc(3500,wp(wr(k,{sz:19,color:'5A5A5A'}),{after:0}),{shd:'F2F7FB'})+wtc(6138,wp(wr(v,{sz:20,b:!!c,color:c?SEMC[c]:'1A1A1A'}),{after:0}))),[3500,6138])+wp('',{after:60})}
+function wh(n,t,o={}){return wp([wr(` ${n} `,{b:true,color:'FFFFFF',shd:'1F4E79',sz:22}),wr('  '+t,{b:true,color:'1F4E79',sz:26})],{keep:true,pb:o.pb,before:o.pb?0:240,after:120,bdr:'<w:pBdr><w:bottom w:val="single" w:sz="6" w:space="3" w:color="1F4E79"/></w:pBdr>'})}
+function wsub(t){return wp(wr(t,{b:true,color:'1F4E79',sz:21}),{keep:true,before:120,after:60})}
+function wimg(rid,id,img,wcm,cap){const cx=Math.round(wcm*360000),cy=Math.round(cx*img.h/img.w);
+  return wp(`<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:docPr id="${id}" name="Image ${id}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="${id}" name="Image ${id}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="${rid}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>`,{keep:true,before:120,after:40,jc:'center'})
+    +wp(wr(cap,{i:true,sz:17,color:'5A5A5A'}),{jc:'center',after:160})}
+async function exportDOCX(){
+  if(typeof JSZip==='undefined'){xmsg('La librairie de création DOCX n’a pas pu se charger (connexion internet nécessaire).','err');return}
+  xmsg('Préparation du document DOCX…');
+  const R=reportData(),I=await captures(),zip=new JSZip(),rels=[];let nImg=0,body='';
+  const addImg=(img,wcm,cap)=>{if(!img)return '';nImg++;const rid='rIdImg'+nImg;zip.file(`word/media/image${nImg}.png`,b64(img.url),{base64:true});
+    rels.push(`<Relationship Id="${rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image${nImg}.png"/>`);return wimg(rid,nImg,img,wcm,cap)};
+  // bandeau titre
+  const band=wp(wr('OMBRAGE — ÉTUDE D’OMBRAGE DE BRISE-SOLEIL',{b:true,color:'FFD54F',sz:17}),{after:60})+wp(wr(R.title,{b:true,color:'FFFFFF',sz:40}),{after:60,line:240})
+    +(R.addr?wp(wr(R.addr,{color:'FFFFFF',sz:22}),{after:20}):'')+wp(wr('Coordonnées : '+R.gps,{color:'DCE6F0',sz:19}),{after:0});
+  body+=wtbl([wtc(9638,band,{shd:'1F4E79',mar:160})],[9638],{border:''});
+  body+=wp('',{after:80});
+  const chip=(k,v)=>wtc(3212,wp(wr(k,{sz:16,color:'5A5A5A'}),{after:0})+wp(wr(v,{b:true,sz:26,color:'1F4E79'}),{after:0}),{shd:'EAF1F8',mar:80});
+  body+=wtbl([chip('Menuiserie extérieure',R.mex)+chip('Orientation de la façade',R.orient)+chip('Date de l’étude',R.dateEtude)],[3212,3213,3213],{border:'FFFFFF'});
+  body+=wp([wr('⚠ Avertissement : ',{b:true,color:'B45309',sz:18}),wr(DISCL,{color:'5C4400',sz:18})],{before:120,after:120,shd:'FFF8E1',bdr:'<w:pBdr><w:left w:val="single" w:sz="24" w:space="6" w:color="F59E0B"/></w:pBdr>',ind:'<w:ind w:left="120" w:right="120"/>'});
+  body+=wh(1,'Site et orientation')+wkv(R.site);
+  if(I.map)body+=addImg(I.map,9,I.map.photo?'Photo aérienne IGN : point du site, mur tracé, flèche « ext. » (normale à la façade) et direction du soleil à l’heure simulée':'Schéma d’orientation : point du site, mur tracé, flèche « ext. » et direction du soleil (photo aérienne indisponible)');
+  body+=wh(2,'Menuiserie '+(S.mex||''))+wkv(R.fen);
+  body+=wh(3,'Brise-soleil')+wsub('Support')+wkv(R.sup)+wsub('Lames')+wkv(R.lam);
+  body+=wh(4,'Résultats d’ensoleillement')+wsub('À l’instant simulé — '+R.simLabel)+wkv(R.inst)+wsub('Jours de référence (ciel clair)')+wkv(R.res);
+  if(R.opt)body+=wsub('Dernière optimisation : '+R.opt.title)+wkv(R.opt.lines);
+  body+=wh(5,'Illustrations',{pb:true});
+  body+=addImg(I.v3d,15.5,'Vue 3D avec ombres portées — '+R.simLabel);
+  body+=addImg(I.coupe,10.5,'Coupe verticale au milieu de la fenêtre — rayons solaires selon l’angle de profil');
+  body+=addImg(I.day,15.5,'Profil de la journée : surface vitrée au soleil (%), date simulée et jours de référence');
+  body+=addImg(I.heat,15.5,'Carte annuelle : surface vitrée au soleil le 21 de chaque mois, de 4 h à 22 h');
+  let nSec=6;
+  if(S.xCfg!==false){body+=wh(nSec++,'Réglages enregistrés',{pb:true})+wp(wr(CFG_INTRO,{sz:19}),{after:120})
+    +cfgLines(100).map(l=>wp(wr(l,{sz:15,mono:true}),{shd:'F2F7FB',after:0,line:240,ind:'<w:ind w:left="113" w:right="113"/>'})).join('')+wp('',{after:120})}
+  body+=wh(nSec,'Méthode et limites')+METHODE.map(t=>wp(wr('• '+t,{sz:19}),{after:60,ind:'<w:ind w:left="240" w:hanging="240"/>'})).join('');
+  body+=wp([wr('Avertissement — ',{b:true,color:'B45309',sz:18}),wr(DISCL,{i:true,color:'8A4A1F',sz:18})],{before:200,after:80});
+  body+=wp(wr(LICENCE,{sz:17,color:'5A5A5A'}),{after:0});
+  const sect=`<w:sectPr><w:headerReference w:type="default" r:id="rIdHdr"/><w:footerReference w:type="default" r:id="rIdFtr"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr>`;
+  zip.file('word/document.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ${NS}><w:body>${body}${sect}</w:body></w:document>`);
+  const fld=c=>`<w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> ${c} </w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r>${wr('1',{sz:15,color:'9A9A9A'})}<w:r><w:fldChar w:fldCharType="end"/></w:r>`;
+  zip.file('word/footer1.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr ${NS}>${wp([wr(`Ombrage v${VERSION} — J.Pineau + Claude · ${LICENCE} · page `,{sz:15,color:'9A9A9A'}),fld('PAGE'),wr(' / ',{sz:15,color:'9A9A9A'}),fld('NUMPAGES')],{jc:'center',after:0,bdr:'<w:pBdr><w:top w:val="single" w:sz="4" w:space="4" w:color="E0E0E0"/></w:pBdr>'})}</w:ftr>`);
+  zip.file('word/header1.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr ${NS}>${wp(wr(`Ombrage · ${R.title}${S.mex?' · '+S.mex:''}`,{sz:15,color:'9A9A9A'}),{jc:'right',after:0})}</w:hdr>`);
+  zip.file('word/styles.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsia="Calibri" w:cs="Calibri"/><w:sz w:val="21"/><w:szCs w:val="21"/><w:lang w:val="fr-FR"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="80" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style><w:style w:type="table" w:default="1" w:styleId="TableNormal"><w:name w:val="Normal Table"/><w:tblPr><w:tblInd w:w="0" w:type="dxa"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="108" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>`);
+  zip.file('word/_rels/document.xml.rels',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rIdHdr" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/><Relationship Id="rIdFtr" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>${rels.join('')}</Relationships>`);
+  zip.file('_rels/.rels',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>`);
+  const iso=new Date().toISOString().replace(/\.\d+Z$/,'Z');
+  zip.file('docProps/core.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${XE(R.title+(S.mex?' — '+S.mex:''))} — Étude d’ombrage</dc:title><dc:creator>Ombrage v${VERSION}</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${iso}</dcterms:created></cp:coreProperties>`);
+  zip.file('[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`);
+  const blob=await zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+  download(blob,fileBase()+'.docx');xmsg('✓ Document DOCX créé : '+fileBase()+'.docx','ok');
+}
+
+/* ---------- export PDF (jsPDF) ---------- */
+const latin=s=>String(s).replace(/[  ]/g,' ').replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/[–—−]/g,'-').replace(/→/g,'->').replace(/œ/g,'oe').replace(/Œ/g,'OE').replace(/…/g,'...').replace(/≈/g,'~').replace(/[^\x00-\xFF]/g,'').replace(/^\s+/,'');
+async function exportPDF(){
+  if(!window.jspdf||!window.jspdf.jsPDF){xmsg('La librairie de création PDF n’a pas pu se charger (connexion internet nécessaire).','err');return}
+  xmsg('Préparation du document PDF…');
+  const R=reportData(),I=await captures(),d=new window.jspdf.jsPDF({unit:'mm',format:'a4',compress:true});
+  const Lm=15,Wc=180,BOT=282;let y=0;
+  const col=h=>[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];
+  const font=(st,sz,c)=>{d.setFont('helvetica',st);d.setFontSize(sz);d.setTextColor(...col(c||'1A1A1A'))};
+  const page=()=>{d.addPage();y=20};
+  const ensure=h=>{if(y+h>BOT)page()};
+  const lines=(t,w)=>d.splitTextToSize(latin(t),w);
+  // bandeau
+  font('bold',20,'FFFFFF');const tl=lines(R.title,Wc);const ad=R.addr?(font('normal',11),lines(R.addr,Wc)):[];
+  const bh=14+tl.length*8+ad.length*5+8;
+  d.setFillColor(31,78,121);d.rect(0,0,210,bh,'F');
+  font('bold',8.5,'FFD54F');d.text(latin('OMBRAGE - ÉTUDE D’OMBRAGE DE BRISE-SOLEIL'),Lm,10);
+  font('bold',20,'FFFFFF');d.text(tl,Lm,18.5);y=18.5+tl.length*8;
+  if(ad.length){font('normal',11,'FFFFFF');d.text(ad,Lm,y-1.5);y+=ad.length*5}
+  font('normal',9,'DCE6F0');d.text(latin('Coordonnées : '+R.gps),Lm,y);y=bh+6;
+  // pastilles
+  [['Menuiserie extérieure',R.mex],['Orientation de la façade',R.orient],['Date de l’étude',R.dateEtude]].forEach(([k,v],i)=>{
+    const x=Lm+i*61;d.setFillColor(234,241,248);d.roundedRect(x,y,58,15,2,2,'F');font('normal',7.5,'5A5A5A');d.text(latin(k),x+3,y+5);
+    font('bold',11.5,'1F4E79');d.text(lines(v,52)[0]||'',x+3,y+11.5)});
+  y+=20;
+  // avertissement
+  font('normal',8.5,'5C4400');const dl=lines('Avertissement : '+DISCL,Wc-8);const dh=dl.length*3.8+5;
+  d.setFillColor(255,248,225);d.rect(Lm,y,Wc,dh,'F');d.setFillColor(245,158,11);d.rect(Lm,y,1.3,dh,'F');d.text(dl,Lm+5,y+4.6);y+=dh+5;
+  const head=(n,t,newPage)=>{if(newPage)page();else ensure(42);y+=3;d.setFillColor(31,78,121);d.circle(Lm+3.5,y-1.6,3.5,'F');font('bold',9.5,'FFFFFF');d.text(String(n),Lm+3.5,y-0.2,{align:'center'});
+    font('bold',13,'1F4E79');d.text(latin(t),Lm+10,y);y+=3;d.setDrawColor(31,78,121);d.setLineWidth(.4);d.line(Lm,y,Lm+Wc,y);y+=5};
+  const sub=t=>{ensure(14);font('bold',10.5,'1F4E79');d.text(latin(t),Lm,y+1);y+=5};
+  const kv=rows=>{d.setLineWidth(.2);d.setDrawColor(224,224,224);
+    for(const [k,v,c] of rows){font('normal',9);const kl=lines(k,58),vl=lines(v,112);const h=Math.max(kl.length,vl.length)*4+3.2;ensure(h);
+      d.setFillColor(242,247,251);d.rect(Lm,y,64,h,'F');d.rect(Lm,y,Wc,h,'S');d.line(Lm+64,y,Lm+64,y+h);
+      font('normal',8.8,'5A5A5A');d.text(kl,Lm+2.5,y+4.6);font(c?'bold':'normal',9.3,c?SEMC[c]:'1A1A1A');d.text(vl,Lm+66.5,y+4.6);y+=h}
+    y+=4};
+  const img=(im,wmm,cap)=>{if(!im)return;let w=wmm,h=w*im.h/im.w;if(h>150){h=150;w=h*im.w/im.h}ensure(h+10);
+    d.addImage(im.url,'PNG',Lm+(Wc-w)/2,y,w,h);y+=h+4;font('italic',8,'5A5A5A');const cl=lines(cap,Wc);d.text(cl,105,y,{align:'center'});y+=cl.length*3.6+4};
+  head(1,'Site et orientation');kv(R.site);
+  if(I.map)img(I.map,95,I.map.photo?'Photo aérienne IGN : point du site, mur tracé, flèche « ext. » et direction du soleil à l’heure simulée':'Schéma d’orientation : point du site, mur tracé, flèche « ext. » et direction du soleil');
+  head(2,'Menuiserie '+(S.mex||''));kv(R.fen);
+  head(3,'Brise-soleil');sub('Support');kv(R.sup);sub('Lames');kv(R.lam);
+  head(4,'Résultats d’ensoleillement');sub('À l’instant simulé - '+R.simLabel);kv(R.inst);sub('Jours de référence (ciel clair)');kv(R.res);
+  if(R.opt){sub('Dernière optimisation : '+R.opt.title);kv(R.opt.lines)}
+  head(5,'Illustrations',true);
+  img(I.v3d,170,'Vue 3D avec ombres portées - '+R.simLabel);img(I.coupe,115,'Coupe verticale au milieu de la fenêtre - rayons solaires selon l’angle de profil');
+  img(I.day,170,'Profil de la journée : surface vitrée au soleil (%), date simulée et jours de référence');img(I.heat,170,'Carte annuelle : surface vitrée au soleil le 21 de chaque mois, de 4 h à 22 h');
+  let nSec=6;
+  if(S.xCfg!==false){head(nSec++,'Réglages enregistrés',true);font('normal',9,'1A1A1A');const il=lines(CFG_INTRO,Wc);d.text(il,Lm,y);y+=il.length*4+3;
+    const lh=3.3;
+    for(const l of cfgLines(108)){if(y+lh>BOT)page();d.setFillColor(242,247,251);d.rect(Lm,y-2.6,Wc,lh,'F');font('normal',7.5,'1A1A1A');d.setFont('courier','normal');
+      d.text(latin(l.replace(/^ +/,m=>'\u0001'.repeat(m.length))).replace(/\u0001/g,' '),Lm+2,y);y+=lh}
+    y+=6}
+  head(nSec,'Méthode et limites');
+  for(const t of METHODE){font('normal',9,'1A1A1A');const l=lines(t,Wc-5);ensure(l.length*4+2);d.text('•',Lm,y);d.text(l,Lm+4,y);y+=l.length*4+2}
+  y+=3;font('italic',8.5,'8A4A1F');const al=lines('Avertissement - '+DISCL,Wc);ensure(al.length*3.8+8);d.text(al,Lm,y);y+=al.length*3.8+3;
+  font('normal',8,'5A5A5A');d.text(lines(LICENCE,Wc),Lm,y);
+  const n=d.getNumberOfPages();
+  for(let i=1;i<=n;i++){d.setPage(i);d.setDrawColor(224,224,224);d.setLineWidth(.2);d.line(Lm,287,Lm+Wc,287);font('normal',7,'9A9A9A');
+    d.text(latin(`Ombrage v${VERSION} - J.Pineau + Claude · Licence CC BY-NC-ND 4.0 · © 2026 Jean Pineau`),Lm,291);d.text(`page ${i} / ${n}`,Lm+Wc,291,{align:'right'});
+    if(i>1)d.text(latin(`Ombrage · ${R.title}${S.mex?' · '+S.mex:''}`),Lm+Wc,10,{align:'right'})}
+  d.setProperties({title:latin(R.title+(S.mex?' - '+S.mex:'')+' - Étude d’ombrage'),creator:'Ombrage v'+VERSION});
+  download(d.output('blob'),fileBase()+'.pdf');xmsg('✓ Document PDF créé : '+fileBase()+'.pdf','ok');
+}
+
+/* ---------- export DXF (R12, vraie grandeur en mm) ---------- */
+function buildDXF(den,withDims){
+  const G=geom(S),T=G.T,b=G.b,r=T.reveal,th=r+200,k=den;
+  const TXT=2.5*k,TTL=3.5*k,TK=0.9*k,EXT=1.5*k,GAP=Math.max(1500,25*k);
+  const tipZ=T.D*Math.cos(b),tipY=T.Ha-T.D*Math.sin(b),hc=T.ch/2;
+  const E=[];const f=v=>(Math.round(v*1000)/1000).toString();
+  const L=(ly,x1,y1,x2,y2)=>E.push(`0\nLINE\n8\n${ly}\n10\n${f(x1)}\n20\n${f(y1)}\n30\n0\n11\n${f(x2)}\n21\n${f(y2)}\n31\n0`);
+  const PL=(ly,pts,cl=true)=>{let s=`0\nPOLYLINE\n8\n${ly}\n66\n1\n70\n${cl?1:0}\n10\n0\n20\n0\n30\n0`;for(const [x,y] of pts)s+=`\n0\nVERTEX\n8\n${ly}\n10\n${f(x)}\n20\n${f(y)}\n30\n0`;E.push(s+`\n0\nSEQEND\n8\n${ly}`)};
+  const RC=(ly,x0,y0,x1,y1)=>PL(ly,[[x0,y0],[x1,y0],[x1,y1],[x0,y1]]);
+  const CI=(ly,x,y,rr)=>E.push(`0\nCIRCLE\n8\n${ly}\n10\n${f(x)}\n20\n${f(y)}\n30\n0\n40\n${f(rr)}`);
+  const TX=(ly,x,y,h,s,al=0,rot=0)=>E.push(`0\nTEXT\n8\n${ly}\n10\n${f(x)}\n20\n${f(y)}\n30\n0\n40\n${f(h)}\n1\n${s}\n50\n${f(rot)}`+(al?`\n72\n${al}\n11\n${f(x)}\n21\n${f(y)}\n31\n0`:''));
+  const hatch=(x0,y0,x1,y1)=>{const sp=Math.max(3*k,25);for(let c=Math.ceil((y0-x1)/sp)*sp;c<=y1-x0;c+=sp){const pts=[];
+    for(const x of [x0,x1]){const y=x+c;if(y>=y0-1e-6&&y<=y1+1e-6)pts.push([x,y])}for(const y of [y0,y1]){const x=y-c;if(x>x0+1e-6&&x<x1-1e-6)pts.push([x,y])}
+    if(pts.length>=2)L('MUR_HACHURES',pts[0][0],pts[0][1],pts[1][0],pts[1][1])}};
+  const tick=(x,y)=>L('COTES',x-TK,y-TK,x+TK,y+TK);
+  const dimH=(x1,y1,x2,y2,yd,lab)=>{if(!withDims||Math.abs(x2-x1)<1)return;const s=yd>=Math.max(y1,y2)?1:-1;
+    L('COTES',x1,y1+s*EXT*0.6,x1,yd+s*EXT);L('COTES',x2,y2+s*EXT*0.6,x2,yd+s*EXT);L('COTES',x1,yd,x2,yd);tick(x1,yd);tick(x2,yd);
+    TX('COTES',(x1+x2)/2,yd+0.8*k,TXT,lab||String(Math.round(Math.abs(x2-x1))),1)};
+  const dimV=(x1,y1,x2,y2,xd,lab)=>{if(!withDims||Math.abs(y2-y1)<1)return;const s=xd>=Math.max(x1,x2)?1:-1;
+    L('COTES',x1+s*EXT*0.6,y1,xd+s*EXT,y1);L('COTES',x2+s*EXT*0.6,y2,xd+s*EXT,y2);L('COTES',xd,y1,xd,y2);tick(xd,y1);tick(xd,y2);
+    TX('COTES',xd-0.8*k,(y1+y2)/2,TXT,lab||String(Math.round(Math.abs(y2-y1))),1,90)};
+  const level=(x,y,lab,right)=>{if(!withDims)return;const t=1.2*k;PL('COTES',[[x-t,y+1.4*t],[x+t,y+1.4*t],[x,y]]);L('COTES',x,y,right?x-6*k:x+6*k,y);
+    TX('COTES',right?x+1.6*t:x-1.6*t,y+0.4*k,TXT,lab,right?0:2)};
+  const lev=v=>(v>=0?'+':'')+Math.round(v);
+  // sections de lames et console (repère façade : z sortant, y altimétrie)
+  const slats=G.boxes.filter(B=>B.k==='slat').map(B=>{const v=B.a[1],w=B.a[2],hw=B.h[1],ht=B.h[2];
+    return [[1,1],[1,-1],[-1,-1],[-1,1]].map(([a,c])=>[B.c[2]+a*hw*v[2]+c*ht*w[2],B.c[1]+a*hw*v[1]+c*ht*w[1]])});
+  const nb=[Math.cos(b),Math.sin(b)];
+  const cons=[[hc*nb[1],T.Ha+hc*nb[0]],[-hc*nb[1],T.Ha-hc*nb[0]],[tipZ-hc*nb[1],tipY-hc*nb[0]],[tipZ+hc*nb[1],tipY+hc*nb[0]]];
+  const rng=(pts,i)=>[Math.min(...pts.map(p=>p[i])),Math.max(...pts.map(p=>p[i]))];
+  const xL=Math.min(G.x0,0)-600,xR=Math.max(G.x1,T.W)+600;
+  const ytop=Math.max(T.Ha+hc,T.L,rng(cons,1)[1],...slats.map(s=>rng(s,1)[1]))+600;
+  // ===== VUE DE FACE =====
+  L('MUR',xL-300,0,xR+300,0);RC('MUR',xL,0,xR,ytop);RC('MUR',0,T.A,T.W,T.L);
+  RC('MENUISERIE',45,T.A+45,T.W-45,T.L-45);
+  RC('SUPPORT',G.x0,T.Ha-35,G.x1,T.Ha+35);
+  const [cy0,cy1]=rng(cons,1);RC('CONSOLES',G.x0,cy0,G.x0+G.cw,cy1);RC('CONSOLES',G.x1-G.cw,cy0,G.x1,cy1);
+  for(const s of slats){const [a,c]=rng(s,1);RC('LAMES',G.x0,a,G.x1,c)}
+  TX('TEXTES',xL,-8*k,TTL,'VUE DE FACE (DEPUIS L\'EXTERIEUR)');
+  if(withDims){const y1=ytop+8*k,y2=ytop+15*k;
+    if(T.dg>0)dimH(G.x0,ytop,0,ytop,y1);dimH(0,ytop,T.W,ytop,y1);if(T.dd>0)dimH(T.W,ytop,G.x1,ytop,y1);dimH(G.x0,ytop,G.x1,ytop,y2,'HT '+Math.round(G.Lx));
+    const xd=xL-8*k;dimV(xL,0,xL,T.A,xd);dimV(xL,T.A,xL,T.L,xd);dimV(xL,T.L,xL,T.Ha,xd);TX('COTES',xL+2*k,-4*k,TXT,'±0',0)}
+  // ===== PROFIL (à droite, mêmes altimétries) =====
+  const PX=xR+GAP+th+(withDims?20*k:0);
+  RC('MUR',PX-th,0,PX,T.A);RC('MUR',PX-th,T.L,PX,ytop);hatch(PX-th,0,PX,T.A);hatch(PX-th,T.L,PX,ytop);
+  L('MUR',PX-th-600,0,PX+tipZ+800,0);
+  RC('MENUISERIE',PX-r-60,T.A,PX-r,T.L);L('VITRAGE',PX-r-30,T.A+45,PX-r-30,T.L-45);
+  if(r>0){L('MUR',PX-r,T.A,PX,T.A);L('MUR',PX-r,T.L,PX,T.L)}
+  RC('SUPPORT',PX,T.Ha-35,PX+12,T.Ha+35);CI('SUPPORT',PX,T.Ha,10);
+  L('AXES',PX,T.Ha,PX+tipZ,tipY);
+  PL('CONSOLES',cons.map(([z,y])=>[PX+z,y]));
+  for(const s of slats)PL('LAMES',s.map(([z,y])=>[PX+z,y]));
+  TX('TEXTES',PX-th,-8*k,TTL,'PROFIL - COUPE AU MILIEU DE LA FENETRE');
+  TX('TEXTES',PX-th-2*k,ytop-6*k,TXT,'INT.',2);TX('TEXTES',PX+2*k,ytop-6*k,TXT,'EXT.',0);
+  if(withDims){const xl=PX-th-6*k;level(xl,0,'±0');level(xl,T.A,'All. '+lev(T.A));level(xl,T.L,'Lint. '+lev(T.L));level(xl,T.Ha,'Acc. '+lev(T.Ha));
+    const top=Math.max(T.Ha+hc,...slats.map(s=>rng(s,1)[1]),rng(cons,1)[1]);
+    dimH(PX,T.Ha,PX+tipZ,tipY,top+8*k);
+    if(Math.abs(tipY-T.Ha)>1){level(PX+tipZ+10*k,tipY,'About '+lev(tipY),true)}
+    if(r>0)dimH(PX-r,T.A,PX,T.A,T.A-6*k);
+    TX('COTES',PX,top+20*k,TXT,`Support ${Math.round(T.D)} - pente ${nf1.format(T.pente)}°`,0);
+    TX('COTES',PX,top+15*k,TXT,`Lames ${T.N} x ${Math.round(T.lw)}x${Math.round(T.le)} - ${nf1.format(T.lt)}°/support (${nf1.format(T.lt-T.pente)}°/horiz.) - entraxe ${Math.round(T.D/T.N)}`,0)}
+  // ===== VUE EN PLAN (sous la vue de face, extérieur en bas) =====
+  const PY=-(GAP+th+(withDims?14*k:0)+10*k),P=z=>PY-z;
+  RC('MUR',xL,P(0),0,P(-th));RC('MUR',T.W,P(0),xR,P(-th));hatch(xL,P(0),0,P(-th));hatch(T.W,P(0),xR,P(-th));
+  RC('MENUISERIE',0,P(-r),T.W,P(-r-60));L('VITRAGE',45,P(-r-30),T.W-45,P(-r-30));
+  RC('SUPPORT',G.x0,P(12),G.x1,P(0));
+  RC('CONSOLES',G.x0,P(tipZ),G.x0+G.cw,P(0));RC('CONSOLES',G.x1-G.cw,P(tipZ),G.x1,P(0));
+  for(const s of slats){const [a,c]=rng(s,0);RC('LAMES',G.x0,P(c),G.x1,P(a))}
+  TX('TEXTES',xL,P(-th)+3*k,TXT,'INTERIEUR');TX('TEXTES',xL,P(tipZ)-4*k,TXT,'EXTERIEUR');
+  // nord
+  const az=S.azim*rad,nx=Math.sin(az),ny=-Math.cos(az),NL=15*k,ncx=xR+12*k,ncy=P(tipZ/2);
+  L('TEXTES',ncx-nx*NL/2,ncy-ny*NL/2,ncx+nx*NL/2,ncy+ny*NL/2);
+  const hx=ncx+nx*NL/2,hy=ncy+ny*NL/2;PL('TEXTES',[[hx,hy],[hx-nx*3*k-ny*1.5*k,hy-ny*3*k+nx*1.5*k],[hx-nx*3*k+ny*1.5*k,hy-ny*3*k-nx*1.5*k]]);
+  TX('TEXTES',hx+nx*3*k,hy+ny*3*k-TXT/2,TXT*1.2,'N',1);
+  if(withDims){const y1=P(tipZ)-10*k,y2=P(tipZ)-17*k;
+    if(T.dg>0)dimH(G.x0,P(tipZ),0,P(tipZ),y1);dimH(0,P(tipZ),T.W,P(tipZ),y1);if(T.dd>0)dimH(T.W,P(tipZ),G.x1,P(tipZ),y1);dimH(G.x0,P(tipZ),G.x1,P(tipZ),y2,'HT '+Math.round(G.Lx));
+    dimV(G.x0,P(0),G.x0,P(tipZ),G.x0-8*k,String(Math.round(tipZ)));
+    if(G.cw>0)dimH(G.x1-G.cw,P(0),G.x1,P(0),P(0)+6*k)}
+  const ylow=P(tipZ)-(withDims?17*k:0)-10*k;
+  TX('TEXTES',xL,ylow,TTL,'VUE EN PLAN');
+  // cartouche
+  const cart=[`OMBRAGE v${VERSION} - BRISE-SOLEIL A LAMES`,`Chantier : ${S.chantier||'-'}`,`Menuiserie : ${S.mex||'-'}`,
+    `Facade orientee ${nf1.format(S.azim)}° (${cardinal(S.azim)})`,`Echelle 1/${den} - cotes en mm - dessin en vraie grandeur`,`Edite le ${new Date().toLocaleDateString('fr-FR')}`];
+  cart.forEach((t,i)=>TX('TEXTES',xL,ylow-(10+i*5)*k,i===0?TTL:TXT,t));
+  // en-tête
+  const layers=[['MUR',8,'CONTINUOUS'],['MUR_HACHURES',9,'CONTINUOUS'],['MENUISERIE',4,'CONTINUOUS'],['VITRAGE',5,'CONTINUOUS'],['SUPPORT',30,'CONTINUOUS'],['CONSOLES',6,'CONTINUOUS'],['LAMES',7,'CONTINUOUS'],['AXES',1,'AXE'],['COTES',3,'CONTINUOUS'],['TEXTES',7,'CONTINUOUS']];
+  const hdr=['0','SECTION','2','HEADER','9','$ACADVER','1','AC1009','9','$INSUNITS','70','4','9','$DWGCODEPAGE','3','ANSI_1252','9','$LTSCALE','40',f(k),'9','$TEXTSIZE','40',f(TXT),'0','ENDSEC',
+    '0','SECTION','2','TABLES',
+    '0','TABLE','2','LTYPE','70','2',
+    '0','LTYPE','2','CONTINUOUS','70','0','3','Solid line','72','65','73','0','40','0.0',
+    '0','LTYPE','2','AXE','70','0','3','Axe __ . __','72','65','73','4','40','12.5','49','8.0','49','-2.0','49','0.5','49','-2.0',
+    '0','ENDTAB','0','TABLE','2','LAYER','70',String(layers.length)];
+  for(const [n,c,lt] of layers)hdr.push('0','LAYER','2',n,'70','0','62',String(c),'6',lt);
+  hdr.push('0','ENDTAB','0','TABLE','2','STYLE','70','1','0','STYLE','2','STANDARD','70','0','40','0.0','41','1.0','50','0.0','71','0','42',f(TXT),'3','txt','4','','0','ENDTAB','0','ENDSEC','0','SECTION','2','ENTITIES');
+  const txt=hdr.join('\n')+'\n'+E.join('\n')+'\n0\nENDSEC\n0\nEOF\n';
+  const CP={'€':0x80,'‚':0x82,'„':0x84,'…':0x85,'‘':0x91,'’':0x92,'“':0x93,'”':0x94,'–':0x96,'—':0x97,'œ':0x9C,'Œ':0x8C,' ':0x20,' ':0x20,'−':0x2D};
+  const s=txt.replace(/\n/g,'\r\n'),out=new Uint8Array(s.length);
+  for(let i=0;i<s.length;i++){const c=s.charCodeAt(i),ch=s[i];out[i]=c<256?c:(CP[ch]||0x3F)}
+  return out;
+}
+function exportDXF(){
+  const den=+$('#x-scale').value||20,dims=$('#x-dims').checked;
+  try{const bytes=buildDXF(den,dims);const name=fileBase()+`_1-${den}${dims?'':'_sans-cotes'}.dxf`;download(new Blob([bytes],{type:'application/dxf'}),name);xmsg('✓ Plan DXF créé : '+name,'ok')}
+  catch(e){xmsg('Le plan DXF n’a pas pu être créé : '+e.message,'err')}
+}
+
 /* ---------- carrousel de démarrage ---------- */
 const ONB_KEY='ombrage_onboarded';
 const STEPS=[
@@ -1003,6 +1354,7 @@ const STEPS=[
   {icon:'🔩',title:'Étape 3 — Brise-soleil',body:'Décris le <b>support</b> (altimétrie d’accroche, inclinaison, débords, longueur, consoles) puis les <b>lames</b> (nombre, largeur, épaisseur, inclinaison).<br><br>Les lames sont réparties à pas égal sur la longueur du support.'},
   {icon:'🎬',title:'Étapes 4 et 5 — Simuler',body:'La <b>3D</b> montre les ombres portées à la date et l’heure choisies. Fais tourner la vue à la souris, ou choisis <b>Face</b>, <b>Côté</b>, <b>Vue du soleil</b>.<br><br><b>Lecture</b> fait défiler les heures ou les jours. La <b>coupe</b> montre les rayons qui passent (orange plein) et ceux qui sont arrêtés.'},
   {icon:'🎯',title:'Étapes 6 et 7 — Optimiser et analyser',body:'Choisis tes <b>jours de référence</b> été et hiver et règle la <b>priorité</b>. Les boutons cherchent la meilleure <b>inclinaison des lames</b>, <b>inclinaison du support</b> ou <b>longueur du support</b>.<br><br>L’<b>analyse</b> donne le pourcentage de vitrage au soleil, le profil de la journée et une carte annuelle.'},
+  {icon:'📄',title:'Étape 8 — Exporter',body:'Renseigne le <b>nom du chantier</b> (étape 1) et l’<b>indice de la fenêtre</b> (étape 2, ex. MEX 12).<br><br><b>DOCX / PDF</b> : note de synthèse A4 avec toutes les données, les résultats, les illustrations et, si la case est cochée, les réglages enregistrés à recopier pour retrouver l’étude.<br><b>DXF</b> : vue de face, profil et vue en plan en vraie grandeur, avec ou sans cotes, textes calés sur l’échelle choisie.'},
   {icon:'✓',title:'Bonne route !',body:'Tu peux réafficher ce guide à tout moment avec le bouton <b>Revoir le guide</b>, en haut ou en bas de page.<br><br><i>Rappel : les résultats doivent toujours être vérifiés par un professionnel qualifié.</i><br><br><small>Licence Creative Commons <b>BY-NC-ND 4.0</b> · © 2026 Jean Pineau</small>'}
 ];
 function showGuide(){
@@ -1049,14 +1401,25 @@ function wire(){
     const done=()=>{$('#cfg-msg').className='feedback ok';$('#cfg-msg').textContent='✓ Réglages copiés dans le presse-papiers.'};
     const fb=()=>{$('#cfg-txt').value=txt;$('#cfg-txt').select();$('#cfg-msg').className='feedback warn';$('#cfg-msg').textContent='Copie automatique refusée : le texte est sélectionné ci-dessus, copie-le à la main.'};
     try{navigator.clipboard.writeText(txt).then(done,fb)}catch(e){fb()}});
-  $('#cfg-load').addEventListener('click',()=>{try{const o=JSON.parse($('#cfg-txt').value);if(typeof o!=='object'||o===null)throw 0;S={...DEF,...o};initValues();mapCenter(S.lat,S.lon);changed();timeChanged(true);$('#cfg-msg').className='feedback ok';$('#cfg-msg').textContent='✓ Réglages chargés.'}
+  $('#cfg-load').addEventListener('click',()=>{try{const o=parseCfg($('#cfg-txt').value);if(typeof o!=='object'||o===null)throw 0;S={...DEF,...o};initValues();mapCenter(S.lat,S.lon);changed();timeChanged(true);$('#cfg-msg').className='feedback ok';$('#cfg-msg').textContent='✓ Réglages chargés.'}
     catch(e){$('#cfg-msg').className='feedback err';$('#cfg-msg').textContent='Ce texte n’est pas un jeu de réglages valide. Colle exactement ce que donne « Copier les réglages ».'}});
   $('#cfg-reset').addEventListener('click',()=>{S={...DEF};initValues();mapCenter(S.lat,S.lon);changed();timeChanged(true);$('#cfg-msg').className='feedback ok';$('#cfg-msg').textContent='✓ Valeurs d’exemple rétablies.'});
   $('#guide-btn').addEventListener('click',showGuide);$('#guide-btn2').addEventListener('click',showGuide);
+  $('#f-chantier').addEventListener('input',e=>{S.chantier=e.target.value.trim();updateStatus();save()});
+  $('#f-mex').addEventListener('input',e=>{S.mex=e.target.value.trim();$('#mex-chip').textContent=S.mex;save()});
+  $('#x-scale').addEventListener('change',e=>{S.xScale=+e.target.value;save()});
+  $('#x-dims').addEventListener('change',e=>{S.xDims=e.target.checked;save()});
+  $('#x-cfg').addEventListener('change',e=>{S.xCfg=e.target.checked;save()});
+  const guard=(fn,btn)=>async()=>{btn.disabled=true;try{await fn()}catch(e){xmsg('L’export a échoué : '+(e&&e.message||e),'err')}finally{btn.disabled=false}};
+  $('#x-docx').addEventListener('click',guard(exportDOCX,$('#x-docx')));
+  $('#x-pdf').addEventListener('click',guard(exportPDF,$('#x-pdf')));
+  $('#x-dxf').addEventListener('click',exportDXF);
 }
 function initValues(){
   syncFields();$('#o-sum').value=S.sumDate;$('#o-win').value=S.winDate;$('#o-prio').value=S.prio;
   $('#t-mode').value=S.mode;fillSpeeds();$('#t-slider').value=Math.round(S.minutes);$('#t-date').value=S.date;
+  $('#f-chantier').value=S.chantier||'';$('#f-mex').value=S.mex||'';$('#mex-chip').textContent=S.mex||'';
+  $('#x-scale').value=String(S.xScale||20);$('#x-dims').checked=S.xDims!==false;$('#x-cfg').checked=S.xCfg!==false;
   $('#paste').value=S.lat+', '+S.lon;validateCoords(S.lat,S.lon);if(S.place&&!/^Exemple|^Coordonnées|^Point/.test(S.place))$('#addr').value=S.place;
 }
 

@@ -19,6 +19,7 @@ Un brise-soleil bien réglé arrête le soleil haut de l'été et laisse passer 
 - **Coupe verticale** cotée avec les rayons solaires selon l'angle de profil
 - **Pourcentage de vitrage au soleil**, à l'instant et sur la journée, en tenant compte de la largeur, de l'épaisseur, du nombre et de l'inclinaison des lames
 - **Optimisation automatique** de l'inclinaison des lames, de l'inclinaison du support et de la longueur du support
+- **Export d'une note de synthèse** A4 en **DOCX** ou **PDF**, et d'un **plan DXF** (vue de face, profil, vue en plan) importable dans la plupart des logiciels de dessin
 
 L'outil tourne **intégralement dans le navigateur** : pas de serveur, pas d'inscription, pas d'envoi de données. Il suffit d'un navigateur récent et d'une connexion internet (pour la photo aérienne, la recherche d'adresse et le moteur 3D).
 
@@ -27,6 +28,7 @@ L'outil tourne **intégralement dans le navigateur** : pas de serveur, pas d'ins
 ## ✨ Fonctionnalités
 
 ### ① Site
+- **Nom du chantier** (repris en titre des exports)
 - **Recherche par adresse** avec suggestions (API Géocodage IGN Géoplateforme)
 - Champ **« coller GPS »** (`48.1173, -1.6778`, `48,1173 ; -1,6778`…) et saisie manuelle latitude / longitude
 - **Photo aérienne IGN** (BD ORTHO) avec zoom et déplacement
@@ -36,6 +38,7 @@ L'outil tourne **intégralement dans le navigateur** : pas de serveur, pas d'ins
 - Direction du soleil à l'heure affichée tracée sur la photo
 
 ### ② Façade et fenêtre
+- **Indice de la fenêtre** (repère de menuiserie extérieure, ex. MEX 12)
 - Orientation de la façade (0° = nord, 90° = est, 180° = sud, 270° = ouest), avec boussole
 - Largeur de la fenêtre
 - Hauteur, altimétrie d'allège et altimétrie de linteau **liées** (la modification de l'une met à jour les autres)
@@ -68,6 +71,24 @@ L'outil tourne **intégralement dans le navigateur** : pas de serveur, pas d'ins
 - Profil de la journée heure par heure
 - **Carte annuelle** (le 21 de chaque mois, de 4 h à 22 h), cliquable
 
+### ⑧ Exports
+- **Note de synthèse DOCX ou PDF** (A4 portrait, charte Alti-Vent) :
+  - titre = nom du chantier, sous-titre = adresse et coordonnées GPS
+  - pastilles : indice de la menuiserie, orientation de la façade, date de l'étude
+  - tableaux de toutes les données saisies (site, menuiserie, support, lames)
+  - résultats : instant simulé, jours de référence été / hiver, indice d'efficacité, dernière optimisation
+  - illustrations : photo aérienne avec tracé du mur, vue 3D, coupe, profil de la journée, carte annuelle
+  - case **« Inclure les réglages enregistrés »** (cochée par défaut) : ajoute, entre les illustrations et la méthode, le bloc de réglages complet à recopier dans « Réglages enregistrés » → « Charger ces réglages » pour retrouver, retravailler ou vérifier l'étude
+  - méthode, limites, avertissement et licence
+- **Plan DXF** (format R12, lisible par AutoCAD, DraftSight, BricsCAD, LibreCAD, ArchiCAD, Revit, SketchUp Pro…) :
+  - vue de face (depuis l'extérieur), profil (coupe au milieu de la fenêtre) et vue en plan avec flèche du nord, disposées en projection
+  - dessin en **vraie grandeur** (1 unité = 1 mm)
+  - choix de l'échelle (1/1, 1/10, 1/20, 1/25, 1/50) : elle règle la hauteur des textes (2,5 mm imprimés), des titres, des cotes et des hachures
+  - case **« Avec les cotes »** : cotes de largeur, débords, hauteur, avancée, niveaux d'altimétrie et caractéristiques des lames
+  - un calque par famille : `MUR`, `MUR_HACHURES`, `MENUISERIE`, `VITRAGE`, `SUPPORT`, `CONSOLES`, `LAMES`, `AXES`, `COTES`, `TEXTES`
+  - cartouche texte : chantier, menuiserie, orientation, échelle, date
+- Fichiers nommés d'après le chantier et la menuiserie, par exemple `Residence-Les-Pins_MEX-12_ombrage.pdf`
+
 ### Confort
 - **Guide de démarrage** au premier lancement, réaffichable à tout moment
 - Réglages gardés dans le navigateur, copiables pour les transmettre à un autre poste
@@ -88,7 +109,7 @@ L'outil est publié via GitHub Pages :
 2. Ouvrez-le dans un navigateur récent (Chrome, Firefox, Edge, Safari)
 3. Une connexion internet est nécessaire pour la photo aérienne, la recherche d'adresse et le moteur 3D
 
-L'outil est entièrement contenu dans un seul fichier HTML : aucune installation, aucune dépendance à installer manuellement (Three.js est chargé via CDN à la volée).
+L'outil est entièrement contenu dans un seul fichier HTML : aucune installation, aucune dépendance à installer manuellement (Three.js, JSZip et jsPDF sont chargés via CDN à la volée).
 
 ---
 
@@ -119,6 +140,8 @@ L'outil est entièrement contenu dans un seul fichier HTML : aucune installation
 - Les lames sont supposées **opaques**
 - L'heure saisie est l'**heure légale du poste** : pour un site situé dans un autre fuseau horaire, régler l'heure en conséquence
 - L'outil ne fait **aucun calcul de structure** (charges, vent, fixations)
+- Les cotes du DXF sont dessinées (lignes et textes), elles ne sont **pas associatives** : elles ne suivent pas une modification de la géométrie dans le logiciel de dessin
+- Le format **DWG** (format fermé d'Autodesk) n'est pas produit : le DXF s'ouvre et s'enregistre en DWG dans les logiciels de DAO
 - La photo aérienne et la recherche d'adresse IGN couvrent la France
 
 ---
@@ -127,7 +150,9 @@ L'outil est entièrement contenu dans un seul fichier HTML : aucune installation
 
 ```
 ombrage/
-├── index.html              ← l'outil complet, version en cours (autonome, ~90 KB)
+├── index.html              ← l'outil complet, version en cours (autonome, ~130 KB)
+├── ombrage-v1.2.0.html     ← archive de la version 1.2.0
+├── ombrage-v1.1.0.html     ← archive de la version 1.1.0
 ├── ombrage-v1.0.0.html     ← archive de la version 1.0.0
 ├── CHANGELOG.md            ← historique des versions
 ├── LICENSE                 ← licence CC BY-NC-ND 4.0
@@ -141,6 +166,7 @@ ombrage/
 - **IGN Géoplateforme — WMTS** : photos aériennes (BD ORTHO)
 - **IGN Géoplateforme — Géocodage** : recherche par adresse et géocodage inverse
 - **Three.js r128** : moteur 3D (chargé via CDN)
+- **JSZip 3.10** et **jsPDF 2.5** : création des fichiers DOCX et PDF dans le navigateur (chargés via CDN)
 - **J. Meeus, *Astronomical Algorithms*** et **NOAA Solar Calculator** : formules de position du soleil
 
 ---
