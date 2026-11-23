@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ombrage — Simulation d’ombrage de brise-soleil à lames</title>
-<meta name="description" content="Calcul de la course du soleil et simulation 3D de l’ombre portée d’un brise-soleil à lames sur une fenêtre. Outil gratuit, dans le navigateur, données IGN Géoplateforme.">
+<meta name="description" content="Calcul de la course du soleil et simulation 3D de l’ombre portée d’un brise-soleil à lames sur une fenêtre, profils alu, acier ou bois et alertes de durabilité. Outil gratuit, dans le navigateur, données IGN Géoplateforme.">
 <meta name="author" content="Jean Pineau">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2212%22%20fill%3D%22%231F4E79%22/%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%229%22%20fill%3D%22%23FFD54F%22/%3E%3Cg%20stroke%3D%22%23FFD54F%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%3E%3Cline%20x1%3D%2220%22%20y1%3D%224%22%20x2%3D%2220%22%20y2%3D%227%22/%3E%3Cline%20x1%3D%224%22%20y1%3D%2220%22%20x2%3D%227%22%20y2%3D%2220%22/%3E%3Cline%20x1%3D%229%22%20y1%3D%229%22%20x2%3D%2211%22%20y2%3D%2211%22/%3E%3C/g%3E%3Crect%20x%3D%2240%22%20y%3D%2210%22%20width%3D%226%22%20height%3D%2246%22%20fill%3D%22%23DCD8CF%22/%3E%3Cg%20fill%3D%22%23ffffff%22%3E%3Crect%20x%3D%2222%22%20y%3D%2234%22%20width%3D%2216%22%20height%3D%224%22%20rx%3D%221%22%20transform%3D%22rotate%28-15%2030%2036%29%22/%3E%3Crect%20x%3D%2222%22%20y%3D%2242%22%20width%3D%2216%22%20height%3D%224%22%20rx%3D%221%22%20transform%3D%22rotate%28-15%2030%2044%29%22/%3E%3Crect%20x%3D%2222%22%20y%3D%2250%22%20width%3D%2216%22%20height%3D%224%22%20rx%3D%221%22%20transform%3D%22rotate%28-15%2030%2052%29%22/%3E%3C/g%3E%3C/svg%3E">
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -226,6 +226,50 @@ footer .warnline{margin-top:6px;font-style:italic;color:#8a4a1f}
 .onboard-actions button{min-width:130px}
 @media (prefers-reduced-motion:reduce){.onboard-overlay,.onboard-card{animation:none}.meter i{transition:none}}
 @media (max-width:440px){.fgrid,.linked{grid-template-columns:1fr}.linked .three{grid-template-columns:1fr}}
+/* v2 : matériau, profils, boutons d'optimisation, durabilité */
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:.5px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:10px}
+.seg button{border:0;border-right:.5px solid var(--border);background:#fff;padding:8px 4px;font-size:13px;cursor:pointer;color:var(--text);font-family:inherit}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--formbg)}
+.seg button[aria-pressed="true"]{background:var(--color-info);color:#fff;font-weight:600}
+.inrow{display:flex;gap:4px;min-width:0}
+.inrow input{flex:1;min-width:0}
+.ob{flex:0 0 34px;border:.5px solid var(--color-info);border-radius:6px;background:#fff;color:var(--color-info);font-size:16px;line-height:1;cursor:pointer;padding:0;font-family:inherit}
+.ob:hover:not(:disabled){background:var(--color-info);color:#fff}
+.ob:disabled{opacity:.45;cursor:not-allowed;border-color:var(--border);color:var(--text3)}
+.ob.busy{animation:obp .8s ease-in-out infinite;opacity:1}
+@keyframes obp{50%{opacity:.3}}
+.optmsg{grid-column:1/-1;font-size:12px;line-height:1.45;background:var(--color-success-bg);border-left:3px solid var(--color-success);padding:5px 8px;border-radius:0 4px 4px 0;color:#14694F;margin-top:-4px}
+.optmsg.none{background:var(--color-warning-bg);border-color:var(--color-warning);color:#8a5200}
+.optmsg .sm{opacity:.85}
+.optmsg .linkbtn{font-size:12px}
+#om-lw{margin-top:6px}
+.prof{background:var(--formbg);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.prof .ph{display:flex;gap:6px;align-items:flex-end}
+.prof .ph .field{flex:1;min-width:0}
+.prof select,.prof input{background:#fff}
+button.b.qbtn{flex:0 0 36px;height:36px;padding:0;font-weight:700;color:var(--color-info);border-color:var(--color-info)}
+.pdes{font-size:11.5px;color:var(--color-info);font-weight:600}
+.sing{display:flex;flex-direction:column;gap:6px}
+.al-list{display:flex;flex-direction:column;gap:6px}
+.dsum{font-size:13px;font-weight:600;padding:6px 10px;border-radius:4px}
+.dsum.r{background:var(--color-danger-bg);color:#B3302F}.dsum.a{background:var(--color-warning-bg);color:#8a5200}.dsum.g{background:var(--color-success-bg);color:#14694F}
+.al{display:grid;grid-template-columns:10px minmax(0,1fr);gap:8px;font-size:12.5px;line-height:1.4;padding:6px 9px;border-radius:4px}
+.al>i{width:10px;height:10px;border-radius:50%;margin-top:4px}
+.al.r{background:var(--color-danger-bg)}.al.r>i{background:var(--color-danger)}
+.al.a{background:var(--color-warning-bg)}.al.a>i{background:var(--color-warning)}
+.al.g{background:var(--color-success-bg)}.al.g>i{background:var(--color-success)}
+.al.i{background:var(--color-info-bg)}.al.i>i{background:var(--color-info)}
+.al .ref{display:block;font-size:11px;color:var(--text2);font-style:italic;margin-top:2px}
+#details svg{max-height:360px;width:100%}
+.modal-ov{position:fixed;inset:0;z-index:9000;background:rgba(31,78,121,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:10px;max-width:640px;width:100%;max-height:calc(100vh - 32px);overflow:auto;padding:22px 20px 18px;position:relative;box-shadow:0 12px 48px rgba(0,0,0,.25)}
+.modal table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums;margin-top:8px}
+.modal th{background:var(--color-info);color:#fff;font-weight:600}
+.modal th,.modal td{padding:5px 8px;border-bottom:.5px solid var(--border);text-align:right;white-space:nowrap}
+.modal th:first-child,.modal td:first-child{text-align:left}
+.modal tbody tr{cursor:pointer}
+.modal tbody tr:hover,.modal tbody tr:focus{background:var(--formbg);outline:none}
 </style>
 </head>
 <body>
@@ -234,7 +278,7 @@ footer .warnline{margin-top:6px;font-style:italic;color:#8a4a1f}
   <div class="wrap">
     <div>
       <h1><span class="brand">Ombrage</span> — Simulation d’ombrage de brise-soleil à lames</h1>
-      <p>Course du soleil (formules NOAA / Meeus) — adresses et photo aérienne IGN Géoplateforme — J.Pineau + Claude · v1.2.0</p>
+      <p>Course du soleil (formules NOAA / Meeus) — adresses et photo aérienne IGN Géoplateforme — J.Pineau + Claude · v2.0.0</p>
     </div>
     <button class="guide-btn" id="guide-btn" type="button">? Revoir le guide</button>
   </div>
@@ -248,6 +292,13 @@ footer .warnline{margin-top:6px;font-style:italic;color:#8a4a1f}
     <section class="card" aria-labelledby="h-site">
       <h2 id="h-site"><span class="step-badge">1</span>Site</h2>
       <div class="field" style="margin-bottom:12px"><label for="f-chantier" class="paste-label">🏗 Nom du chantier</label><input id="f-chantier" type="text" class="paste-input" placeholder="ex : Résidence Les Pins — Bâtiment B" autocomplete="off"></div>
+      <div class="sub-t" style="margin-top:2px">Matériau du brise-soleil</div>
+      <div class="seg" role="group" aria-label="Matériau du brise-soleil">
+        <button type="button" data-mat="alu" aria-pressed="false">Aluminium</button>
+        <button type="button" data-mat="acier" aria-pressed="false">Acier protégé</button>
+        <button type="button" data-mat="bois" aria-pressed="true">Bois</button>
+      </div>
+      <div class="fgrid" id="mat-fields" style="margin-bottom:14px"></div>
       <div class="addr-wrap">
         <label for="addr" class="paste-label">🔎 Recherche par adresse</label>
         <input id="addr" type="text" class="paste-input" placeholder="Rue, ville… ex : 12 rue de la Paix, Rennes" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="addr-list">
@@ -285,11 +336,18 @@ footer .warnline{margin-top:6px;font-style:italic;color:#8a4a1f}
     </section>
 
     <section class="card" aria-labelledby="h-bs">
-      <h2 id="h-bs"><span class="step-badge">3</span>Brise-soleil</h2>
+      <h2 id="h-bs"><span class="step-badge">3</span>Brise-soleil <span class="mex-chip" id="mat-chip"></span></h2>
+      <p class="note" style="margin:-4px 0 10px">Le bouton <b>⟳</b> cherche la valeur qui donne le plus d’ombre sur le vitrage à la date et à l’heure affichées, les autres valeurs restant fixes.</p>
       <div class="sub-t" style="margin-top:0">Support</div>
       <div class="fgrid" id="fields-support"></div>
+      <div id="prof-pc"></div>
       <div class="sub-t">Lames</div>
       <div class="fgrid" id="fields-lames"></div>
+      <div id="prof-pl"></div>
+      <div class="optmsg" id="om-lw" hidden></div>
+      <div id="sing"></div>
+      <div class="sub-t">Durabilité</div>
+      <div id="dura" class="al-list" aria-live="polite"></div>
     </section>
 
     <section class="card" aria-labelledby="h-cfg">
@@ -339,37 +397,28 @@ footer .warnline{margin-top:6px;font-style:italic;color:#8a4a1f}
 
     <section class="card" aria-labelledby="h-coupe">
       <h2 id="h-coupe"><span class="step-badge">5</span>Coupe verticale du brise-soleil</h2>
-      <p class="note" style="margin:-6px 0 8px">Au milieu de la fenêtre, rayons projetés selon l’angle de profil.</p>
+      <p class="note" style="margin:-6px 0 8px">Au milieu de la fenêtre, rayons projetés selon l’angle de profil. α : pente du support, β : inclinaison des lames par rapport à l’horizontale, en couleur selon les alertes de durabilité.</p>
       <div class="svgbox" id="coupe"></div>
-    </section>
-
-    <section class="card" aria-labelledby="h-opt">
-      <h2 id="h-opt"><span class="step-badge">6</span>Optimisation</h2>
-      <div class="objectifs">
-        <div class="field"><label for="o-sum">Jour de référence été</label><input id="o-sum" type="date"></div>
-        <div class="field"><label for="o-win">Jour de référence hiver</label><input id="o-win" type="date"></div>
-      </div>
-      <div class="prio"><span>Apports d’hiver</span><input id="o-prio" type="range" min="0" max="100" step="5" aria-label="Priorité entre apports d’hiver et protection d’été"><span>Protection d’été</span></div>
-      <div class="opt-btns">
-        <button class="b opt" data-opt="lt" type="button">Inclinaison des lames</button>
-        <button class="b opt" data-opt="pente" type="button">Inclinaison du support</button>
-        <button class="b opt" data-opt="D" type="button">Longueur du support</button>
-        <button class="b primary" data-opt="all" type="button">Tout optimiser</button>
-      </div>
-      <div class="optres" id="optres" hidden></div>
+      <div class="panel-title" style="margin-top:14px">Détails de durabilité</div>
+      <p class="note">Sections réelles agrandies, angles et zones où l’eau stagne, avec le renvoi aux documents.</p>
+      <div class="svgbox" id="details"></div>
     </section>
 
     <section class="card" aria-labelledby="h-an">
-      <h2 id="h-an"><span class="step-badge">7</span>Analyse de l’ensoleillement</h2>
+      <h2 id="h-an"><span class="step-badge">6</span>Analyse de l’ensoleillement</h2>
       <div class="an-grid">
         <div class="panel">
           <div class="panel-title">Vitrage au soleil à cet instant</div>
           <div class="big"><span class="n" id="b-pct">—</span><span class="t" id="b-pct-t">de la surface vitrée au soleil</span></div>
           <div class="meter"><i id="b-bar"></i></div>
           <p class="note" id="b-day"></p>
+          <div class="panel-title" style="margin-top:8px">Bilans été / hiver</div>
+          <div class="objectifs">
+            <div class="field"><label for="o-sum">Jour de référence été</label><input id="o-sum" type="date"></div>
+            <div class="field"><label for="o-win">Jour de référence hiver</label><input id="o-win" type="date"></div>
+          </div>
           <div class="refs" id="b-refs"></div>
-          <div class="score"><span>Indice d’efficacité <span class="state" id="b-state"></span></span><span class="n" id="b-score">—</span></div>
-          <p class="note">Part du rayonnement direct reçu par le vitrage sur la journée, par ciel clair, comparée à une fenêtre sans brise-soleil. Le but : peu en été, beaucoup en hiver.</p>
+          <p class="note">Part du rayonnement direct reçue par le vitrage sur la journée, par ciel clair, comparée à une fenêtre sans brise-soleil. Sert à justifier la conception : peu en été, beaucoup en hiver.</p>
         </div>
         <div class="panel">
           <div class="panel-title">Profil de la journée</div>
@@ -387,7 +436,7 @@ footer .warnline{margin-top:6px;font-style:italic;color:#8a4a1f}
     </section>
 
     <section class="card" aria-labelledby="h-exp">
-      <h2 id="h-exp"><span class="step-badge">8</span>Exports</h2>
+      <h2 id="h-exp"><span class="step-badge">7</span>Exports</h2>
       <div class="exp-grid">
         <div class="exp-box">
           <div class="panel-title">Note de synthèse <small>A4 portrait</small></div>
@@ -460,20 +509,33 @@ const YEAR=new Date().getFullYear();
 const GPF='https://data.geopf.fr';
 
 /* ---------- état ---------- */
+const PDEF={pc:{t:'rect',b:40,h:80,e:3,D:60.3,tw:6,tf:8,rot:0,o:0,R:'sym',des:''},pl:{t:'rect',b:100,h:25,e:2,D:48.3,tw:4,tf:4,rot:0,o:0,des:''}};
 const DEF={
   place:'Exemple — Rennes centre', lat:48.11173, lon:-1.67957,
   azim:180, W:1200, H:1350, A:900, L:2250, reveal:0,
-  Ha:2400, band:150, pente:0, dg:200, dd:200, D:800, cw:40, ch:80,
-  N:6, lw:100, le:25, lt:15,
+  Ha:2400, band:150, pente:0, dg:200, dd:200, D:800,
+  N:6, lt:15,
+  mat:'bois', ess:'douglas', clim:'modere', vie:'L1', corro:'C3', atmo:'E12', capC:false, capL:false, desol:false,
+  pc:{...PDEF.pc}, pl:{...PDEF.pl},
   date:YEAR+'-06-21', minutes:14*60,
-  sumDate:YEAR+'-06-21', winDate:YEAR+'-12-21', prio:50,
+  sumDate:YEAR+'-06-21', winDate:YEAR+'-12-21',
   mode:'h', speed:30, wall:null,
   chantier:'', mex:'', xScale:20, xDims:true, xCfg:true
 };
-const VERSION='1.2.0';
-const KEY='ombrage-v2';
-let S=load()||{...DEF};
-function load(){try{const t=localStorage.getItem(KEY)||localStorage.getItem('ombrage-v1');if(!t)return null;return {...DEF,...JSON.parse(t)}}catch(e){return null}}
+const VERSION='2.0.0';
+const KEY='ombrage-v3';
+/* reprend aussi les réglages v1.x (consoles cw × ch, lames lw × le, curseur de priorité) */
+function migrate(o0){
+  const src=o0&&typeof o0==='object'?o0:{},o={...DEF,...src};
+  o.pc=src.pc&&typeof src.pc==='object'?{...PDEF.pc,...src.pc}:{...PDEF.pc,b:+src.cw||PDEF.pc.b,h:+src.ch||PDEF.pc.h};
+  o.pl=src.pl&&typeof src.pl==='object'?{...PDEF.pl,...src.pl}:{...PDEF.pl,b:+src.lw||PDEF.pl.b,h:+src.le||PDEF.pl.h};
+  for(const k of ['cw','ch','lw','le','prio'])delete o[k];
+  if(!['alu','acier','bois'].includes(o.mat))o.mat='bois';
+  if(o.mat==='bois'){o.pc.t='rect';o.pl.t='rect'}
+  return o;
+}
+let S=load()||migrate({});
+function load(){try{const t=localStorage.getItem(KEY)||localStorage.getItem('ombrage-v2')||localStorage.getItem('ombrage-v1');if(!t)return null;return migrate(JSON.parse(t))}catch(e){return null}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
 /* ---------- position du soleil (NOAA / Meeus) ---------- */
@@ -506,37 +568,114 @@ function msOf(ds,min){const [y,m,d]=ds.split('-').map(Number);min=Math.max(0,Mat
 function dni(el){if(el<=0)return 0;const z=90-el,am=1/(Math.cos(z*rad)+0.50572*Math.pow(96.07995-z,-1.6364));return 1353*Math.pow(0.7,Math.pow(am,0.678))}
 function sunAt(T,ds,min){const p=sunPos(msOf(ds,min),T.lat,T.lon);return {...p,s:toLocal(p.az,p.el,T.azim)}}
 
+/* ---------- profils (sections des consoles et des lames) ---------- */
+const PT={
+  rect:{lab:'Rectangulaire / plat',p:['b','h'],rot:1},
+  tuber:{lab:'Tube carré ou rectangulaire',p:['b','h','e'],rot:1,hollow:1},
+  tubec:{lab:'Tube rond',p:['D','e'],hollow:1},
+  L:{lab:'Cornière',p:['b','h','e'],n:4},
+  U:{lab:'U (UPN, UPE)',p:['h','b','tw','tf'],n:4},
+  T:{lab:'T',p:['b','h','tw','tf'],n:4},
+  I:{lab:'I ou H (IPE, HEA, HEB)',p:['h','b','tw','tf'],n:2}
+};
+const MATS={alu:['rect','tuber','tubec','L','U','T','I'],acier:['rect','tuber','tubec','L','U','T','I'],bois:['rect']};
+const TDEF={
+  pc:{rect:{b:40,h:80,des:''},tuber:{b:40,h:80,e:3,des:'40 × 80 × 3'},tubec:{D:60.3,e:4,des:'Ø 60,3 × 4'},L:{b:60,h:60,e:6,des:'L 60 × 60 × 6'},U:{h:100,b:50,tw:6,tf:8.5,des:'UPN 100'},T:{b:60,h:60,tw:7,tf:7,des:'T 60'},I:{h:100,b:55,tw:4.1,tf:5.7,des:'IPE 100'}},
+  pl:{rect:{b:100,h:25,des:''},tuber:{b:100,h:30,e:2,des:''},tubec:{D:48.3,e:3.2,des:'Ø 48,3 × 3,2'},L:{b:60,h:40,e:5,des:''},U:{h:80,b:45,tw:6,tf:8,des:'UPN 80'},T:{b:50,h:50,tw:6,tf:6,des:'T 50'},I:{h:80,b:46,tw:3.8,tf:5.2,des:'IPE 80'}}
+};
+/* positions : rotation de k × 90° de la forme de base (consoles vues de l'extérieur, lames vues en coupe extérieur à droite) */
+function orLabels(t,el){const g=el==='pl'?'côté façade':'à gauche',d=el==='pl'?'côté extérieur':'à droite';
+  if(t==='L')return ['└ ouverture en haut, '+d,'┘ ouverture en haut, '+g,'┐ ouverture en bas, '+g,'┌ ouverture en bas, '+d];
+  if(t==='U')return ['⊔ ouverture en haut','⊐ ouverture '+g,'⊓ ouverture en bas','⊏ ouverture '+d];
+  if(t==='T')return ['T aile en haut','⊢ aile '+g,'⊥ aile en bas','⊣ aile '+d];
+  if(t==='I')return ['I âme verticale','H âme horizontale'];
+  return []}
+function pLabel(el,t,k){
+  if(t==='rect')return k==='b'?'Largeur':(el==='pl'?'Épaisseur':'Hauteur');
+  if(t==='L')return {b:'Aile b',h:'Aile h',e:'Épaisseur e'}[k];
+  if(t==='U')return {h:'Hauteur d’âme h',b:'Largeur d’aile b',tw:'Ép. d’âme tw',tf:'Ép. d’aile tf'}[k];
+  return {b:'Largeur b',h:'Hauteur h',e:'Épaisseur e',D:'Diamètre D',tw:'Ép. d’âme tw',tf:'Ép. d’aile tf'}[k]}
+const R2=(w,h)=>[[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]];
+const circ=(r,n)=>Array.from({length:n},(_,i)=>[r*Math.cos(2*Math.PI*i/n),r*Math.sin(2*Math.PI*i/n)]);
+const area2=P=>{let a=0;for(let i=0;i<P.length;i++){const p=P[i],q=P[(i+1)%P.length];a+=p[0]*q[1]-q[0]*p[1]}return a/2};
+function hullIdx(P){const id=P.map((_,i)=>i).sort((a,b)=>P[a][0]-P[b][0]||P[a][1]-P[b][1]);if(id.length<3)return id;
+  const cr=(o,a,b)=>(P[a][0]-P[o][0])*(P[b][1]-P[o][1])-(P[a][1]-P[o][1])*(P[b][0]-P[o][0]);
+  const lo=[],up=[];
+  for(const i of id){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],i)<=1e-9)lo.pop();lo.push(i)}
+  for(let j=id.length-1;j>=0;j--){const i=id[j];while(up.length>=2&&cr(up[up.length-2],up[up.length-1],i)<=1e-9)up.pop();up.push(i)}
+  up.pop();lo.pop();return lo.concat(up)}
+const hull=P=>hullIdx(P).map(i=>P[i]);
+/* section : contour (sens trigo), trous, enveloppe convexe ; repère local u horizontal, v vers le haut, centré sur l'encombrement */
+function shapeOf(p0,mirror){
+  const p=p0||{},t=PT[p.t]?p.t:'rect',g=(k,d)=>Math.max(.5,+p[k]||d||1);let out,holes=[],k=0;
+  if(t==='rect'){out=R2(g('b',40),g('h',20));k=p.rot?1:0}
+  else if(t==='tuber'){const b=g('b'),h=g('h'),e=Math.min(g('e',2),Math.min(b,h)/2-.5);out=R2(b,h);if(e>0)holes=[R2(b-2*e,h-2*e)];k=p.rot?1:0}
+  else if(t==='tubec'){const D=g('D',50),e=Math.min(g('e',3),D/2-.5);out=circ(D/2,36);if(e>0)holes=[circ(D/2-e,36)]}
+  else if(t==='L'){const b=g('b'),h=g('h'),e=Math.min(g('e'),Math.min(b,h)-.5);out=[[0,0],[b,0],[b,e],[e,e],[e,h],[0,h]];k=(+p.o||0)%4}
+  else if(t==='U'){const h=g('h'),b=g('b'),tw=Math.min(g('tw'),b-.5),tf=Math.min(g('tf'),h/2-.5);out=[[0,0],[h,0],[h,b],[h-tf,b],[h-tf,tw],[tf,tw],[tf,b],[0,b]];k=(+p.o||0)%4}
+  else if(t==='T'){const b=g('b'),h=g('h'),tw=Math.min(g('tw'),b-.5),tf=Math.min(g('tf'),h-.5);out=[[-tw/2,0],[tw/2,0],[tw/2,h-tf],[b/2,h-tf],[b/2,h],[-b/2,h],[-b/2,h-tf],[-tw/2,h-tf]];k=(+p.o||0)%4}
+  else{const h=g('h'),b=g('b'),tw=Math.min(g('tw'),b-.5),tf=Math.min(g('tf'),h/2-.5);out=[[-b/2,0],[b/2,0],[b/2,tf],[tw/2,tf],[tw/2,h-tf],[b/2,h-tf],[b/2,h],[-b/2,h],[-b/2,h-tf],[-tw/2,h-tf],[-tw/2,tf],[-b/2,tf]];k=(+p.o||0)%2}
+  const tr=q=>{let u=q[0],v=q[1];for(let i=0;i<k;i++){const w=u;u=-v;v=w}return [mirror?-u:u,v]};
+  out=out.map(tr);holes=holes.map(H=>H.map(tr));
+  let u0=Infinity,u1=-Infinity,v0=Infinity,v1=-Infinity;for(const [u,v] of out){if(u<u0)u0=u;if(u>u1)u1=u;if(v<v0)v0=v;if(v>v1)v1=v}
+  const cu=(u0+u1)/2,cv=(v0+v1)/2,sh=q=>[q[0]-cu,q[1]-cv];out=out.map(sh);holes=holes.map(H=>H.map(sh));
+  if(area2(out)<0)out.reverse();holes=holes.map(H=>area2(H)>0?H.slice().reverse():H);
+  return {t,out,holes,hull:hull(out),w:u1-u0,h:v1-v0,hollow:!!PT[t].hollow};
+}
+/* paramètre qui règle la largeur de la lame (étendue selon u) */
+function widthKey(p){const t=PT[p.t]?p.t:'rect',odd=(t==='rect'||t==='tuber')?!!p.rot:((+p.o||0)%2===1);
+  if(t==='tubec')return 'D';if(t==='U')return odd?'b':'h';return odd?'h':'b'}
+const f1=v=>nf1.format(+v).replace(/,0$/,'');
+function profDims(p){const t=PT[p.t]?p.t:'rect';
+  if(t==='rect')return `${f1(p.b)} × ${f1(p.h)} mm`;if(t==='tuber')return `${f1(p.b)} × ${f1(p.h)} × ${f1(p.e)} mm`;if(t==='tubec')return `Ø ${f1(p.D)} × ${f1(p.e)} mm`;
+  if(t==='L')return `${f1(p.b)} × ${f1(p.h)} × ${f1(p.e)} mm`;return `h ${f1(p.h)} · b ${f1(p.b)} · tw ${f1(p.tw)} · tf ${f1(p.tf)} mm`}
+function profDesc(p,el){const t=PT[p.t]?p.t:'rect',P=PT[t],o=P.n?orLabels(t,el)[(+p.o||0)%P.n]:'';
+  return [p.des||P.lab,profDims(p),P.rot&&p.rot?(el==='pl'?'posée sur chant':'tournée de 90°'):'',o,el==='pc'&&P.n&&t!=='I'?'console droite '+(p.R==='copy'?'identique':'symétrique'):''].filter(Boolean).join(' · ')}
+
 /* ---------- géométrie (mm) ---------- */
 function clean(T){
   const o={...T};
   o.W=Math.max(10,+o.W||0); o.A=+o.A||0; o.L=Math.max(o.A+10,+o.L||0);
   o.reveal=Math.max(0,+o.reveal||0); o.D=Math.max(10,+o.D||0);
-  o.N=Math.max(1,Math.min(200,Math.round(+o.N||1))); o.lw=Math.max(1,+o.lw||1); o.le=Math.max(1,+o.le||1);
-  o.cw=Math.max(5,+o.cw||40); o.ch=Math.max(5,+o.ch||80);
+  o.N=Math.max(1,Math.min(200,Math.round(+o.N||1)));
   o.dg=+o.dg||0; o.dd=+o.dd||0; o.pente=+o.pente||0; o.lt=+o.lt||0; o.Ha=+o.Ha||0;
+  o.pc={...PDEF.pc,...(T.pc||{})}; o.pl={...PDEF.pl,...(T.pl||{})};
   return o;
 }
-function geom(T0){
-  const T=clean(T0), b=T.pente*rad, phi=(T.lt-T.pente)*rad;
-  const x0=-T.dg, x1=T.W+T.dd, Lx=Math.max(10,x1-x0), cx=(x0+x1)/2, boxes=[];
-  for(let i=0;i<T.N;i++){const t=T.D*(i+0.5)/T.N;
-    boxes.push({k:'slat',c:[cx,T.Ha-t*Math.sin(b),t*Math.cos(b)],a:[[1,0,0],[0,Math.sin(phi),Math.cos(phi)],[0,Math.cos(phi),-Math.sin(phi)]],h:[Lx/2,T.lw/2,T.le/2]})}
-  const cw=Math.min(T.cw,Lx/2);
-  for(const xc of [x0+cw/2,x1-cw/2]) boxes.push({k:'cons',c:[xc,T.Ha-T.D/2*Math.sin(b),T.D/2*Math.cos(b)],a:[[1,0,0],[0,-Math.sin(b),Math.cos(b)],[0,Math.cos(b),Math.sin(b)]],h:[cw/2,T.D/2,T.ch/2]});
-  return {T,boxes,b,phi,x0,x1,Lx,cx,cw,win:{x0:0,x1:T.W,y0:T.A,y1:T.L,r:T.reveal}};
+const dot3=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+/* prisme : section convexe (enveloppe) extrudée selon ax ; demi-espaces n·q ≤ k */
+function prism(k,c,u,v,ax,h0,sh){
+  const pl=[{n:ax,k:h0+dot3(ax,c)},{n:[-ax[0],-ax[1],-ax[2]],k:h0-dot3(ax,c)}],H=sh.hull,m=H.length;
+  for(let i=0;i<m;i++){const a=H[i],b=H[(i+1)%m],ex=b[0]-a[0],ey=b[1]-a[1],L=Math.hypot(ex,ey);if(L<1e-9)continue;
+    const nu=ey/L,nv=-ex/L,o=nu*a[0]+nv*a[1],N=[nu*u[0]+nv*v[0],nu*u[1]+nv*v[1],nu*u[2]+nv*v[2]];pl.push({n:N,k:o+dot3(N,c)})}
+  return {k,c,u,v,ax,h0,sh,pl};
 }
-function hitBox(B,p,d){
-  let tmin=-Infinity,tmax=Infinity;
-  for(let k=0;k<3;k++){const a=B.a[k],hk=B.h[k];
-    const e=a[0]*(p[0]-B.c[0])+a[1]*(p[1]-B.c[1])+a[2]*(p[2]-B.c[2]), f=a[0]*d[0]+a[1]*d[1]+a[2]*d[2];
-    if(Math.abs(f)>1e-12){let t1=(-hk-e)/f,t2=(hk-e)/f;if(t1>t2){const q=t1;t1=t2;t2=q}if(t1>tmin)tmin=t1;if(t2<tmax)tmax=t2;if(tmin>tmax)return Infinity}
-    else if(Math.abs(e)>hk)return Infinity}
-  if(tmax<1e-6)return Infinity; return Math.max(tmin,0);
+/* plate = true : support seul, traité comme une plaque pleine (boutons du support) */
+function geom(T0,plate){
+  const T=clean(T0),b=T.pente*rad,phi=(T.lt-T.pente)*rad;
+  const x0=-T.dg,x1=T.W+T.dd,Lx=Math.max(10,x1-x0),cx=(x0+x1)/2,els=[];
+  const s=[0,-Math.sin(b),Math.cos(b)],n=[0,Math.cos(b),Math.sin(b)],my=T.Ha-T.D/2*Math.sin(b),mz=T.D/2*Math.cos(b);
+  const SC=shapeOf(T.pc),SR=shapeOf(T.pc,T.pc.R!=='copy'),SL=shapeOf(T.pl);
+  if(plate)els.push(prism('plate',[cx,my,mz],s,n,[-1,0,0],Lx/2,{hull:R2(T.D,2)}));
+  else{
+    const u=[0,Math.sin(phi),Math.cos(phi)],v=[0,Math.cos(phi),-Math.sin(phi)];
+    for(let i=0;i<T.N;i++){const t=T.D*(i+.5)/T.N;els.push(prism('slat',[cx,T.Ha-t*Math.sin(b),t*Math.cos(b)],u,v,[-1,0,0],Lx/2,SL))}
+    els.push(prism('cons',[x0+SC.w/2,my,mz],[1,0,0],n,s,T.D/2,SC));
+    els.push(prism('cons',[x1-SR.w/2,my,mz],[1,0,0],n,s,T.D/2,SR));
+  }
+  return {T,els,b,phi,s,n,x0,x1,Lx,cx,cw:SC.w,SC,SR,SL,win:{x0:0,x1:T.W,y0:T.A,y1:T.L,r:T.reveal}};
+}
+function hitPrism(E,p,d){
+  let t0=0,t1=Infinity;
+  for(const P of E.pl){const q=P.n,num=P.k-(q[0]*p[0]+q[1]*p[1]+q[2]*p[2]),den=q[0]*d[0]+q[1]*d[1]+q[2]*d[2];
+    if(den>1e-12){const t=num/den;if(t<t1)t1=t}else if(den<-1e-12){const t=num/den;if(t>t0)t0=t}else if(num<0)return Infinity;
+    if(t0>t1)return Infinity}
+  return t1<1e-6?Infinity:t0;
 }
 function isLit(G,p,d){
   const w=G.win;
   if(w.r>0){const t=-p[2]/d[2],x=p[0]+d[0]*t,y=p[1]+d[1]*t;if(x<w.x0||x>w.x1||y<w.y0||y>w.y1)return false}
-  for(const B of G.boxes)if(hitBox(B,p,d)!==Infinity)return false;
+  for(const E of G.els)if(hitPrism(E,p,d)!==Infinity)return false;
   return true;
 }
 function litFraction(G,s,n){
@@ -551,7 +690,6 @@ function dayStats(G,ds,step,n){
     if(first===null)first=m;last=m;const w=dni(p.el)*s.z,f=litFraction(G,s,n);if(f===null)continue;sw+=w;sf+=w*f}
   return {pass:sw>0?sf/sw:null,possible:sw*step/60/1000,got:sf*step/60/1000,first,last};
 }
-function scoreOf(ps,pw,prio){const k=prio/100;if(ps===null&&pw===null)return null;if(pw===null)return 1-ps;if(ps===null)return pw;return (1-k)*pw+k*(1-ps)}
 
 /* ---------- champs ---------- */
 const FIELDS={
@@ -564,35 +702,32 @@ const FIELDS={
     {g:'Liés : hauteur = linteau − allège',three:['H','A','L']}
   ],
   support:[
-    {g:'Liés : accroche = linteau + bandeau',two:['Ha','band']},
-    {k:'pente',l:'Inclinaison du support',u:'°',step:0.5},
-    {k:'D',l:'Longueur (avancée)',u:'mm',step:10},
+    {g:'Liés : accroche = linteau + bandeau',two:['Ha','band'],ob:{Ha:1}},
+    {k:'pente',l:'Inclinaison du support',u:'°',step:0.5,ob:1},
+    {k:'D',l:'Longueur (avancée)',u:'mm',step:10,ob:1},
     {hint:'0° = de niveau, positif = descend vers l’extérieur. La longueur se mesure le long du support depuis le nu de façade.'},
-    {k:'dg',l:'Débord à gauche',u:'mm',step:10},
-    {k:'dd',l:'Débord à droite',u:'mm',step:10},
-    {hint:'Gauche et droite vues depuis l’extérieur.'},
-    {k:'cw',l:'Largeur des consoles',u:'mm',step:5},
-    {k:'ch',l:'Hauteur des consoles',u:'mm',step:5},
-    {hint:'Deux consoles, une à chaque extrémité du support.'}
+    {k:'dg',l:'Débord à gauche',u:'mm',step:10,ob:1},
+    {k:'dd',l:'Débord à droite',u:'mm',step:10,ob:1},
+    {hint:'Gauche et droite vues depuis l’extérieur. Deux consoles, une à chaque extrémité du support.'}
   ],
   lames:[
-    {k:'N',l:'Nombre de lames',u:'u',step:1},
-    {k:'lt',l:'Inclinaison sur le support',u:'°',step:0.5},
-    {k:'lw',l:'Largeur des lames',u:'mm',step:5},
-    {k:'le',l:'Épaisseur des lames',u:'mm',step:1},
+    {k:'N',l:'Nombre de lames',u:'u',step:1,ob:1},
+    {k:'lt',l:'Inclinaison sur le support',u:'°',step:0.5,ob:1},
     {hint:'Inclinaison positive = bord extérieur relevé. Les lames sont réparties à pas égal sur la longueur du support.'}
   ]
 };
 const LBL={H:['Hauteur fenêtre','mm',10],A:['Altimétrie allège','mm',10],L:['Altimétrie linteau','mm',10],Ha:['Altimétrie d’accroche','mm',10],band:['Bandeau linteau → accroche','mm',10]};
-const fieldHTML=(k,l,u,step,full)=>`<div class="field${full?' full':''}"><label for="f-${k}">${l} <span class="u">(${u})</span></label><input id="f-${k}" data-k="${k}" type="number" inputmode="decimal" step="${step}"></div>`;
+const OBT='Optimiser : ombre maximale sur le vitrage à la date et à l’heure affichées, les autres valeurs restant fixes';
+const fieldHTML=(k,l,u,step,full,ob)=>{const inp=`<input id="f-${k}" data-k="${k}" type="number" inputmode="decimal" step="${step}">`;
+  return `<div class="field${full?' full':''}"><label for="f-${k}">${l} <span class="u">(${u})</span></label>${ob?`<div class="inrow">${inp}<button class="ob" type="button" data-o="${k}" title="${OBT}" aria-label="Optimiser : ${l}">⟳</button></div>`:inp}</div>`+(ob?`<div class="optmsg" id="om-${k}" hidden></div>`:'')};
 function renderFields(){
   for(const [sec,arr] of Object.entries(FIELDS)){
     let h='';
     for(const f of arr){
       if(f.dial)h+=`<div class="dialrow"><svg id="dial" viewBox="0 0 112 112" aria-label="Orientation de la façade"></svg><p id="dial-t"></p></div>`;
       else if(f.hint)h+=`<div class="hint full" style="grid-column:1/-1;margin-top:-4px">${f.hint}</div>`;
-      else if(f.g){const ks=f.three||f.two;h+=`<div class="linked"><div class="lt">${f.g}</div>${f.three?'<div class="three">':''}${ks.map(k=>fieldHTML(k,...LBL[k])).join('')}${f.three?'</div>':''}</div>`}
-      else h+=fieldHTML(f.k,f.l,f.u,f.step,f.full)+(f.h?`<div class="hint" style="grid-column:1/-1;margin-top:-6px">${f.h}</div>`:'');
+      else if(f.g){const ks=f.three||f.two;h+=`<div class="linked"><div class="lt">${f.g}</div>${f.three?'<div class="three">':''}${ks.map(k=>fieldHTML(k,...LBL[k],false,f.ob&&f.ob[k])).join('')}${f.three?'</div>':''}</div>`}
+      else h+=fieldHTML(f.k,f.l,f.u,f.step,f.full,f.ob)+(f.h?`<div class="hint" style="grid-column:1/-1;margin-top:-6px">${f.h}</div>`:'');
     }
     document.getElementById('fields-'+sec).innerHTML=h;
   }
@@ -614,8 +749,103 @@ function setParam(k,v,src){
 function fmtField(k,v){const dec=['azim','pente','lt'].includes(k)?1:0;return String(Math.round(v*Math.pow(10,dec))/Math.pow(10,dec))}
 function syncFields(except){
   $$('input[data-k]').forEach(inp=>{if(inp!==except)inp.value=fmtField(inp.dataset.k,S[inp.dataset.k])});
+  $$('input[data-pp]').forEach(inp=>{if(inp===except||inp.type!=='number')return;const v=+S[inp.dataset.pk][inp.dataset.pp];inp.value=isFinite(v)?String(Math.round(v*10)/10):''});
   if(except!==$('#f-lat'))$('#f-lat').value=S.lat;
   if(except!==$('#f-lon'))$('#f-lon').value=S.lon;
+}
+
+/* ---------- matériau et environnement ---------- */
+const MATN={alu:'Aluminium',acier:'Acier protégé',bois:'Bois'};
+const CLIM={sec:'Sec (moins de 100 jours de pluie par an)',modere:'Modéré (100 à 150 jours de pluie)',humide:'Humide (150 jours de pluie et plus)'};
+const VIE={L1:'L1 — 10 à 50 ans',L2:'L2 — 50 à 100 ans',L3:'L3 — plus de 100 ans'};
+const CORRO={C1:'C1 — très faible',C2:'C2 — faible : zones rurales peu polluées',C3:'C3 — moyenne : urbain, industriel modéré, côtier peu salin',C4:'C4 — élevée : industriel, côtier à salinité modérée',C5:'C5 — très élevée : industriel humide, côtier salin',CX:'CX — extrême : maritime très salin, tropical'};
+const ATMO={E11:['Rurale non polluée','classe AA 15','polyester 60 µm',0],E12:['Urbaine ou industrielle normale','classe AA 15','polyester 60 µm',0],E13:['Urbaine ou industrielle sévère','classe AA 15','polyester 60 µm',0],
+  E14:['Marine, de 10 à 20 km du littoral','classe AA 20','polyester 60 µm',1],E15:['Marine, de 3 à 10 km du littoral','classe AA 20','polyester 60 µm',1],E16:['Bord de mer, moins de 3 km','classe AA 20','polyester 60 µm',1],
+  E17:['Mixte normale (bord de mer et urbaine)','classe AA 20','polyester 60 µm',1],E18:['Mixte sévère','classe AA 20','polyester 60 µm',1],E19:['Agressive (embruns, abrasion, pollution forte)','étude spécifique','étude spécifique',0]};
+const selHTML=(id,lab,opts,val,full)=>`<div class="field${full?' full':''}"><label for="${id}">${lab}</label><select id="${id}">${Object.entries(opts).map(([k,v])=>`<option value="${k}"${k===val?' selected':''}>${XE(typeof v==='string'?v:v.n)}</option>`).join('')}</select></div>`;
+function renderMat(){
+  $$('.seg [data-mat]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mat===S.mat)));
+  let h='';
+  if(S.mat==='bois')h=selHTML('m-ess','Essence',ESS,S.ess,true)+selHTML('m-clim','Climat d’humidification',CLIM,S.clim)+selHTML('m-vie','Durée de vie visée',VIE,S.vie)
+    +`<div class="hint" style="grid-column:1/-1">Climat selon le nombre de jours de pluie par an : FD P 20-651, figure 1 et annexe B (liste des cantons). Un brise-soleil est en pleine exposition (§7.2.2).</div>`;
+  else if(S.mat==='acier')h=selHTML('m-corro','Catégorie de corrosivité (NF EN ISO 12944-2)',CORRO,S.corro,true)
+    +`<div class="hint" style="grid-column:1/-1">Acier protégé par peinture ou galvanisation. La catégorie se choisit d’après l’environnement du site (tableau 1 de la norme).</div>`;
+  else h=selHTML('m-atmo','Atmosphère extérieure (NF P 24-351)',Object.fromEntries(Object.entries(ATMO).map(([k,v])=>[k,k+' — '+v[0]])),S.atmo,true)
+    +`<div class="hint" style="grid-column:1/-1">La finition (anodisation ou thermolaquage) se déduit de l’atmosphère.</div>`;
+  $('#mat-fields').innerHTML=h;
+  const on=(id,k)=>{const e=$(id);if(e)e.addEventListener('change',()=>{S[k]=e.value;changed()})};
+  on('#m-ess','ess');on('#m-clim','clim');on('#m-vie','vie');on('#m-corro','corro');on('#m-atmo','atmo');
+  $('#mat-chip').textContent=MATN[S.mat];
+}
+function setMat(m){
+  if(!MATN[m]||m===S.mat)return;S.mat=m;
+  for(const el of ['pc','pl'])if(!MATS[m].includes(S[el].t))S[el]={...S[el],t:'rect',...TDEF[el].rect,o:0};
+  $$('.optmsg').forEach(m=>m.hidden=true);renderMat();renderProfiles();renderSing();changed();
+}
+
+/* ---------- profils : saisie ---------- */
+function profHTML(el){
+  const p=S[el],types=MATS[S.mat],t=types.includes(p.t)?p.t:'rect',P=PT[t],wk=el==='pl'?widthKey(p):null,ttl=el==='pc'?'Profil des consoles':'Profil des lames';
+  let h=`<div class="prof"><div class="ph"><div class="field"><label for="p-${el}-t">${ttl}</label><select id="p-${el}-t" data-pk="${el}" data-pp="t">${types.map(k=>`<option value="${k}"${k===t?' selected':''}>${PT[k].lab}</option>`).join('')}</select></div><button class="b qbtn" type="button" data-q="${el}" title="Sections courantes en Europe" aria-label="Voir les sections courantes">?</button></div><div class="fgrid">`;
+  for(const k of P.p){const inp=`<input id="p-${el}-${k}" data-pk="${el}" data-pp="${k}" type="number" step="0.5" min="0.5" inputmode="decimal">`;
+    h+=`<div class="field"><label for="p-${el}-${k}">${pLabel(el,t,k)} <span class="u">(mm)</span></label>${k===wk?`<div class="inrow">${inp}<button class="ob" type="button" data-o="lw" title="${OBT}" aria-label="Optimiser la largeur des lames">⟳</button></div>`:inp}</div>`}
+  if(P.rot)h+=`<label class="chk" style="grid-column:1/-1"><input type="checkbox" data-pk="${el}" data-pp="rot"${p.rot?' checked':''}> Rotation 90° ${el==='pl'?'(lame posée sur chant)':'(section couchée)'}</label>`;
+  if(P.n)h+=`<div class="field full"><label for="p-${el}-o">Position ${el==='pc'?'de la console gauche (vue de l’extérieur)':'(en coupe, extérieur à droite)'}</label><select id="p-${el}-o" data-pk="${el}" data-pp="o">${orLabels(t,el).map((l,i)=>`<option value="${i}"${((+p.o||0)%P.n)===i?' selected':''}>${l}</option>`).join('')}</select></div>`;
+  if(el==='pc'&&P.n&&t!=='I')h+=`<div class="field full"><label for="p-pc-R">Console droite</label><select id="p-pc-R" data-pk="pc" data-pp="R"><option value="sym"${p.R!=='copy'?' selected':''}>Symétrique de la console gauche (miroir)</option><option value="copy"${p.R==='copy'?' selected':''}>Identique à la console gauche (copie)</option></select></div>`;
+  return h+`</div><div class="pdes" id="pdes-${el}"></div></div>`;
+}
+function renderProfiles(){for(const el of ['pc','pl'])$('#prof-'+el).innerHTML=profHTML(el);syncFields();updPdes();updateObState()}
+function updPdes(){for(const el of ['pc','pl']){const d=$('#pdes-'+el);if(d)d.textContent=profDesc(S[el],el)}}
+function wireProfiles(){
+  for(const el of ['pc','pl']){const box=$('#prof-'+el);
+    box.addEventListener('input',e=>{const t=e.target;if(t.type!=='number'||!t.dataset.pp)return;const v=parseFloat(t.value);if(!(v>0))return;S[el]={...S[el],[t.dataset.pp]:v,des:''};updPdes();changed()});
+    box.addEventListener('change',e=>{const t=e.target,pp=t.dataset.pp;if(!pp)return;
+      if(t.type==='number'){syncFields();return}
+      if(pp==='t')S[el]={...S[el],t:t.value,o:0,rot:0,...TDEF[el][t.value]};
+      else if(pp==='rot')S[el]={...S[el],rot:t.checked?1:0};
+      else if(pp==='o')S[el]={...S[el],o:+t.value};
+      else if(pp==='R')S[el]={...S[el],R:t.value};
+      renderProfiles();changed()});
+    box.addEventListener('click',e=>{const q=e.target.closest('[data-q]');if(q)showCat(q.dataset.q)});
+  }
+}
+
+/* ---------- sections courantes (fenêtre « ? ») ---------- */
+const CAT={
+  boisrect:{ref:'Sections courantes de bois massif raboté (indicatif, à confirmer auprès du fournisseur)',head:['Section e × l (mm)'],rows:[[27,70],[27,95],[27,120],[27,145],[32,95],[45,70],[45,95],[45,120],[45,145],[45,195],[63,145],[75,200]].map(([e,l])=>[`${e} × ${l}`,[e,l]])},
+  plat:{ref:'Fers plats laminés NF EN 10058 (acier) — mêmes dimensions courantes en aluminium',head:['Plat l × e (mm)'],rows:[[30,5],[40,5],[40,8],[50,6],[50,10],[60,8],[60,10],[80,8],[80,10],[100,10],[120,10]].map(([l,e])=>[`${l} × ${e}`,[e,l]])},
+  tuber:{ref:'Tubes carrés et rectangulaires NF EN 10219-2 (formés à froid) et NF EN 10210-2',head:['Tube','b','h','e'],rows:[[40,40,3],[50,50,3],[60,60,4],[80,80,4],[100,100,5],[60,40,3],[80,40,3],[100,50,4],[120,60,4],[120,80,5],[150,100,5]].map(([b,h,e])=>[`${b} × ${h} × ${e}`,{b,h,e}])},
+  tubec:{ref:'Tubes ronds NF EN 10219-2 et NF EN 10210-2',head:['Tube','D','e'],rows:[[33.7,3.2],[42.4,3.2],[48.3,3.2],[60.3,4],[76.1,4],[88.9,5],[114.3,5]].map(([D,e])=>[`Ø ${f1(D)} × ${f1(e)}`,{D,e}])},
+  L:{ref:'Cornières à ailes égales et inégales NF EN 10056-1',head:['Cornière','b','h','e'],rows:[[30,30,3],[40,40,4],[50,50,5],[60,60,6],[70,70,7],[80,80,8],[100,100,10],[120,120,12],[60,40,6],[80,40,6],[100,50,8],[100,65,7],[120,80,8]].map(([b,h,e])=>[`L ${b} × ${h} × ${e}`,{b,h,e}])},
+  U:{ref:'UPN et UPE NF EN 10365 (ailes des UPN à faces inclinées, dessinées parallèles)',head:['Profil','h','b','tw','tf'],rows:[['UPN 80',80,45,6,8],['UPN 100',100,50,6,8.5],['UPN 120',120,55,7,9],['UPN 140',140,60,7,10],['UPN 160',160,65,7.5,10.5],['UPN 180',180,70,8,11],['UPN 200',200,75,8.5,11.5],['UPE 80',80,50,4,7],['UPE 100',100,55,4.5,7.5],['UPE 120',120,60,5,8],['UPE 140',140,65,5,9],['UPE 160',160,70,5.5,9.5],['UPE 180',180,75,5.5,10.5],['UPE 200',200,80,6,11]].map(([d,h,b,tw,tf])=>[d,{h,b,tw,tf}])},
+  T:{ref:'Fers T à ailes égales NF EN 10055',head:['Profil','b','h','tw','tf'],rows:[[30,4],[40,5],[50,6],[60,7],[70,8],[80,9],[100,11]].map(([s,t])=>[`T ${s}`,{b:s,h:s,tw:t,tf:t}])},
+  I:{ref:'IPE, HEA et HEB NF EN 10365',head:['Profil','h','b','tw','tf'],rows:[['IPE 80',80,46,3.8,5.2],['IPE 100',100,55,4.1,5.7],['IPE 120',120,64,4.4,6.3],['IPE 140',140,73,4.7,6.9],['IPE 160',160,82,5,7.4],['IPE 180',180,91,5.3,8],['IPE 200',200,100,5.6,8.5],['IPE 220',220,110,5.9,9.2],['IPE 240',240,120,6.2,9.8],['HEA 100',96,100,5,8],['HEA 120',114,120,5,8],['HEA 140',133,140,5.5,8.5],['HEA 160',152,160,6,9],['HEA 180',171,180,6,9.5],['HEA 200',190,200,6.5,10],['HEB 100',100,100,6,10],['HEB 120',120,120,6.5,11],['HEB 140',140,140,7,12],['HEB 160',160,160,8,13],['HEB 180',180,180,8.5,14],['HEB 200',200,200,9,15]].map(([d,h,b,tw,tf])=>[d,{h,b,tw,tf}])}
+};
+function showCat(el){
+  if($('.modal-ov'))return;
+  const p=S[el],t=PT[p.t]?p.t:'rect',C=t==='rect'?(S.mat==='bois'?CAT.boisrect:CAT.plat):CAT[t],keys=C.head.slice(1);
+  const note=S.mat==='alu'?'Aluminium : pas de série normalisée de sections. Ces dimensions courantes sont indicatives (tolérances NF EN 755-9) : vérifier au catalogue du fabricant.':'Valeurs nominales arrondies, à vérifier au catalogue du fabricant.';
+  const ov=document.createElement('div');ov.className='modal-ov';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','cat-t');
+  ov.innerHTML=`<div class="modal"><button class="onboard-skip" type="button" aria-label="Fermer">×</button><div class="onboard-title" id="cat-t" style="text-align:left;font-size:17px;margin-bottom:6px">${el==='pc'?'Consoles':'Lames'} — ${PT[t].lab}</div><p class="note"><b>${C.ref}</b></p><p class="note" style="margin-top:4px">${note} Clique une ligne pour l’appliquer.</p><div class="svgbox"><table><thead><tr>${C.head.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${C.rows.map((r,i)=>`<tr data-i="${i}" tabindex="0"><td>${r[0]}</td>${keys.map(k=>`<td>${f1(r[1][k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`;
+  document.body.appendChild(ov);
+  const key=e=>{if(e.key==='Escape')close()};
+  const close=()=>{ov.remove();document.removeEventListener('keydown',key)};
+  const pick=i=>{const r=C.rows[i];let q;if(t==='rect'){const [e,l]=r[1];q=el==='pl'?{b:l,h:e}:{b:e,h:l};q.rot=0}else q={...r[1]};
+    S[el]={...S[el],...q,des:t==='rect'?(S.mat==='bois'?'':'Plat '+r[0]):r[0]};close();renderProfiles();changed()};
+  ov.addEventListener('click',e=>{if(e.target===ov||e.target.closest('.onboard-skip')){close();return}const tr=e.target.closest('tr[data-i]');if(tr)pick(+tr.dataset.i)});
+  ov.addEventListener('keydown',e=>{const tr=e.target.closest&&e.target.closest('tr[data-i]');if(tr&&(e.key==='Enter'||e.key===' ')){e.preventDefault();pick(+tr.dataset.i)}});
+  document.addEventListener('keydown',key);const first=ov.querySelector('tbody tr');if(first)first.focus();
+}
+
+/* ---------- points singuliers (bois) ---------- */
+function renderSing(){
+  const box=$('#sing');if(S.mat!=='bois'){box.innerHTML='';return}
+  box.innerHTML=`<div class="sub-t">Points singuliers (bois)</div><div class="sing">
+    <label class="chk"><input type="checkbox" id="s-capC"${S.capC?' checked':''}> Consoles capotées (dessus et about protégés)</label>
+    <label class="chk"><input type="checkbox" id="s-capL"${S.capL?' checked':''}> Extrémités des lames protégées (capot ou débord)</label>
+    <label class="chk"><input type="checkbox" id="s-desol"${S.desol?' checked':''}> Lames désolidarisées des consoles (cales ou rondelles de 5 mm)</label></div>
+    <p class="hint">Coche ce qui est prévu au projet : ces dispositions changent la conception (drainante, moyenne, piégeante) et donc la classe d’emploi.</p>`;
+  for(const k of ['capC','capL','desol'])$('#s-'+k).addEventListener('change',e=>{S[k]=e.target.checked;changed()});
 }
 
 /* ---------- site : adresse, GPS ---------- */
@@ -824,10 +1054,21 @@ function resize3D(){if(!G3.ok)return;const h=$('#stage');G3.r.setSize(h.clientWi
 function textSprite(txt,color){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.fillStyle=color;x.font='700 84px Calibri, Arial, sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(txt,64,68);
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false}));sp.scale.set(.45,.45,1);return sp}
 function winCenter(){const T=clean(S);return new THREE.Vector3(T.W/2/1000,(T.A+Math.max(T.L,T.Ha))/2/1000,0)}
+const MATCOL={bois:0x8B6A47,alu:0x9AA5AE,acier:0x4C5A66};
+function extrudeEl(E,mat){
+  const shp=new THREE.Shape(E.sh.out.map(([u,v])=>new THREE.Vector2(u,v)));
+  for(const H of E.sh.holes||[])shp.holes.push(new THREE.Path(H.map(([u,v])=>new THREE.Vector2(u,v))));
+  const geo=new THREE.ExtrudeGeometry(shp,{depth:2*E.h0,bevelEnabled:false,curveSegments:1});
+  geo.translate(0,0,-E.h0);
+  const m=new THREE.Matrix4().makeBasis(new THREE.Vector3(...E.u),new THREE.Vector3(...E.v),new THREE.Vector3(...E.ax));
+  m.setPosition(E.c[0],E.c[1],E.c[2]);geo.applyMatrix4(m);geo.scale(.001,.001,.001);
+  const mesh=new THREE.Mesh(geo,mat);mesh.castShadow=true;mesh.receiveShadow=true;return mesh;
+}
 function buildModel(){
   if(!G3.ok)return;const {scene,M}=G3;
   if(G3.group){scene.remove(G3.group);G3.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material&&o.material.map){o.material.map.dispose();o.material.dispose()}})}
   const grp=new THREE.Group(),G=geom(S),T=G.T,k=0.001,th=T.reveal+250;
+  M.slat.color.setHex(MATCOL[T.mat]||MATCOL.acier);
   const xmin=Math.min(G.x0,0)-1400,xmax=Math.max(G.x1,T.W)+1400,tipY=T.Ha-T.D*Math.sin(G.b),ytop=Math.max(T.Ha,T.L,tipY)+900;
   const box=(x0,x1,y0,y1,z0,z1,mat,cast=true)=>{if(x1-x0<=.5||y1-y0<=.5||z1-z0<=.5)return;const m=new THREE.Mesh(new THREE.BoxGeometry((x1-x0)*k,(y1-y0)*k,(z1-z0)*k),mat);
     m.position.set((x0+x1)/2*k,(y0+y1)/2*k,(z0+z1)/2*k);m.castShadow=cast;m.receiveShadow=true;grp.add(m)};
@@ -836,9 +1077,8 @@ function buildModel(){
   const fw=45;
   box(0,fw,T.A,T.L,-T.reveal-50,-T.reveal-2,M.frame,false);box(T.W-fw,T.W,T.A,T.L,-T.reveal-50,-T.reveal-2,M.frame,false);
   box(0,T.W,T.A,T.A+fw,-T.reveal-50,-T.reveal-2,M.frame,false);box(0,T.W,T.L-fw,T.L,-T.reveal-50,-T.reveal-2,M.frame,false);
-  box(G.x0,G.x1,T.Ha-35,T.Ha+35,0,12,M.slat,false);
-  for(const B of G.boxes){const m=new THREE.Mesh(B.k==='slat'?new THREE.BoxGeometry(G.Lx*k,T.le*k,T.lw*k):new THREE.BoxGeometry(G.cw*k,T.ch*k,T.D*k),M.slat);
-    m.position.set(B.c[0]*k,B.c[1]*k,B.c[2]*k);m.rotation.x=B.k==='slat'?-G.phi:G.b;m.castShadow=true;m.receiveShadow=true;grp.add(m)}
+  box(G.x0,G.x1,T.Ha-35,T.Ha+35,0,12,M.frame,false);
+  for(const E of G.els)grp.add(extrudeEl(E,M.slat));
   const gr=new THREE.Mesh(new THREE.PlaneGeometry(80,80),M.ground);gr.rotation.x=-Math.PI/2;gr.receiveShadow=true;grp.add(gr);
   // nord : direction du nord dans le repère façade
   const a=T.azim*rad,nd=new THREE.Vector3(Math.sin(a),0,Math.cos(a)),org=new THREE.Vector3(T.W/2*k,.01,2.4);
@@ -880,7 +1120,7 @@ function updateHUD(){
     `<span class="chip hot"><b>Vitrage au soleil</b>${f===null?'—':nf0.format(f*100)+' %'}</span>`;
   if(f===null){$('#b-pct').textContent='—';$('#b-pct-t').textContent=p.el<=0?'Soleil sous l’horizon':'Le soleil ne frappe pas cette façade à cette heure';$('#b-bar').style.width='0%'}
   else{$('#b-pct').textContent=nf0.format(f*100)+' %';$('#b-pct-t').textContent='de la surface vitrée au soleil';$('#b-bar').style.width=(f*100)+'%'}
-  $('#clock').textContent=hhmm(S.minutes);drawDial(p);updateStatus();MAP.need=true;
+  $('#clock').textContent=hhmm(S.minutes);drawDial(p);updateStatus();updateObState();MAP.need=true;
 }
 function drawDial(p){
   const c=56,R=42,a=S.azim*rad,pt=(g,r)=>[c+r*Math.sin(g),c-r*Math.cos(g)];
@@ -893,28 +1133,32 @@ function drawDial(p){
 }
 
 /* ---------- coupe ---------- */
+const LC={r:'#E24B4A',a:'#D98613',g:'#1D9E75',i:'#1F4E79'};
+/* arc de cercle en coordonnées « y vers le haut », tracé dans un SVG à y inversé ; angles en degrés */
+function arcPath(cx,cy,R,a0,a1){const p=a=>[cx+R*Math.cos(a*rad),-(cy+R*Math.sin(a*rad))],[x0,y0]=p(a0),[x1,y1]=p(a1);
+  return `M${x0.toFixed(1)},${y0.toFixed(1)} A${R.toFixed(1)},${R.toFixed(1)} 0 0 ${a1>a0?0:1} ${x1.toFixed(1)},${y1.toFixed(1)}`}
 function drawCoupe(){
-  const G=geom(S),T=G.T,p=curSun(),s=p.s,r=T.reveal,th=r+250,b=G.b;
-  const tipY=T.Ha-T.D*Math.sin(b),tipZ=T.D*Math.cos(b);
-  const ymax=Math.max(T.Ha,T.L,tipY)+T.lw+520,ymin=Math.min(T.A,tipY-T.lw)-380,zmin=-th-820,zmax=Math.max(tipZ+T.lw,500)+560;
+  const G=geom(S),T=G.T,p=curSun(),s=p.s,r=T.reveal,th=r+250,b=G.b,D=DUR||durability(S);
+  const tipY=T.Ha-T.D*Math.sin(b),tipZ=T.D*Math.cos(b),ext=Math.max(G.SL.w,G.SL.h,G.SC.h);
+  const ymax=Math.max(T.Ha,T.L,tipY)+ext+520,ymin=Math.min(T.A,tipY-ext)-380,zmin=-th-820,zmax=Math.max(tipZ+ext,500)+700;
   const W=zmax-zmin,H=ymax-ymin,fs=Math.max(W,H)/30,Y=y=>-y,ns='vector-effect="non-scaling-stroke"';
   let o=`<svg viewBox="${zmin} ${-ymax} ${W} ${H}" role="img" aria-label="Coupe verticale du brise-soleil"><defs><pattern id="hatch" patternUnits="userSpaceOnUse" width="${fs*.7}" height="${fs*.7}" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="${fs*.7}" class="c-hatch" ${ns}/></pattern></defs>`;
   o+=`<rect x="${zmin}" y="${-ymax}" width="${W}" height="${H}" fill="#ffffff"/>`;
   o+=`<rect x="${-th}" y="${Y(T.A)}" width="${th}" height="${T.A-ymin}" class="c-wall" ${ns}/><rect x="${-th}" y="${-ymax}" width="${th}" height="${ymax-T.L}" class="c-wall" ${ns}/>`;
   o+=`<line x1="${-r-12}" y1="${Y(T.A)}" x2="${-r-12}" y2="${Y(T.L)}" class="c-glass" ${ns}/>`;
-  const nb=[Math.cos(b),Math.sin(b)],hc=T.ch/2;
-  const cons=[[T.Ha+hc*nb[0],hc*nb[1]],[T.Ha-hc*nb[0],-hc*nb[1]],[tipY-hc*nb[0],tipZ-hc*nb[1]],[tipY+hc*nb[0],tipZ+hc*nb[1]]];
+  const n=G.n,sv=G.s,hc=G.SC.h/2,cp=(t,v)=>[T.Ha+t*sv[1]+v*n[1],t*sv[2]+v*n[2]];
+  const cons=[cp(0,hc),cp(0,-hc),cp(T.D,-hc),cp(T.D,hc)];
   o+=`<polygon points="${cons.map(q=>q[1]+','+Y(q[0])).join(' ')}" class="c-cons" ${ns}/><line x1="0" y1="${Y(T.Ha)}" x2="${tipZ}" y2="${Y(tipY)}" class="c-axis" ${ns}/>`;
-  for(const B of G.boxes){if(B.k!=='slat')continue;const v=B.a[1],w=B.a[2],hw=B.h[1],ht=B.h[2];
-    const pts=[[1,1],[1,-1],[-1,-1],[-1,1]].map(([a,c])=>[B.c[1]+a*hw*v[1]+c*ht*w[1],B.c[2]+a*hw*v[2]+c*ht*w[2]]);
-    o+=`<polygon points="${pts.map(q=>q[1]+','+Y(q[0])).join(' ')}" class="c-slat"/>`}
+  const wz=(E,P)=>P.map(([u,v])=>[E.c[2]+u*E.u[2]+v*E.v[2],E.c[1]+u*E.u[1]+v*E.v[1]]),pth=P=>'M'+P.map(q=>q[0].toFixed(1)+','+(-q[1]).toFixed(1)).join('L')+'Z';
+  const slats=G.els.filter(E=>E.k==='slat');
+  for(const E of slats)o+=`<path d="${pth(wz(E,E.sh.out))}${E.sh.holes.map(Q=>pth(wz(E,Q))).join('')}" fill-rule="evenodd" class="c-slat"/>`;
   o+=`<circle cx="0" cy="${Y(T.Ha)}" r="${fs*.18}" fill="#fff" stroke="#1a1a1a" ${ns}/>`;
   let prof=null;
   if(p.el>0&&s.z>0){
     const len=Math.hypot(s.y,s.z),d=[0,s.y/len,s.z/len],BIG=(W+H)*2;prof=Math.atan2(s.y,s.z)*deg;
     for(let j=0;j<9;j++){const y=T.A+(T.L-T.A)*(j+.5)/9,P=[G.cx,y,-r+.5];let t0=Infinity;
       if(r>0){const tz=r/d[2],yy=y+d[1]*tz;if(yy>T.L)t0=(T.L-y)/d[1]}
-      for(const B of G.boxes){if(B.k!=='slat')continue;const t=hitBox(B,P,d);if(t<t0)t0=t}
+      for(const E of slats){const t=hitPrism(E,P,d);if(t<t0)t0=t}
       const far=[P[1]+d[1]*BIG,P[2]+d[2]*BIG];
       if(t0===Infinity)o+=`<line x1="${far[1]}" y1="${Y(far[0])}" x2="${P[2]-12}" y2="${Y(P[1])}" class="c-ray" ${ns}/><circle cx="${-r-12}" cy="${Y(y)}" r="${fs*.16}" class="c-dot"/>`;
       else{const hp=[P[1]+d[1]*t0,P[2]+d[2]*t0];o+=`<line x1="${far[1]}" y1="${Y(far[0])}" x2="${hp[1]}" y2="${Y(hp[0])}" class="c-ray" ${ns}/><line x1="${hp[1]}" y1="${Y(hp[0])}" x2="${P[2]-12}" y2="${Y(P[1])}" class="c-rayoff" ${ns}/>`}}
@@ -922,13 +1166,64 @@ function drawCoupe(){
   const zl=-th-90;
   const alt=(y,lab)=>{const t=fs*.32;return `<path d="M${zl-t},${Y(y)-t*1.4} L${zl+t},${Y(y)-t*1.4} L${zl},${Y(y)} Z" fill="#1F4E79"/><line x1="${zl}" y1="${Y(y)}" x2="${-th}" y2="${Y(y)}" class="c-dim" ${ns}/><text x="${zl-fs*.5}" y="${Y(y)+fs*.1}" text-anchor="end" class="c-t" font-size="${fs*.64}">${lab} +${nf0.format(y)}</text>`};
   o+=alt(T.A,'Allège')+alt(T.L,'Linteau')+alt(T.Ha,'Accroche');
-  const yd=Math.max(T.Ha,tipY)+T.lw+fs*1.3;
+  const yd=Math.max(T.Ha,tipY)+ext+fs*1.3;
   o+=`<line x1="0" y1="${Y(yd)}" x2="${tipZ}" y2="${Y(yd)}" class="c-dim" ${ns}/><line x1="0" y1="${Y(yd)-fs*.35}" x2="0" y2="${Y(yd)+fs*.35}" class="c-dim" ${ns}/><line x1="${tipZ}" y1="${Y(yd)-fs*.35}" x2="${tipZ}" y2="${Y(yd)+fs*.35}" class="c-dim" ${ns}/>`+
-     `<text x="${tipZ/2}" y="${Y(yd)-fs*.35}" text-anchor="middle" class="c-t" font-size="${fs*.64}">${nf0.format(T.D)}${T.pente?' (pente '+nf1.format(T.pente)+'°)':''}</text>`;
+     `<text x="${tipZ/2}" y="${Y(yd)-fs*.35}" text-anchor="middle" class="c-t" font-size="${fs*.64}">${nf0.format(T.D)}</text>`;
+  // angles réels : α pente du support, β inclinaison des lames (couleur = alerte de durabilité)
+  const ca=LC[D.alphaLvl]||LC.i,cb=LC[D.betaLvl]||LC.i,Ra=Math.max(fs*2.6,Math.min(T.D*.45,fs*6));
+  const xa=Math.max(Ra*1.15,tipZ+G.SL.w/2+fs*.6);
+  o+=`<line x1="0" y1="${Y(T.Ha)}" x2="${xa}" y2="${Y(T.Ha)}" stroke="${ca}" stroke-width="1" stroke-dasharray="5 3" ${ns}/>`;
+  if(Math.abs(T.pente)>.2)o+=`<path d="${arcPath(0,T.Ha,Ra,0,-T.pente)}" fill="none" stroke="${ca}" stroke-width="1.8" ${ns}/>`;
+  o+=`<text x="${xa+fs*.25}" y="${Y(T.Ha)-fs*.35}" class="c-t" font-size="${fs*.62}" style="fill:${ca};font-weight:700">α ${nf1.format(Math.abs(T.pente))}°</text>`;
+  const Eo=slats[slats.length-1];
+  if(Eo){const cz=Eo.c[2],cy=Eo.c[1],ph=D.phi,Rb=Math.max(G.SL.w*.7,fs*1.4),xb=Math.max(cz+Rb*1.25,xa);
+    o+=`<line x1="${cz-Rb*.6}" y1="${Y(cy)}" x2="${xb}" y2="${Y(cy)}" stroke="${cb}" stroke-width="1" stroke-dasharray="5 3" ${ns}/>`;
+    if(Math.abs(ph)>.2)o+=`<path d="${arcPath(cz,cy,Rb,0,ph)}" fill="none" stroke="${cb}" stroke-width="1.8" ${ns}/>`;
+    o+=`<text x="${xb+fs*.25}" y="${Y(cy)+fs*.75}" class="c-t" font-size="${fs*.62}" style="fill:${cb};font-weight:700">β ${nf1.format(Math.abs(ph))}°</text>`}
   o+=`<text x="${-th-fs*.4}" y="${-ymin-fs*.4}" text-anchor="end" class="c-tb" font-size="${fs*.72}">INT.</text><text x="${fs*.4}" y="${-ymin-fs*.4}" class="c-tb" font-size="${fs*.72}">EXT.</text>`;
   o+=`<text x="${zmax-fs*.4}" y="${-ymax+fs*1}" text-anchor="end" class="c-tsun" font-size="${fs*.68}">${prof===null?'pas de soleil direct':'☀ angle de profil '+nf1.format(prof)+'°'}</text>`;
-  o+=`<text x="${zmax-fs*.4}" y="${-ymax+fs*1.9}" text-anchor="end" class="c-t" font-size="${fs*.58}">lames à ${nf1.format(T.lt-T.pente)}° de l’horizontale</text></svg>`;
+  o+=`<text x="${zmax-fs*.4}" y="${-ymax+fs*1.9}" text-anchor="end" class="c-t" font-size="${fs*.56}">α pente du support ${nf1.format(T.pente)}° · β lames ${nf1.format(G.phi*deg)}° / horizontale</text></svg>`;
   $('#coupe').innerHTML=o;
+  drawDetails();
+}
+function wrapT(t,max){const w=String(t).split(' '),L=[];let c='';for(const x of w){if(c&&(c+' '+x).length>max){L.push(c);c=x}else c=c?c+' '+x:x}if(c)L.push(c);return L}
+/* détails agrandis des sections : A consoles (vue de l'extérieur), B lame (coupe) */
+function drawDetails(){
+  const G=geom(S),D=DUR||durability(S),W=760,PW=380,TOP=44,DH=160,ff='font-family="Calibri,Carlito,Arial,sans-serif"';
+  const fill=S.mat==='bois'?'#B8875A':S.mat==='alu'?'#A4AEB6':'#5E6B76';
+  const wrapL=arr=>arr.flatMap(([l,t])=>wrapT(t,64).map((x,i)=>[i?null:l,x]));
+  const LA=wrapL(D.A),LB=wrapL(D.B),H=TOP+DH+26+Math.max(LA.length,LB.length,1)*16+8;
+  let o=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Détails de durabilité : sections des consoles et des lames"><rect width="${W}" height="${H}" fill="#ffffff"/><line x1="${PW}" y1="8" x2="${PW}" y2="${H-8}" stroke="#e0e0e0"/>`;
+  const panel=(x0,title,sub,P,holes,pk,lines,ex)=>{
+    const xs=P.map(q=>q[0]),ys=P.map(q=>q[1]),u0=Math.min(...xs),u1=Math.max(...xs),v0=Math.min(...ys),v1=Math.max(...ys),w=u1-u0,h=v1-v0;
+    const k=Math.min(170/Math.max(w,1),(DH-40)/Math.max(h,1),6),cx=x0+PW/2,cy=TOP+DH/2+4,mx=(u0+u1)/2,my=(v0+v1)/2;
+    const g={X:u=>cx+(u-mx)*k,Yv:v=>cy-(v-my)*k,k,cx,cy,mx,my,w,h,u0,u1,v0,v1};
+    const pth=Q=>'M'+Q.map(q=>g.X(q[0]).toFixed(1)+','+g.Yv(q[1]).toFixed(1)).join('L')+'Z';
+    let s=`<text x="${x0+10}" y="20" font-size="13" font-weight="700" fill="#1F4E79" ${ff}>${title}</text><text x="${x0+10}" y="36" font-size="11" fill="#5a5a5a" ${ff}>${XE(sub)}</text>`;
+    if(ex.under)s+=ex.under(g);
+    s+=`<path d="${pth(P)}${holes.map(pth).join('')}" fill="${fill}" fill-rule="evenodd" stroke="#1a1a1a" stroke-width="1.2"/>`;
+    for(const q of pk)if(q.poly.length>2)s+=`<path d="${pth(q.poly)}" fill="#5DA9E9" fill-opacity=".85" stroke="#2E75B6"/>`;
+    if(pk.length)s+=`<rect x="${x0+PW-104}" y="${TOP+2}" width="10" height="10" fill="#5DA9E9" stroke="#2E75B6"/><text x="${x0+PW-90}" y="${TOP+11}" font-size="11" fill="#2E75B6" font-weight="700" ${ff}>eau retenue</text>`;
+    if(ex.over)s+=ex.over(g);
+    lines.forEach(([l,t],i)=>{const y=TOP+DH+28+i*16;if(l)s+=`<circle cx="${x0+15}" cy="${y-4}" r="4.5" fill="${LC[l]}"/>`;s+=`<text x="${x0+26}" y="${y}" font-size="11.5" fill="#1a1a1a" ${ff}>${XE(t)}</text>`});
+    return s};
+  const asym=PT[G.SC.t].n&&G.SC.t!=='I';
+  const exA={over:g=>{let s='';
+    if(S.mat==='bois'&&!S.capC){const dy=(g.w/2)*Math.tan(15*rad),top=g.v1;
+      s+=`<path d="M${g.X(g.u0)},${g.Yv(top-dy)} L${g.X(g.mx)},${g.Yv(top)} L${g.X(g.u1)},${g.Yv(top-dy)}" fill="none" stroke="#1D9E75" stroke-width="1.8" stroke-dasharray="5 3"/><text x="${g.X(g.u1)+8}" y="${g.Yv(top-dy)+4}" font-size="11" fill="#14694F" font-weight="700" ${ff}>délardement ≥ 15° proposé</text>`}
+    if(S.mat==='bois'&&S.capC){const X0=g.X(g.u0)-5,X1=g.X(g.u1)+5,yt=g.Yv(g.v1)-6;
+      s+=`<path d="M${X0},${yt+18} L${X0},${yt} L${X1},${yt} L${X1},${yt+18}" fill="none" stroke="#1F4E79" stroke-width="2.2"/><text x="${X1+6}" y="${yt+4}" font-size="11" fill="#1F4E79" font-weight="700" ${ff}>capot</text>`}
+    return s}};
+  o+=panel(0,'A — Section des consoles','Console gauche, vue de l’extérieur'+(asym?' ; droite '+(S.pc.R==='copy'?'identique':'symétrique'):''),G.SC.out,G.SC.holes,D.pkC,LA,exA);
+  const ph=D.phi,cb=LC[D.betaLvl]||LC.i,Rr=g=>Math.min(70,Math.max(38,g.w*g.k*.45));
+  const exB={under:g=>{const R=Rr(g);let s=`<line x1="${g.cx-R*1.3}" y1="${g.cy}" x2="${g.cx+R*1.5}" y2="${g.cy}" stroke="${cb}" stroke-dasharray="5 3"/>`;
+      if(S.mat==='bois'&&Math.abs(ph)<30){const sg=ph<0?-1:1,a=30*sg*rad;s+=`<line x1="${g.cx}" y1="${g.cy}" x2="${g.cx+R*1.45*Math.cos(a)}" y2="${g.cy-R*1.45*Math.sin(a)}" stroke="#1D9E75" stroke-width="1.6" stroke-dasharray="5 3"/><text x="${g.cx+R*1.5*Math.cos(a)+4}" y="${g.cy-R*1.5*Math.sin(a)}" font-size="11" fill="#14694F" font-weight="700" ${ff}>30° mini</text>`}
+      return s},
+    over:g=>{const R=Rr(g);let s='';
+      if(Math.abs(ph)>.2){const pt=a=>[g.cx+R*Math.cos(a*rad),g.cy-R*Math.sin(a*rad)],[x0,y0]=pt(0),[x1,y1]=pt(ph);s+=`<path d="M${x0.toFixed(1)},${y0.toFixed(1)} A${R},${R} 0 0 ${ph>0?0:1} ${x1.toFixed(1)},${y1.toFixed(1)}" fill="none" stroke="${cb}" stroke-width="2"/>`}
+      const am=ph/2*rad;s+=`<text x="${g.cx+(R+10)*Math.cos(am)+2}" y="${g.cy-(R+10)*Math.sin(am)+(ph<0?12:4)}" font-size="12.5" font-weight="700" fill="${cb}" ${ff}>β ${nf1.format(Math.abs(ph))}°</text>`;return s}};
+  o+=panel(PW,'B — Section d’une lame','En coupe, extérieur à droite',D.SLw.out,D.SLw.holes,D.pkL,LB,exB);
+  $('#details').innerHTML=o+'</svg>';
 }
 
 /* ---------- analyse ---------- */
@@ -941,9 +1236,6 @@ function updateRefs(){
     const [sc,sl]=stateOf(st.pass,goodHigh);
     return `<div class="ref"><span class="pill ${cls}">${tag}</span><span>${lab} : <b class="num">${nf0.format(st.pass*100)} %</b> passe <span class="state ${sc}">${goodHigh?'apports':'protection'} ${sl}</span></span><span class="v" title="Énergie directe reçue sur le vitrage, ciel clair">${nf2.format(st.got)} / ${nf2.format(st.possible)} kWh/m²</span><div class="meter"><i style="width:${st.pass*100}%;background:${cls==='s'?'#EF9F27':'#1F4E79'}"></i></div></div>`};
   $('#b-refs').innerHTML=row('Été','s',refLabel(S.sumDate),sum,false)+row('Hiver','w',refLabel(S.winDate),win,true);
-  const sc=scoreOf(sum.pass,win.pass,S.prio),[c,l]=stateOf(sc,true);
-  $('#b-score').textContent=sc===null?'—':nf0.format(sc*100)+' / 100';$('#b-state').className='state '+c;$('#b-state').textContent=sc===null?'':l;
-  $('#b-score').style.color=c==='g'?'#14694F':c==='a'?'#8a5200':c==='r'?'#B3302F':'';
   $('#b-day').textContent=cur.first===null?`Le ${refLabel(S.date)}, le soleil ne frappe jamais cette façade.`:`Le ${refLabel(S.date)}, le soleil frappe la façade de ${hhmm(cur.first-5)} à ${hhmm(cur.last+5)} ; ${cur.pass===null?'—':nf0.format(cur.pass*100)+' %'} du rayonnement direct atteint le vitrage.`;
 }
 function daySeries(G,ds,step,n){const out=[];for(let m=240;m<=1320;m+=step){const s=sunAt(G.T,ds,m);out.push([m,(s.el>0&&s.s.z>0)?litFraction(G,s.s,n):null])}return out}
@@ -977,47 +1269,181 @@ function drawHeat(){
   $$('#heat .cell').forEach(c=>c.addEventListener('click',()=>{S.date=c.dataset.d;S.minutes=+c.dataset.m-15;timeChanged(true)}));
 }
 
-/* ---------- optimisation ---------- */
-const OPT={
-  lt:{label:'Inclinaison des lames',from:-60,to:80,step:2.5,fmt:v=>nf1.format(v)+'°'},
-  pente:{label:'Inclinaison du support',from:-30,to:60,step:2.5,fmt:v=>nf1.format(v)+'°'},
-  D:{label:'Longueur du support',from:100,to:2500,step:50,fmt:v=>nf0.format(v)+' mm'}
+/* ---------- optimisation à l'instant T (boutons ⟳) ---------- */
+const OB={Ha:{lab:'Altimétrie d’accroche',sup:1},pente:{lab:'Inclinaison du support',sup:1,deg:1},D:{lab:'Longueur du support',sup:1},
+  dg:{lab:'Débord à gauche',sup:1},dd:{lab:'Débord à droite',sup:1},N:{lab:'Nombre de lames',n:1},lt:{lab:'Inclinaison des lames',deg:1},lw:{lab:'Largeur des lames'}};
+const obFmt=(k,v)=>OB[k].deg?nf1.format(v)+'°':OB[k].n?nf0.format(v)+' lame'+(v>1?'s':''):nf0.format(v)+' mm';
+const rngV=(a,b,st)=>{const o=[];for(let v=a;v<=b+1e-9;v+=st)o.push(Math.round(v*100)/100);return o};
+function obCands(k,T){
+  if(k==='Ha')return rngV(T.L,T.L+2000,10);if(k==='pente')return rngV(-45,60,.5);if(k==='D')return rngV(50,3000,10);
+  if(k==='dg'||k==='dd')return rngV(0,2000,10);if(k==='N')return rngV(1,60,1);if(k==='lw')return rngV(20,500,5);
+  const lim=T.mat==='bois'?30:0;return rngV(-85,85,.5).filter(f=>Math.abs(f)>=lim-1e-9).map(f=>Math.round((f+T.pente)*100)/100);
+}
+/* coût : plus petit = plus économique (le plus court, le moins de lames, le plus proche de l'horizontale…) */
+function obCost(k,v,T){return k==='pente'?Math.abs(v):k==='lt'?Math.abs(v-T.pente):k==='Ha'?v-T.L:v}
+function obGet(T,k){return k==='lw'?+T.pl[widthKey(T.pl)]:+T[k]}
+function obSet(T,k,v){const o={...T,pc:{...T.pc},pl:{...T.pl}};if(k==='lw'){o.pl[widthKey(o.pl)]=v;o.pl.des=''}else if(k==='Ha'){o.Ha=v;o.band=v-o.L}else o[k]=v;return o}
+const shade=(T,s,plate,n)=>{const f=litFraction(geom(T,plate),s,n);return f===null?null:1-f};
+const sunOnFacade=s=>s.y>0.0005&&s.z>0.0005;
+let obUndo={};const optLog=[];
+function runOB(k){
+  const o=OB[k],msg=$('#om-'+k);if(!o||!msg)return;
+  const btns=$$(`.ob[data-o="${k}"]`),s=curSun().s;msg.hidden=false;
+  if(!sunOnFacade(s)){msg.className='optmsg none';msg.textContent='Le soleil ne frappe pas la façade à cet instant : rien à optimiser.';return}
+  msg.className='optmsg';msg.textContent='Calcul en cours…';btns.forEach(b=>{b.disabled=true;b.classList.add('busy')});
+  setTimeout(()=>{try{
+    const T=clean(S),plate=!!o.sup,n=24,v0=obGet(T,k),p0=plate?shade(T,s,true,n):null,f0=shade(T,s,false,n);
+    let best=-1;const res=obCands(k,T).map(v=>{const sc=shade(obSet(T,k,v),s,plate,n)||0;if(sc>best)best=sc;return [v,sc]});
+    if(best<=0.001){msg.className='optmsg none';msg.textContent=`Aucune valeur testée ne porte d’ombre sur le vitrage le ${dateFr(S.date)} à ${hhmm(S.minutes)}.`;return}
+    const pick=res.filter(q=>q[1]>=best-0.002).reduce((a,q)=>obCost(k,q[0],T)<obCost(k,a[0],T)?q:a);
+    obUndo[k]={...S,pc:{...S.pc},pl:{...S.pl}};
+    S=obSet(S,k,pick[0]);syncFields();changed();
+    const f1v=shade(clean(S),s,false,n),pc=v=>v===null?'—':nf0.format(v*100)+' %';
+    const bound=k==='lt'&&S.mat==='bois'?' · bornée à 30° minimum (bois)':'';
+    msg.className='optmsg';
+    msg.innerHTML=`⟳ ${obFmt(k,v0)} → <b>${obFmt(k,pick[0])}</b> · vitrage à l’ombre ${pc(f0)} → <b>${pc(f1v)}</b>${plate?` <span class="sm">(support seul, en plaque pleine : ${pc(p0)} → ${pc(pick[1])})</span>`:''}${bound} <button class="linkbtn" type="button" data-undo="${k}">Annuler</button>`;
+    optLog.unshift({lab:o.lab,from:obFmt(k,v0),to:obFmt(k,pick[0]),f0:pc(f0),f1:pc(f1v),plate,ps:plate?pc(p0)+' → '+pc(pick[1]):'',when:`${dateFr(S.date)} à ${hhmm(S.minutes)}`});
+    if(optLog.length>12)optLog.length=12;
+  }finally{btns.forEach(b=>b.classList.remove('busy'));updateObState()}},40);
+}
+function undoOB(k){if(!obUndo[k])return;S=obUndo[k];delete obUndo[k];optLog.shift();initValues();renderMat();renderProfiles();renderSing();changed();const m=$('#om-'+k);if(m)m.hidden=true}
+function updateObState(){const ok=sunOnFacade(curSun().s);$$('.ob').forEach(b=>{if(b.classList.contains('busy'))return;b.disabled=!ok;b.title=ok?OBT:'Le soleil ne frappe pas la façade à la date et à l’heure affichées'})}
+
+/* ---------- durabilité : alertes et références ---------- */
+/* longévités FD P 20-651 (tableaux 4 à 6) par classe d'emploi 1, 2, 3.1, 3.2, 4 ; élancement maxi lame à plat (Recommandations PACTE 2020, tableaux 3 et 4) */
+const ESS={
+  douglas:{n:'Douglas (purgé d’aubier)',L:['L3','L3','L2','L1','N'],el:6},
+  douglas_t:{n:'Douglas traité classe 3.2',L:['L1','L1','L1','L1','N'],el:6},
+  meleze:{n:'Mélèze d’Europe (purgé d’aubier)',L:['L3','L3','L2','L1','N'],el:6},
+  meleze_t:{n:'Mélèze traité classe 3.2',L:['L1','L1','L1','L1','N'],el:6},
+  pin_t4:{n:'Pin sylvestre ou maritime traité classe 4',L:['L1','L1','L1','L1','L1'],el:6},
+  chataignier:{n:'Châtaignier (purgé d’aubier)',L:['L3','L3','L3','L2','L1'],el:5},
+  chene:{n:'Chêne rouvre ou pédonculé (purgé d’aubier)',L:['L3','L3','L3','L2','L1'],el:5},
+  robinier:{n:'Robinier (purgé d’aubier)',L:['L3','L3','L3','L2','L1'],el:4},
+  cumaru:{n:'Cumaru',L:['L3','L3','L3','L2','L1'],el:6},
+  ipe:{n:'Ipé',L:['L3','L3','L3','L2','L1'],el:7},
+  tali:{n:'Tali',L:['L3','L3','L3','L2','L1'],el:4}
 };
-function evalT(T){const G=geom(T),ps=dayStats(G,T.sumDate,20,12).pass,pw=dayStats(G,T.winDate,20,12).pass;return {ps,pw,sc:scoreOf(ps,pw,T.prio)}}
-function sweep(key,base){
-  const o=OPT[key],res=[];for(let v=o.from;v<=o.to+1e-9;v+=o.step)res.push({v,...evalT({...base,[key]:v})});
-  const valid=res.filter(x=>x.sc!==null);if(!valid.length)return null;
-  const best=Math.max(...valid.map(x=>x.sc)),near=valid.filter(x=>x.sc>=best-.003);
-  const pick=key==='D'?near.reduce((a,x)=>x.v<a.v?x:a):near.reduce((a,x)=>Math.abs(x.v-base[key])<Math.abs(a.v-base[key])?x:a);
-  return {res,pick};
+const CLS=['1','2','3.1','3.2','4'],CLN={'1':'1','2':'2','3.1':'3.1 (ex 3a)','3.2':'3.2 (ex 3b)','4':'4'};
+const T3={faible:{dr:['3.1','3.1','3.1'],mo:['3.1','3.2','3.2'],pi:['3.2','4','4']},moyenne:{dr:['3.1','3.1','3.2'],mo:['3.1','3.2','3.2'],pi:['3.2','4','4']},forte:{dr:['3.1','3.2','3.2'],mo:['3.2','3.2','4'],pi:['4','4','4']}};
+const CONC={dr:'drainante',mo:'moyenne',pi:'piégeante'},CRANK={dr:0,mo:1,pi:2},LR={N:0,L1:1,L2:2,L3:3};
+const CLIMN={sec:'sec',modere:'modéré',humide:'humide'};
+const worst=(...c)=>c.reduce((a,b)=>CRANK[b]>CRANK[a]?b:a,'dr');
+const massiv=e=>e<=28?'faible':e<=75?'moyenne':'forte';
+const REF={
+  fs:'NF DTU 31.1 P1-1 §5.10.3.1 et §5.10.3.2, fig. 4 et 5, p. 14',
+  fl:'NF DTU 31.1 P1-1 §5.10.3.3, fig. 6, p. 14-15',
+  bout:'NF DTU 31.1 P1-1 §5.10.4.1, fig. 7, p. 15',
+  ass:'NF DTU 31.1 P1-1 §5.10.4.3, fig. 10 et 11, p. 17',
+  hab:'NF DTU 31.1 P1-1 §5.10.2, p. 13',
+  bs30:'Recommandations professionnelles PACTE « Éléments bois non structuraux rapportés en façade » (2020) §6.10.1, p. 62',
+  goutte:'Recommandations PACTE 2020 §6.5.1, p. 59',
+  elan:'Recommandations PACTE 2020 §5.1.2, tableaux 3 et 4, p. 16-17',
+  larg:'Recommandations PACTE 2020 §6.3.4, p. 34',
+  cls:'FD P 20-651 §7.2.2, tableau 3, p. 13 ; massivité : tableau 1',
+  ess:'FD P 20-651 tableaux 4 à 6, p. 16-21',
+  verre:'Recommandations PACTE 2020 §6.10.1, p. 63 ; NF DTU 39 P3',
+  eau:'NF EN ISO 12944-3 §5.4, p. 10',
+  creux:'NF EN ISO 12944-3 §5.7, p. 11 ; galvanisation : NF EN ISO 1461 et NF EN ISO 14713-2',
+  galv:'NF EN ISO 12944-3 §5.10, p. 11',
+  corro:'NF EN ISO 12944-2, tableau 1, p. 12',
+  alu:'NF P 24-351, tableaux 23 et 24, p. 30',
+  dil:'Guide AQC « Brise-soleil métalliques » (2014) §4, p. 17'
+};
+const LVN={r:'à corriger',a:'à vérifier',g:'conforme',i:'information'};
+/* poches d'eau : zones entre l'enveloppe convexe et le contour, plus basses que leurs deux bords (y vers le haut) */
+function clipBelow(poly,lv){const out=[];for(let i=0;i<poly.length;i++){const p=poly[i],q=poly[(i+1)%poly.length],pin=p[1]<=lv,qin=q[1]<=lv;
+  if(pin)out.push(p);if(pin!==qin){const t=(lv-p[1])/(q[1]-p[1]);out.push([p[0]+t*(q[0]-p[0]),lv])}}return out}
+function pocketsOf(P,tol){
+  const H=hullIdx(P),n=P.length,res=[];
+  for(let j=0;j<H.length;j++){const a=H[j],b=H[(j+1)%H.length];if((a+1)%n===b)continue;
+    const chain=[];for(let i=a,c=0;c<=n;i=(i+1)%n,c++){chain.push(P[i]);if(i===b)break}
+    const lvl=Math.min(P[a][1],P[b][1]);let low=Infinity;for(let i=1;i<chain.length-1;i++)low=Math.min(low,chain[i][1]);
+    if(low<lvl-(tol||.5))res.push({poly:clipBelow(chain,lvl),depth:lvl-low})}
+  return res}
+function flatTops(P,lim){const r=[];for(let i=0;i<P.length;i++){const p=P[i],q=P[(i+1)%P.length],ex=q[0]-p[0],ey=q[1]-p[1],L=Math.hypot(ex,ey);if(L<5)continue;const ny=-ex/L;
+  if(ny>Math.cos(lim*rad))r.push({slope:Math.acos(Math.min(1,ny))*deg})}return r}
+let DUR=null;
+function durability(T0){
+  const G=geom(T0),T=G.T,phiD=Math.round(G.phi*deg*100)/100,beta=Math.abs(phiD),alpha=Math.round(Math.abs(T.pente)*100)/100,items=[],A=[],B=[];
+  const add=(lvl,el,txt,ref)=>items.push({lvl,el,txt,ref});
+  const cph=Math.cos(G.phi),sph=Math.sin(G.phi),rotP=P=>P.map(([u,v])=>[u*cph-v*sph,u*sph+v*cph]);
+  const SLw={out:rotP(G.SL.out),holes:G.SL.holes.map(rotP)};
+  const res={items,A,B,alpha,beta,phi:phiD,SLw,cls:[],pkC:[],pkL:[]};
+  if(T.mat==='bois'){
+    const es=ESS[T.ess]||ESS.douglas,ci={sec:0,modere:1,humide:2}[T.clim]??1,target=T.vie||'L1',nm=es.n.split(' (')[0];
+    const clsItem=(el,e,conc,cl)=>{const m=massiv(e),lg=es.L[CLS.indexOf(cl)]||'N',ok=LR[lg]>=LR[target];
+      add(ok?'g':'r',el,`${conc?`Massivité ${m} (e = ${nf0.format(e)} mm), conception ${CONC[conc]}, climat ${CLIMN[T.clim]||'modéré'} : classe`:'Classe'} d’emploi ${CLN[cl]}. ${es.n} : longévité ${lg} dans cette classe, ${ok?'convient':'ne convient pas'} pour la durée de vie visée ${target}.`,(conc?REF.cls:REF.hab)+' ; '+REF.ess);
+      res.cls.push({el,e,m,conc,cl,lg,ok})};
+    // consoles
+    const eC=Math.min(G.SC.w,G.SC.h);
+    if(T.capC){add('g','Consoles','Consoles capotées (dessus et about) : protégées par un habillage, ramenées en classe d’emploi 2.',REF.hab);A.push(['g','Consoles capotées : classe d’emploi 2 — NF DTU 31.1 P1-1 §5.10.2, p. 13']);clsItem('Consoles',eC,null,'2')}
+    else{
+      const fs=alpha<15?'pi':alpha<75?'mo':'dr';
+      if(fs==='pi'){add('r','Consoles',`Face supérieure à ${nf1.format(alpha)}° de l’horizontale : conception piégeante (0 à 15°). Délarder la face supérieure d’au moins 15° (mono ou bipente), incliner le support d’au moins 15° ou capoter les consoles.`,REF.fs);
+        A.push(['r',`Pente ${nf1.format(alpha)}° < 15° : piégeante ; délardement ≥ 15° — NF DTU 31.1 P1-1 §5.10.3, p. 14`])}
+      else{add(fs==='mo'?'a':'g','Consoles',`Face supérieure à ${nf1.format(alpha)}° de l’horizontale : conception ${CONC[fs]} (${fs==='mo'?'de 15 à 75°':'de 75 à 90°'}).`,REF.fs);
+        A.push([fs==='mo'?'a':'g',`Pente ${nf1.format(alpha)}° : ${CONC[fs]} — NF DTU 31.1 P1-1 §5.10.3.1, p. 14`])}
+      const ret=G.SC.h,fl=alpha>=75||ret<=230?'dr':'mo';
+      if(fl==='mo'){add('a','Consoles',`Retombée de ${nf0.format(ret)} mm, plus de 23 cm : face latérale en conception moyenne.`,REF.fl);A.push(['a',`Retombée ${nf0.format(ret)} mm > 23 cm — NF DTU 31.1 P1-1 §5.10.3.3, p. 14`])}
+      add('r','Consoles','About des consoles exposé (bois de bout) : conception piégeante. Capoter l’about.',REF.bout);
+      A.push(['r','About exposé (bois de bout) : capoter — NF DTU 31.1 P1-1 §5.10.4.1, p. 15']);
+      clsItem('Consoles',eC,worst(fs,fl,'pi'),T3[massiv(eC)][worst(fs,fl,'pi')][ci]);
+    }
+    // lames
+    if(beta<30){add('r','Lames',`Lames à ${nf1.format(beta)}° de l’horizontale : moins que les 30° minimum pour une durabilité satisfaisante d’un brise-soleil horizontal. Incliner à 30° au moins.`,REF.bs30);
+      B.push(['r',`${nf1.format(beta)}° < 30° mini — Recommandations PACTE 2020 §6.10.1, p. 62`])}
+    else{add('g','Lames',`Lames à ${nf1.format(beta)}° de l’horizontale (30° minimum).`,REF.bs30);B.push(['g',`${nf1.format(beta)}° ≥ 30° mini — Recommandations PACTE 2020 §6.10.1, p. 62`])}
+    add('i','Lames',`Inclinaison solaire théorique : latitude − 23° ≈ ${nf0.format(Math.abs(T.lat)-23)}° ; la durabilité impose 30° au moins.`,REF.bs30);
+    add('i','Lames','Former une goutte d’eau en sous-face (angle d’au moins 30° vers l’extérieur en parties haute et basse de la lame).',REF.goutte);
+    B.push(['i','Goutte d’eau en sous-face — Recommandations PACTE 2020 §6.5.1, p. 59']);
+    const fsL=beta<15?'pi':'dr';
+    if(fsL==='pi')add('r','Lames',`Face supérieure à ${nf1.format(beta)}° : écoulement latéral insuffisant (moins de 15°), conception piégeante.`,REF.fs);
+    const ys=SLw.out.map(q=>q[1]),retL=Math.max(...ys)-Math.min(...ys),flL=retL<=230?'dr':'mo';
+    if(flL==='mo')add('a','Lames',`Retombée de ${nf0.format(retL)} mm, plus de 23 cm : face latérale en conception moyenne.`,REF.fl);
+    if(!T.capL)add('r','Lames','Extrémités des lames (bois de bout) exposées : conception piégeante. Prévoir un capotage ou un débord qui les protège.',REF.bout);
+    else add('g','Lames','Extrémités des lames protégées.',REF.bout);
+    if(!T.desol)add('a','Lames','Lames posées en contact sur les consoles : assemblage en conception moyenne. Les désolidariser (cales ou rondelles de 5 mm) pour un assemblage drainant.',REF.ass);
+    else add('g','Lames','Lames désolidarisées des consoles : assemblage drainant.',REF.ass);
+    const w=Math.max(T.pl.b,T.pl.h),th=Math.min(T.pl.b,T.pl.h),chant=!!T.pl.rot,lam=w/th,lmax=es.el-(chant?2:0);
+    if(lam>lmax+1e-9)add('r','Lames',`Élancement largeur / épaisseur de ${nf1.format(lam)} : plus que ${lmax} pour ${nm} (lame ${chant?'sur chant':'à plat'}). Épaissir ou réduire la largeur.`,REF.elan);
+    else add('g','Lames',`Élancement ${nf1.format(lam)}, au plus ${lmax} pour ${nm} (lame ${chant?'sur chant':'à plat'}).`,REF.elan);
+    if(w<=40||w<th)add('a','Lames',`Largeur de ${nf0.format(w)} mm : elle doit dépasser 40 mm et ne pas être inférieure à l’épaisseur.`,REF.larg);
+    const cL=worst(fsL,flL,T.capL?'dr':'pi',T.desol?'dr':'mo');
+    clsItem('Lames',th,cL,T3[massiv(th)][cL][ci]);
+    add('i','Vitrage','Ombre partielle sur le vitrage : vérifier le risque de casse thermique (verre trempé ou durci, chants façonnés).',REF.verre);
+  }else{
+    const chk=sh=>({pk:pocketsOf(sh.out,.5),fl:flatTops(sh.out,5)});
+    const cl=chk(G.SC),cr=chk(G.SR);res.pkC=cl.pk;
+    if(cl.pk.length||cr.pk.length){const sides=[cl.pk.length?'gauche':'',cr.pk.length?'droite':''].filter(Boolean).join(' et ');
+      if(alpha<1){add('r','Consoles',`Console ${sides} : profil ouvert vers le haut, l’eau stagne dans le creux. Retourner le profil (ouverture vers le bas ou sur le côté) ou incliner le support.`,REF.eau);A.push(['r','Profil ouvert vers le haut : rétention d’eau — NF EN ISO 12944-3 §5.4, p. 10'])}
+      else{add('a','Consoles',`Console ${sides} : profil ouvert vers le haut ; avec la pente de ${nf1.format(alpha)}°, l’eau s’écoule dans la longueur. Laisser l’about ouvert pour l’évacuation.`,REF.eau);A.push(['a',`Creux drainé par la pente de ${nf1.format(alpha)}° — NF EN ISO 12944-3 §5.4, p. 10`])}}
+    else if(alpha<1&&(cl.fl.length||cr.fl.length)){add('a','Consoles','Face supérieure horizontale : préférer une surface inclinée ou chanfreinée, ou incliner le support.',REF.eau);A.push(['a','Face supérieure horizontale — NF EN ISO 12944-3 §5.4, p. 10'])}
+    else{add('g','Consoles','Pas de rétention d’eau sur la section des consoles.',REF.eau);A.push(['g','Pas de rétention d’eau — NF EN ISO 12944-3 §5.4, p. 10'])}
+    if(G.SC.hollow){add('i','Consoles','Consoles en tube : extrémités fermées étanches (soudure continue) ou percées pour le drainage et la ventilation.',REF.creux);A.push(['i','Tube : fermé étanche ou drainé — NF EN ISO 12944-3 §5.7, p. 11'])}
+    const pL=pocketsOf(SLw.out,.5),fL=flatTops(SLw.out,5);res.pkL=pL;
+    if(pL.length){add('r','Lames',`Lames : profil ouvert vers le haut à ${nf1.format(phiD)}°, l’eau stagne dans le creux. Retourner ou incliner le profil.`,REF.eau);B.push(['r','Creux ouvert vers le haut : rétention d’eau — NF EN ISO 12944-3 §5.4, p. 10'])}
+    else if(fL.length){const sl=Math.min(...fL.map(f=>f.slope));add('a','Lames',`Face supérieure des lames à ${nf1.format(sl)}° : quasi horizontale. Préférer une surface inclinée ou chanfreinée (incliner les lames).`,REF.eau);B.push(['a',`Face supérieure à ${nf1.format(sl)}° : quasi horizontale — NF EN ISO 12944-3 §5.4, p. 10`])}
+    else{add('g','Lames',`Lames à ${nf1.format(beta)}° : pas de rétention d’eau sur la section.`,REF.eau);B.push(['g',`${nf1.format(beta)}° : pas de rétention d’eau — NF EN ISO 12944-3 §5.4, p. 10`])}
+    if(G.SL.hollow){add('i','Lames','Lames en tube : extrémités fermées étanches ou percées pour le drainage et la ventilation.',REF.creux);B.push(['i','Tube : fermé étanche ou drainé — NF EN ISO 12944-3 §5.7, p. 11'])}
+    if(T.mat==='acier')add('i','Protection',`Catégorie de corrosivité ${CORRO[T.corro]||T.corro} : choisir le système de protection (peinture ou galvanisation à chaud) pour cette catégorie et la durabilité visée.`,REF.corro);
+    else{const a=ATMO[T.atmo]||ATMO.E12;add('i','Protection',`Atmosphère ${T.atmo} (${a[0].toLowerCase()}) : anodisation ${a[1]} ou thermolaquage ${a[2]}${a[3]?', avec préanodisation QUALICOAT ou label QUALIMARINE':''}.`,REF.alu)}
+    const kd=T.mat==='alu'?1:.5,dl=G.Lx/1000*kd;
+    add(G.Lx>6000?'a':'i','Dilatation',`Environ ±${nf1.format(dl)} mm sur ${nf2.format(G.Lx/1000)} m hors tout (±${T.mat==='alu'?'1':'0,5'} mm/m).${G.Lx>6000?' Prévoir un joint de dilatation environ tous les 6 m.':''}`,REF.dil);
+    add('i','Fixations','Isoler électriquement les métaux différents (fixations, supports) pour éviter la corrosion galvanique.',REF.galv);
+    add('i','Vitrage','Ombre partielle sur le vitrage : vérifier le risque de casse thermique.',REF.verre);
+  }
+  const ord=['r','a','i','g'];items.sort((a,b)=>ord.indexOf(a.lvl)-ord.indexOf(b.lvl));
+  const top=arr=>arr.reduce((a,x)=>ord.indexOf(x[0])<ord.indexOf(a)?x[0]:a,'g');
+  res.alphaLvl=A.length?top(A):'i';res.betaLvl=B.length?top(B.filter(x=>x[0]!=='i').length?B.filter(x=>x[0]!=='i'):B):'i';
+  return res;
 }
-let undoState=null,lastOpt=null;
-function runOpt(key){
-  const box=$('#optres');box.hidden=false;box.innerHTML='<span class="note">Calcul en cours…</span>';
-  setTimeout(()=>{
-    const before={...S},e0=evalT(S),keys=key==='all'?['D','pente','lt','D','lt']:[key];let last=null;
-    for(const k of keys){const r=sweep(k,S);if(!r){box.innerHTML='<span class="note">Aucun soleil sur la façade aux jours de référence : rien à optimiser.</span>';return}S[k]=r.pick.v;last={k,r}}
-    const e1=evalT(S);undoState=before;syncFields();changed();
-    const pc=v=>v===null?'—':nf0.format(v*100)+' %';
-    lastOpt={title:key==='all'?'Réglage combiné':OPT[key].label,
-      lines:(key==='all'?['D','pente','lt']:[key]).map(k=>[OPT[k].label,OPT[k].fmt(before[k])+' → '+OPT[k].fmt(S[k])]).concat([
-        ['Passage été',pc(e0.ps)+' → '+pc(e1.ps)],['Passage hiver',pc(e0.pw)+' → '+pc(e1.pw)],
-        ['Indice',(e0.sc===null?'—':nf0.format(e0.sc*100))+' → '+(e1.sc===null?'—':nf0.format(e1.sc*100))+' / 100']])};
-    const lines=(key==='all'?['D','pente','lt']:[key]).map(k=>`<div>${OPT[k].label} : <span class="num">${OPT[k].fmt(before[k])} → <b>${OPT[k].fmt(S[k])}</b></span></div>`).join('');
-    box.innerHTML=`<div class="head">✓ ${key==='all'?'Réglage combiné appliqué':OPT[key].label+' optimisée'}</div>${lines}
-      <div>Été : <span class="num">${pc(e0.ps)} → ${pc(e1.ps)}</span> passe · Hiver : <span class="num">${pc(e0.pw)} → ${pc(e1.pw)}</span> passe</div>
-      <div>Indice : <span class="num">${e0.sc===null?'—':nf0.format(e0.sc*100)} → <b>${e1.sc===null?'—':nf0.format(e1.sc*100)}</b></span></div>
-      ${key==='all'?'':spark(last.r,OPT[key])}
-      <div class="row"><button class="b sm" id="opt-undo" type="button">Revenir aux valeurs précédentes</button></div>`;
-    $('#opt-undo').addEventListener('click',()=>{if(!undoState)return;S={...undoState};undoState=null;syncFields();changed();box.hidden=true});
-  },30);
-}
-function spark(r,o){
-  const Wd=560,Hd=90,l=4,rr=4,t=8,b=18,v=r.res.filter(x=>x.sc!==null);
-  const mn=Math.min(...v.map(x=>x.sc)),mx=Math.max(...v.map(x=>x.sc)),rg=Math.max(1e-6,mx-mn);
-  const X=x=>l+(x-o.from)/(o.to-o.from)*(Wd-l-rr),Yv=s=>t+(1-(s-mn)/rg)*(Hd-t-b),px=X(r.pick.v);
-  const d=v.map((x,i)=>(i?'L':'M')+X(x.v).toFixed(1)+','+Yv(x.sc).toFixed(1)).join('');
-  return `<div class="svgbox"><svg viewBox="0 0 ${Wd} ${Hd}" role="img" aria-label="Indice selon la valeur testée"><path d="${d}" fill="none" stroke="#5a5a5a" stroke-width="1.5"/><line x1="${px}" x2="${px}" y1="${t}" y2="${Hd-b}" stroke="#1D9E75"/><circle cx="${px}" cy="${Yv(r.pick.sc)}" r="4" fill="#1D9E75"/><text x="${l}" y="${Hd-4}" class="axt">${o.fmt(o.from)}</text><text x="${Wd-rr}" y="${Hd-4}" text-anchor="end" class="axt">${o.fmt(o.to)}</text><text x="${Math.min(Wd-80,Math.max(60,px))}" y="${Hd-4}" text-anchor="middle" class="axt" style="fill:#14694F;font-weight:700">${o.fmt(r.pick.v)}</text></svg></div><p class="note">Indice obtenu pour chaque valeur testée, les autres réglages restant fixes.</p>`;
+function renderDura(){
+  const D=DUR;if(!D)return;
+  const nr=D.items.filter(x=>x.lvl==='r').length,na=D.items.filter(x=>x.lvl==='a').length;
+  let h=`<div class="dsum ${nr?'r':na?'a':'g'}">${MATN[S.mat]} : ${nr?nr+' point'+(nr>1?'s':'')+' à corriger':'aucun point à corriger'}${na?', '+na+' à vérifier':''}</div>`;
+  h+=D.items.map(x=>`<div class="al ${x.lvl}"><i aria-hidden="true"></i><div><b>${x.el}</b> — ${XE(x.txt)}<span class="ref">${XE(x.ref)}</span></div></div>`).join('');
+  $('#dura').innerHTML=h;
 }
 
 /* ---------- temps & animation ---------- */
@@ -1041,7 +1467,7 @@ function loop(t){
   requestAnimationFrame(loop);
 }
 function scheduleHeavy(ms){clearTimeout(heavyT);heavyT=setTimeout(()=>{updateRefs();drawDay();drawHeat()},ms||180)}
-function changed(){buildModel();updateHUD();drawCoupe();wallInfo();scheduleHeavy();save()}
+function changed(){DUR=durability(S);buildModel();updateHUD();drawCoupe();renderDura();updPdes();wallInfo();scheduleHeavy();save()}
 
 /* ---------- exports : données communes ---------- */
 const hasAddr=()=>S.place&&!/^(Exemple|Coordonnées|Point placé|Site)/.test(S.place);
@@ -1055,9 +1481,9 @@ function download(data,name,type){
 }
 const gpsTxt=()=>`${S.lat.toFixed(5)}, ${S.lon.toFixed(5)} (${nf5.format(Math.abs(S.lat))}° ${S.lat>=0?'N':'S'} – ${nf5.format(Math.abs(S.lon))}° ${S.lon>=0?'E':'O'})`;
 function reportData(){
-  clearTimeout(heavyT);updateRefs();drawDay();drawHeat();drawCoupe();
+  clearTimeout(heavyT);DUR=durability(S);updateRefs();drawDay();drawHeat();drawCoupe();
   const G=geom(S),T=G.T,p=curSun(),s=p.s,f=litFraction(G,s,26);
-  const sum=dayStats(G,S.sumDate,15,14),win=dayStats(G,S.winDate,15,14),sc=scoreOf(sum.pass,win.pass,S.prio);
+  const sum=dayStats(G,S.sumDate,15,14),win=dayStats(G,S.winDate,15,14);
   const mm=v=>nf0.format(v)+' mm',dg=v=>nf1.format(v)+'°',pc=v=>v===null?'—':nf0.format(v*100)+' %',lv=v=>(v>=0?'+':'')+nf0.format(v)+' mm';
   const long={day:'numeric',month:'long',year:'numeric'};
   const tipZ=T.D*Math.cos(G.b),tipY=T.Ha-T.D*Math.sin(G.b),prof=s.z>0&&p.el>0?Math.atan2(s.y,s.z)*deg:null;
@@ -1066,24 +1492,37 @@ function reportData(){
     site.push(['Mur tracé sur la photo aérienne',`${nf1.format(distM(a[0],a[1],b[0],b[1]))} m, axe à ${dg(br)} du nord`])}
   site.push(['Date et heure simulées',`${dateFr(S.date,long)} à ${hhmm(S.minutes)} (heure légale)`]);
   const fen=[['Indice de la menuiserie',S.mex||'—'],['Largeur',mm(T.W)],['Hauteur',mm(T.L-T.A)],['Altimétrie allège',lv(T.A)],['Altimétrie linteau',lv(T.L)],['Retrait de la menuiserie (tableau)',mm(T.reveal)]];
+  const matRows=[['Matériau',MATN[T.mat]]];
+  if(T.mat==='bois')matRows.push(['Essence',(ESS[T.ess]||ESS.douglas).n],['Climat d’humidification (FD P 20-651)',CLIM[T.clim]||'—'],['Durée de vie visée',VIE[T.vie]||'—'],
+    ['Points singuliers déclarés',[T.capC?'consoles capotées':'consoles non capotées',T.capL?'extrémités des lames protégées':'extrémités des lames exposées',T.desol?'lames désolidarisées des consoles':'lames en contact sur les consoles'].join(' · ')]);
+  else if(T.mat==='acier')matRows.push(['Catégorie de corrosivité (NF EN ISO 12944-2)',CORRO[T.corro]||T.corro]);
+  else matRows.push(['Atmosphère extérieure (NF P 24-351)',T.atmo+' — '+(ATMO[T.atmo]||ATMO.E12)[0]]);
   const sup=[['Altimétrie d’accroche',lv(T.Ha)],['Bandeau linteau → accroche',mm(T.Ha-T.L)],
     ['Inclinaison du support',dg(T.pente)+(T.pente>0?' (descend vers l’extérieur)':T.pente<0?' (monte vers l’extérieur)':' (de niveau)')],
     ['Longueur le long du support',mm(T.D)],['Avancée horizontale / altimétrie en about',`${mm(tipZ)} / ${lv(tipY)}`],
-    ['Débords gauche / droite (vus de l’extérieur)',`${mm(T.dg)} / ${mm(T.dd)}`],['Longueur hors tout',mm(G.Lx)],['Consoles (2, une à chaque extrémité)',`${nf0.format(G.cw)} × ${nf0.format(T.ch)} mm`]];
-  const lam=[['Nombre de lames',nf0.format(T.N)],['Largeur × épaisseur',`${nf0.format(T.lw)} × ${nf0.format(T.le)} mm`],['Inclinaison sur le support',dg(T.lt)+' (positif = bord extérieur relevé)'],
+    ['Débords gauche / droite (vus de l’extérieur)',`${mm(T.dg)} / ${mm(T.dd)}`],['Longueur hors tout',mm(G.Lx)],['Consoles (2, une à chaque extrémité)',profDesc(T.pc,'pc')]];
+  const lam=[['Nombre de lames',nf0.format(T.N)],['Profil',profDesc(T.pl,'pl')],['Inclinaison sur le support',dg(T.lt)+' (positif = bord extérieur relevé)'],
     ['Inclinaison par rapport à l’horizontale',dg(T.lt-T.pente)],['Entraxe des lames (le long du support)',mm(T.D/T.N)]];
   const inst=[['Azimut / hauteur du soleil',`${dg(p.az)} / ${dg(p.el)}`],['Angle de profil sur la façade',prof===null?'pas de soleil direct sur la façade':dg(prof)],['Surface vitrée au soleil',pc(f)]];
   const ref=st=>st.pass===null?'Pas de soleil sur la façade ce jour-là':`${pc(st.pass)} du rayonnement direct atteint le vitrage · ${nf2.format(st.got)} / ${nf2.format(st.possible)} kWh/m² · soleil sur la façade de ${hhmm(st.first-7.5)} à ${hhmm(st.last+7.5)}`;
-  const [scC,scL]=stateOf(sc,true);
-  const res=[['Été — '+dateFr(S.sumDate,long),ref(sum),sum.pass===null?'':stateOf(sum.pass,false)[0]],['Hiver — '+dateFr(S.winDate,long),ref(win),win.pass===null?'':stateOf(win.pass,true)[0]],
-    ['Priorité retenue',`${100-S.prio} % apports d’hiver / ${S.prio} % protection d’été`],['Indice d’efficacité',sc===null?'—':`${nf0.format(sc*100)} / 100 (${scL})`,scC]];
+  const res=[['Été — '+dateFr(S.sumDate,long),ref(sum),sum.pass===null?'':stateOf(sum.pass,false)[0]],['Hiver — '+dateFr(S.winDate,long),ref(win),win.pass===null?'':stateOf(win.pass,true)[0]]];
+  const dura=DUR.items.map(x=>[x.el+' — '+LVN[x.lvl],x.txt,x.ref,x.lvl]);
+  const opts=optLog.map(o=>[o.lab+' — '+o.when,`${o.from} → ${o.to} · vitrage à l’ombre ${o.f0} → ${o.f1}${o.plate?' (support seul en plaque pleine : '+o.ps+')':''}`]);
   return {title:S.chantier||'Chantier sans nom',addr:hasAddr()?S.place:'',gps:gpsTxt(),mex:S.mex||'—',orient:`${dg(S.azim)} (${cardinal(S.azim)})`,
-    dateEtude:new Date().toLocaleDateString('fr-FR',long),site,fen,sup,lam,inst,res,opt:lastOpt,simLabel:`${dateFr(S.date,long)} à ${hhmm(S.minutes)}`};
+    dateEtude:new Date().toLocaleDateString('fr-FR',long),site,fen,matRows,sup,lam,inst,res,dura,opts,simLabel:`${dateFr(S.date,long)} à ${hhmm(S.minutes)}`};
 }
 const METHODE=['Position du soleil calculée avec les formules NOAA d’après J. Meeus (Astronomical Algorithms), avec correction de réfraction atmosphérique.',
   'Rayonnement direct par ciel clair (modèle de Meinel, masse d’air de Kasten-Young), pondéré par l’incidence sur la façade. Le rayonnement diffus et réfléchi n’est pas pris en compte.',
-  'Ombre calculée par lancer de rayons depuis une grille de points du vitrage vers le soleil : lames, consoles et embrasure. Les masques lointains (bâtiments voisins, relief, végétation) ne sont pas modélisés.',
-  'Le pourcentage indiqué est la part du rayonnement direct reçu par le vitrage, comparée à la même fenêtre sans brise-soleil.'];
+  'Ombre calculée par lancer de rayons depuis une grille de points du vitrage vers le soleil : lames et consoles avec la section réelle du profil choisi, et embrasure. Les masques lointains (bâtiments voisins, relief, végétation) ne sont pas modélisés.',
+  'Le pourcentage indiqué est la part du rayonnement direct reçu par le vitrage, comparée à la même fenêtre sans brise-soleil.',
+  'Optimisation à l’instant T : chaque bouton d’optimisation teste une plage de valeurs pour un seul réglage, les autres restant fixes, et retient la plus économique parmi celles qui donnent l’ombre maximale sur le vitrage à la date et à l’heure affichées. Les boutons du support traitent le support comme une plaque pleine, sans les lames. En bois, l’inclinaison des lames reste d’au moins 30°.',
+  'Durabilité : alertes établies d’après NF DTU 31.1 P1-1, FD P 20-651, les Recommandations professionnelles PACTE « Éléments bois non structuraux rapportés en façade » (2020), NF EN ISO 12944-2 et -3, NF P 24-351 et le guide AQC « Brise-soleil métalliques » (2014). Seuls les références et les seuils sont repris : se reporter aux documents pour leur application.'];
+const DURA_INTRO='Alertes établies d’après les documents cités en référence (norme, paragraphe, page). Les dispositions de protection et les points singuliers sont ceux déclarés dans l’étude. Ces alertes ne remplacent pas l’application des documents.';
+const LVC={r:['FCE9E9','B3302F'],a:['FDF4E3','8A5200'],g:['EAF6F1','14694F'],i:['EAF1F8','1F4E79']};
+function walerts(rows){
+  const hd=t=>wp(wr(t,{b:true,sz:18,color:'FFFFFF'}),{after:0});
+  return wtbl([wtc(1900,hd('Élément'),{shd:'1F4E79'})+wtc(4900,hd('Constat et préconisation'),{shd:'1F4E79'})+wtc(2838,hd('Référence'),{shd:'1F4E79'})]
+    .concat(rows.map(([k,v,ref,l])=>wtc(1900,wp(wr(k,{b:true,sz:18,color:LVC[l][1]}),{after:0}),{shd:LVC[l][0]})+wtc(4900,wp(wr(v,{sz:18}),{after:0}))+wtc(2838,wp(wr(ref,{i:true,sz:16,color:'5A5A5A'}),{after:0})))),[1900,4900,2838])+wp('',{after:60})}
 const DISCL='Cet outil est fourni à des fins pédagogiques et d’assistance au pré-dimensionnement. Les résultats doivent être vérifiés par un professionnel qualifié. Aucun calcul de structure (charges, vent, fixations) n’est effectué.';
 const CFG_INTRO='Pour retrouver, retravailler ou vérifier cette étude dans Ombrage : copier tout le bloc ci-dessous, de la première à la dernière ligne, le coller dans la carte « Réglages enregistrés », puis cliquer « Charger ces réglages ».';
 function cfgLines(max){const out=[];for(const l of JSON.stringify(S,null,1).split('\n')){for(let i=0;i<l.length;i+=max)out.push(l.slice(i,i+max));if(!l.length)out.push('')}return out}
@@ -1105,7 +1544,7 @@ function svgToPng(svg,wpx){return new Promise(res=>{try{
 function cap3D(){if(!G3.ok)return null;try{G3.r.render(G3.scene,G3.cam);const c=G3.r.domElement;return {url:c.toDataURL('image/png'),w:c.width,h:c.height}}catch(e){return null}}
 function capMap(){try{drawMap();return {url:cv.toDataURL('image/png'),w:cv.width,h:cv.height,photo:MAP.ok>0}}catch(e){return null}}
 async function captures(){
-  return {map:capMap(),v3d:cap3D(),coupe:await svgToPng($('#coupe svg'),1100),day:await svgToPng($('#daychart svg'),1400),heat:await svgToPng($('#heat svg'),1400)};
+  return {map:capMap(),v3d:cap3D(),coupe:await svgToPng($('#coupe svg'),1100),details:await svgToPng($('#details svg'),1400),day:await svgToPng($('#daychart svg'),1400),heat:await svgToPng($('#heat svg'),1400)};
 }
 const b64=u=>u.slice(u.indexOf(',')+1);
 
@@ -1144,15 +1583,17 @@ async function exportDOCX(){
   body+=wh(1,'Site et orientation')+wkv(R.site);
   if(I.map)body+=addImg(I.map,9,I.map.photo?'Photo aérienne IGN : point du site, mur tracé, flèche « ext. » (normale à la façade) et direction du soleil à l’heure simulée':'Schéma d’orientation : point du site, mur tracé, flèche « ext. » et direction du soleil (photo aérienne indisponible)');
   body+=wh(2,'Menuiserie '+(S.mex||''))+wkv(R.fen);
-  body+=wh(3,'Brise-soleil')+wsub('Support')+wkv(R.sup)+wsub('Lames')+wkv(R.lam);
-  body+=wh(4,'Résultats d’ensoleillement')+wsub('À l’instant simulé — '+R.simLabel)+wkv(R.inst)+wsub('Jours de référence (ciel clair)')+wkv(R.res);
-  if(R.opt)body+=wsub('Dernière optimisation : '+R.opt.title)+wkv(R.opt.lines);
-  body+=wh(5,'Illustrations',{pb:true});
+  body+=wh(3,'Brise-soleil')+wsub('Matériau et environnement')+wkv(R.matRows)+wsub('Support')+wkv(R.sup)+wsub('Lames')+wkv(R.lam);
+  body+=wh(4,'Durabilité')+wp(wr(DURA_INTRO,{sz:19}),{after:100})+walerts(R.dura);
+  body+=wh(5,'Résultats d’ensoleillement')+wsub('À l’instant simulé — '+R.simLabel)+wkv(R.inst)+wsub('Bilans été / hiver (ciel clair)')+wkv(R.res);
+  if(R.opts.length)body+=wsub('Optimisations réalisées à l’instant T')+wkv(R.opts);
+  body+=wh(6,'Illustrations',{pb:true});
   body+=addImg(I.v3d,15.5,'Vue 3D avec ombres portées — '+R.simLabel);
-  body+=addImg(I.coupe,10.5,'Coupe verticale au milieu de la fenêtre — rayons solaires selon l’angle de profil');
+  body+=addImg(I.coupe,10.5,'Coupe verticale au milieu de la fenêtre — rayons solaires selon l’angle de profil, angles réels α (support) et β (lames)');
+  body+=addImg(I.details,15.5,'Détails de durabilité : sections réelles, angles, zones de rétention d’eau et références');
   body+=addImg(I.day,15.5,'Profil de la journée : surface vitrée au soleil (%), date simulée et jours de référence');
   body+=addImg(I.heat,15.5,'Carte annuelle : surface vitrée au soleil le 21 de chaque mois, de 4 h à 22 h');
-  let nSec=6;
+  let nSec=7;
   if(S.xCfg!==false){body+=wh(nSec++,'Réglages enregistrés',{pb:true})+wp(wr(CFG_INTRO,{sz:19}),{after:120})
     +cfgLines(100).map(l=>wp(wr(l,{sz:15,mono:true}),{shd:'F2F7FB',after:0,line:240,ind:'<w:ind w:left="113" w:right="113"/>'})).join('')+wp('',{after:120})}
   body+=wh(nSec,'Méthode et limites')+METHODE.map(t=>wp(wr('• '+t,{sz:19}),{after:60,ind:'<w:ind w:left="240" w:hanging="240"/>'})).join('');
@@ -1174,7 +1615,7 @@ async function exportDOCX(){
 }
 
 /* ---------- export PDF (jsPDF) ---------- */
-const latin=s=>String(s).replace(/[  ]/g,' ').replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/[–—−]/g,'-').replace(/→/g,'->').replace(/œ/g,'oe').replace(/Œ/g,'OE').replace(/…/g,'...').replace(/≈/g,'~').replace(/[^\x00-\xFF]/g,'').replace(/^\s+/,'');
+const latin=s=>String(s).replace(/[  ]/g,' ').replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/[–—−]/g,'-').replace(/→/g,'->').replace(/≥/g,'>=').replace(/≤/g,'<=').replace(/α/g,'alpha').replace(/β/g,'beta').replace(/œ/g,'oe').replace(/Œ/g,'OE').replace(/…/g,'...').replace(/≈/g,'~').replace(/[^\x00-\xFF]/g,'').replace(/^\s+/,'');
 async function exportPDF(){
   if(!window.jspdf||!window.jspdf.jsPDF){xmsg('La librairie de création PDF n’a pas pu se charger (connexion internet nécessaire).','err');return}
   xmsg('Préparation du document PDF…');
@@ -1205,22 +1646,32 @@ async function exportPDF(){
     font('bold',13,'1F4E79');d.text(latin(t),Lm+10,y);y+=3;d.setDrawColor(31,78,121);d.setLineWidth(.4);d.line(Lm,y,Lm+Wc,y);y+=5};
   const sub=t=>{ensure(14);font('bold',10.5,'1F4E79');d.text(latin(t),Lm,y+1);y+=5};
   const kv=rows=>{d.setLineWidth(.2);d.setDrawColor(224,224,224);
-    for(const [k,v,c] of rows){font('normal',9);const kl=lines(k,58),vl=lines(v,112);const h=Math.max(kl.length,vl.length)*4+3.2;ensure(h);
+    for(const [k,v,c] of rows){font('normal',9.3);const kl=lines(k,58),vl=lines(v,110);const h=Math.max(kl.length,vl.length)*4+3.2;ensure(h);
       d.setFillColor(242,247,251);d.rect(Lm,y,64,h,'F');d.rect(Lm,y,Wc,h,'S');d.line(Lm+64,y,Lm+64,y+h);
       font('normal',8.8,'5A5A5A');d.text(kl,Lm+2.5,y+4.6);font(c?'bold':'normal',9.3,c?SEMC[c]:'1A1A1A');d.text(vl,Lm+66.5,y+4.6);y+=h}
     y+=4};
   const img=(im,wmm,cap)=>{if(!im)return;let w=wmm,h=w*im.h/im.w;if(h>150){h=150;w=h*im.w/im.h}ensure(h+10);
     d.addImage(im.url,'PNG',Lm+(Wc-w)/2,y,w,h);y+=h+4;font('italic',8,'5A5A5A');const cl=lines(cap,Wc);d.text(cl,105,y,{align:'center'});y+=cl.length*3.6+4};
+  const alerts=rows=>{const w1=36,w3=54,w2=Wc-w1-w3;
+    const hdr=()=>{ensure(8);d.setFillColor(31,78,121);d.rect(Lm,y,Wc,6.5,'F');font('bold',8.5,'FFFFFF');d.text(latin('Élément'),Lm+2,y+4.4);d.text(latin('Constat et préconisation'),Lm+w1+2,y+4.4);d.text(latin('Référence'),Lm+w1+w2+2,y+4.4);y+=6.5};
+    hdr();
+    for(const [k,v,ref,l] of rows){font('bold',8.3);const kl=lines(k,w1-4);font('normal',8.5);const vl=lines(v,w2-4);font('italic',7.6);const rl=lines(ref,w3-4);
+      const h=Math.max(kl.length*3.5,vl.length*3.7,rl.length*3.3)+3.4;if(y+h>BOT){page();hdr()}
+      const c=LVC[l];d.setLineWidth(.2);d.setDrawColor(224,224,224);d.setFillColor(...col(c[0]));d.rect(Lm,y,w1,h,'F');d.rect(Lm,y,Wc,h,'S');d.line(Lm+w1,y,Lm+w1,y+h);d.line(Lm+w1+w2,y,Lm+w1+w2,y+h);
+      font('bold',8.3,c[1]);d.text(kl,Lm+2,y+4.3);font('normal',8.5,'1A1A1A');d.text(vl,Lm+w1+2,y+4.3);font('italic',7.6,'5A5A5A');d.text(rl,Lm+w1+w2+2,y+4.1);y+=h}
+    y+=4};
   head(1,'Site et orientation');kv(R.site);
   if(I.map)img(I.map,95,I.map.photo?'Photo aérienne IGN : point du site, mur tracé, flèche « ext. » et direction du soleil à l’heure simulée':'Schéma d’orientation : point du site, mur tracé, flèche « ext. » et direction du soleil');
   head(2,'Menuiserie '+(S.mex||''));kv(R.fen);
-  head(3,'Brise-soleil');sub('Support');kv(R.sup);sub('Lames');kv(R.lam);
-  head(4,'Résultats d’ensoleillement');sub('À l’instant simulé - '+R.simLabel);kv(R.inst);sub('Jours de référence (ciel clair)');kv(R.res);
-  if(R.opt){sub('Dernière optimisation : '+R.opt.title);kv(R.opt.lines)}
-  head(5,'Illustrations',true);
-  img(I.v3d,170,'Vue 3D avec ombres portées - '+R.simLabel);img(I.coupe,115,'Coupe verticale au milieu de la fenêtre - rayons solaires selon l’angle de profil');
+  head(3,'Brise-soleil');sub('Matériau et environnement');kv(R.matRows);sub('Support');kv(R.sup);sub('Lames');kv(R.lam);
+  head(4,'Durabilité');font('normal',9,'1A1A1A');{const il=lines(DURA_INTRO,Wc);ensure(il.length*4+12);d.text(il,Lm,y);y+=il.length*4+3}alerts(R.dura);
+  head(5,'Résultats d’ensoleillement');sub('À l’instant simulé - '+R.simLabel);kv(R.inst);sub('Bilans été / hiver (ciel clair)');kv(R.res);
+  if(R.opts.length){sub('Optimisations réalisées à l’instant T');kv(R.opts)}
+  head(6,'Illustrations',true);
+  img(I.v3d,170,'Vue 3D avec ombres portées - '+R.simLabel);img(I.coupe,115,'Coupe verticale au milieu de la fenêtre - rayons solaires selon l’angle de profil, angles réels alpha (support) et beta (lames)');
+  img(I.details,175,'Détails de durabilité : sections réelles, angles, zones de rétention d’eau et références');
   img(I.day,170,'Profil de la journée : surface vitrée au soleil (%), date simulée et jours de référence');img(I.heat,170,'Carte annuelle : surface vitrée au soleil le 21 de chaque mois, de 4 h à 22 h');
-  let nSec=6;
+  let nSec=7;
   if(S.xCfg!==false){head(nSec++,'Réglages enregistrés',true);font('normal',9,'1A1A1A');const il=lines(CFG_INTRO,Wc);d.text(il,Lm,y);y+=il.length*4+3;
     const lh=3.3;
     for(const l of cfgLines(108)){if(y+lh>BOT)page();d.setFillColor(242,247,251);d.rect(Lm,y-2.6,Wc,lh,'F');font('normal',7.5,'1A1A1A');d.setFont('courier','normal');
@@ -1240,15 +1691,17 @@ async function exportPDF(){
 
 /* ---------- export DXF (R12, vraie grandeur en mm) ---------- */
 function buildDXF(den,withDims){
-  const G=geom(S),T=G.T,b=G.b,r=T.reveal,th=r+200,k=den;
+  const G=geom(S),T=G.T,b=G.b,r=T.reveal,th=r+200,k=den,D=DUR||durability(S);
   const TXT=2.5*k,TTL=3.5*k,TK=0.9*k,EXT=1.5*k,GAP=Math.max(1500,25*k);
-  const tipZ=T.D*Math.cos(b),tipY=T.Ha-T.D*Math.sin(b),hc=T.ch/2;
+  const tipZ=T.D*Math.cos(b),tipY=T.Ha-T.D*Math.sin(b);
   const E=[];const f=v=>(Math.round(v*1000)/1000).toString();
+  const dx=s=>String(s).replace(/≥/g,'>=').replace(/≤/g,'<=').replace(/β/g,'beta').replace(/α/g,'alpha').replace(/→/g,'->').replace(/[^\x00-\xFF€‚„…‘’“”–—œŒ]/g,'').replace(/\s+/g,' ').trim();
   const L=(ly,x1,y1,x2,y2)=>E.push(`0\nLINE\n8\n${ly}\n10\n${f(x1)}\n20\n${f(y1)}\n30\n0\n11\n${f(x2)}\n21\n${f(y2)}\n31\n0`);
   const PL=(ly,pts,cl=true)=>{let s=`0\nPOLYLINE\n8\n${ly}\n66\n1\n70\n${cl?1:0}\n10\n0\n20\n0\n30\n0`;for(const [x,y] of pts)s+=`\n0\nVERTEX\n8\n${ly}\n10\n${f(x)}\n20\n${f(y)}\n30\n0`;E.push(s+`\n0\nSEQEND\n8\n${ly}`)};
   const RC=(ly,x0,y0,x1,y1)=>PL(ly,[[x0,y0],[x1,y0],[x1,y1],[x0,y1]]);
   const CI=(ly,x,y,rr)=>E.push(`0\nCIRCLE\n8\n${ly}\n10\n${f(x)}\n20\n${f(y)}\n30\n0\n40\n${f(rr)}`);
-  const TX=(ly,x,y,h,s,al=0,rot=0)=>E.push(`0\nTEXT\n8\n${ly}\n10\n${f(x)}\n20\n${f(y)}\n30\n0\n40\n${f(h)}\n1\n${s}\n50\n${f(rot)}`+(al?`\n72\n${al}\n11\n${f(x)}\n21\n${f(y)}\n31\n0`:''));
+  const AR=(ly,x,y,rr,a0,a1)=>{const lo=Math.min(a0,a1),hi=Math.max(a0,a1);if(hi-lo<.05)return;E.push(`0\nARC\n8\n${ly}\n10\n${f(x)}\n20\n${f(y)}\n30\n0\n40\n${f(rr)}\n50\n${f((lo+360)%360)}\n51\n${f((hi+360)%360)}`)};
+  const TX=(ly,x,y,h,s,al=0,rot=0)=>E.push(`0\nTEXT\n8\n${ly}\n10\n${f(x)}\n20\n${f(y)}\n30\n0\n40\n${f(h)}\n1\n${dx(s)}\n50\n${f(rot)}`+(al?`\n72\n${al}\n11\n${f(x)}\n21\n${f(y)}\n31\n0`:''));
   const hatch=(x0,y0,x1,y1)=>{const sp=Math.max(3*k,25);for(let c=Math.ceil((y0-x1)/sp)*sp;c<=y1-x0;c+=sp){const pts=[];
     for(const x of [x0,x1]){const y=x+c;if(y>=y0-1e-6&&y<=y1+1e-6)pts.push([x,y])}for(const y of [y0,y1]){const x=y-c;if(x>x0+1e-6&&x<x1-1e-6)pts.push([x,y])}
     if(pts.length>=2)L('MUR_HACHURES',pts[0][0],pts[0][1],pts[1][0],pts[1][1])}};
@@ -1262,11 +1715,11 @@ function buildDXF(den,withDims){
   const level=(x,y,lab,right)=>{if(!withDims)return;const t=1.2*k;PL('COTES',[[x-t,y+1.4*t],[x+t,y+1.4*t],[x,y]]);L('COTES',x,y,right?x-6*k:x+6*k,y);
     TX('COTES',right?x+1.6*t:x-1.6*t,y+0.4*k,TXT,lab,right?0:2)};
   const lev=v=>(v>=0?'+':'')+Math.round(v);
-  // sections de lames et console (repère façade : z sortant, y altimétrie)
-  const slats=G.boxes.filter(B=>B.k==='slat').map(B=>{const v=B.a[1],w=B.a[2],hw=B.h[1],ht=B.h[2];
-    return [[1,1],[1,-1],[-1,-1],[-1,1]].map(([a,c])=>[B.c[2]+a*hw*v[2]+c*ht*w[2],B.c[1]+a*hw*v[1]+c*ht*w[1]])});
-  const nb=[Math.cos(b),Math.sin(b)];
-  const cons=[[hc*nb[1],T.Ha+hc*nb[0]],[-hc*nb[1],T.Ha-hc*nb[0]],[tipZ-hc*nb[1],tipY-hc*nb[0]],[tipZ+hc*nb[1],tipY+hc*nb[0]]];
+  // sections réelles (repère façade : z sortant, y altimétrie)
+  const wzy=(Q,P)=>P.map(([u,v])=>[Q.c[2]+u*Q.u[2]+v*Q.v[2],Q.c[1]+u*Q.u[1]+v*Q.v[1]]);
+  const slatEls=G.els.filter(q=>q.k==='slat'),slats=slatEls.map(q=>wzy(q,q.sh.out)),slatHoles=slatEls.map(q=>q.sh.holes.map(H=>wzy(q,H)));
+  const nn=G.n,sv=G.s,hc=G.SC.h/2,cp=(t,v)=>[t*sv[2]+v*nn[2],T.Ha+t*sv[1]+v*nn[1]];
+  const cons=[cp(0,hc),cp(0,-hc),cp(T.D,-hc),cp(T.D,hc)];
   const rng=(pts,i)=>[Math.min(...pts.map(p=>p[i])),Math.max(...pts.map(p=>p[i]))];
   const xL=Math.min(G.x0,0)-600,xR=Math.max(G.x1,T.W)+600;
   const ytop=Math.max(T.Ha+hc,T.L,rng(cons,1)[1],...slats.map(s=>rng(s,1)[1]))+600;
@@ -1274,7 +1727,8 @@ function buildDXF(den,withDims){
   L('MUR',xL-300,0,xR+300,0);RC('MUR',xL,0,xR,ytop);RC('MUR',0,T.A,T.W,T.L);
   RC('MENUISERIE',45,T.A+45,T.W-45,T.L-45);
   RC('SUPPORT',G.x0,T.Ha-35,G.x1,T.Ha+35);
-  const [cy0,cy1]=rng(cons,1);RC('CONSOLES',G.x0,cy0,G.x0+G.cw,cy1);RC('CONSOLES',G.x1-G.cw,cy0,G.x1,cy1);
+  const [cy0,cy1]=rng(cons,1);RC('CONSOLES',G.x0,cy0,G.x0+G.SC.w,cy1);RC('CONSOLES',G.x1-G.SR.w,cy0,G.x1,cy1);
+  const cbv=Math.cos(b);for(const [sh,xc] of [[G.SC,G.x0+G.SC.w/2],[G.SR,G.x1-G.SR.w/2]]){const m=P=>P.map(([u,v])=>[xc+u,tipY+v*cbv]);PL('CONSOLES',m(sh.out));for(const H of sh.holes)PL('CONSOLES',m(H))}
   for(const s of slats){const [a,c]=rng(s,1);RC('LAMES',G.x0,a,G.x1,c)}
   TX('TEXTES',xL,-8*k,TTL,'VUE DE FACE (DEPUIS L\'EXTERIEUR)');
   if(withDims){const y1=ytop+8*k,y2=ytop+15*k;
@@ -1289,22 +1743,48 @@ function buildDXF(den,withDims){
   RC('SUPPORT',PX,T.Ha-35,PX+12,T.Ha+35);CI('SUPPORT',PX,T.Ha,10);
   L('AXES',PX,T.Ha,PX+tipZ,tipY);
   PL('CONSOLES',cons.map(([z,y])=>[PX+z,y]));
-  for(const s of slats)PL('LAMES',s.map(([z,y])=>[PX+z,y]));
+  slats.forEach((s,i)=>{PL('LAMES',s.map(([z,y])=>[PX+z,y]));for(const H of slatHoles[i])PL('LAMES',H.map(([z,y])=>[PX+z,y]))});
   TX('TEXTES',PX-th,-8*k,TTL,'PROFIL - COUPE AU MILIEU DE LA FENETRE');
   TX('TEXTES',PX-th-2*k,ytop-6*k,TXT,'INT.',2);TX('TEXTES',PX+2*k,ytop-6*k,TXT,'EXT.',0);
+  const top=Math.max(T.Ha+hc,...slats.map(s=>rng(s,1)[1]),rng(cons,1)[1]);
   if(withDims){const xl=PX-th-6*k;level(xl,0,'±0');level(xl,T.A,'All. '+lev(T.A));level(xl,T.L,'Lint. '+lev(T.L));level(xl,T.Ha,'Acc. '+lev(T.Ha));
-    const top=Math.max(T.Ha+hc,...slats.map(s=>rng(s,1)[1]),rng(cons,1)[1]);
     dimH(PX,T.Ha,PX+tipZ,tipY,top+8*k);
     if(Math.abs(tipY-T.Ha)>1){level(PX+tipZ+10*k,tipY,'About '+lev(tipY),true)}
     if(r>0)dimH(PX-r,T.A,PX,T.A,T.A-6*k);
-    TX('COTES',PX,top+20*k,TXT,`Support ${Math.round(T.D)} - pente ${nf1.format(T.pente)}°`,0);
-    TX('COTES',PX,top+15*k,TXT,`Lames ${T.N} x ${Math.round(T.lw)}x${Math.round(T.le)} - ${nf1.format(T.lt)}°/support (${nf1.format(T.lt-T.pente)}°/horiz.) - entraxe ${Math.round(T.D/T.N)}`,0)}
+    TX('COTES',PX,top+20*k,TXT,`Support ${Math.round(T.D)} - pente ${nf1.format(T.pente)}° - consoles ${profDesc(T.pc,'pc')}`,0);
+    TX('COTES',PX,top+15*k,TXT,`Lames ${T.N} x ${profDesc(T.pl,'pl')} - ${nf1.format(T.lt)}°/support (${nf1.format(T.lt-T.pente)}°/horiz.) - entraxe ${Math.round(T.D/T.N)}`,0);
+    // angles réels
+    const Ra=Math.max(12*k,Math.min(T.D*.4,30*k)),xa=PX+Math.max(Ra*1.15,tipZ+G.SL.w/2+6*k);L('COTES_ANGLES',PX,T.Ha,xa,T.Ha);AR('COTES_ANGLES',PX,T.Ha,Ra,0,-T.pente);
+    TX('COTES_ANGLES',xa+1.5*k,T.Ha+0.6*k,TXT,`Pente support ${nf1.format(Math.abs(T.pente))}°`,0);
+    const Eo=slatEls[slatEls.length-1];
+    if(Eo){const cz=PX+Eo.c[2],cy=Eo.c[1],ph=G.phi*deg,Rb=Math.max(G.SL.w*.7,8*k),xb=Math.max(cz+Rb*1.25,xa);L('COTES_ANGLES',cz-Rb*.6,cy,xb,cy);AR('COTES_ANGLES',cz,cy,Rb,0,ph);
+      TX('COTES_ANGLES',xb+1.5*k,cy-TXT*1.5,TXT,`Incl. lames ${nf1.format(Math.abs(ph))}°`,0)}}
+  // ===== DÉTAILS DE DURABILITÉ (sections agrandies) =====
+  const F=den>5?den/5:1,ech=Math.round(den/F);
+  let DX=PX+tipZ+(withDims?80*k:40*k);
+  const detail=(title,P,holes,pk,lines,extra)=>{
+    const xs=P.map(q=>q[0]),ys=P.map(q=>q[1]),mx=(Math.max(...xs)+Math.min(...xs))/2,my=(Math.max(...ys)+Math.min(...ys))/2;
+    const w=(Math.max(...xs)-Math.min(...xs))*F,h=(Math.max(...ys)-Math.min(...ys))*F,W0=Math.max(w+60*k,150*k),ox=DX+W0/2,oy=T.A+h/2+lines.length*5*k+20*k;
+    const m=Q=>Q.map(([u,v])=>[ox+(u-mx)*F,oy+(v-my)*F]);
+    PL('DETAILS',m(P));for(const H of holes)PL('DETAILS',m(H));for(const q of pk)if(q.poly.length>2){PL('EAU',m(q.poly));TX('EAU',ox+w/2+4*k,oy-h/2,TXT,'eau retenue',0)}
+    extra({ox,oy,w,h});
+    TX('TEXTES',DX,oy+h/2+14*k,TTL,title,0);TX('TEXTES',DX,oy+h/2+9*k,TXT,`Echelle 1/${ech}`,0);
+    lines.forEach(([lv,t],i)=>TX('DETAILS',DX,oy-h/2-10*k-i*5*k,TXT,(lv==='r'?'[A CORRIGER] ':lv==='a'?'[A VERIFIER] ':'')+t,0));
+    DX+=W0+30*k};
+  const exA=({ox,oy,w,h})=>{if(T.mat==='bois'&&!T.capC){const t=oy+h/2,dy=(w/2)*Math.tan(15*rad);L('COTES_ANGLES',ox-w/2,t-dy,ox,t);L('COTES_ANGLES',ox,t,ox+w/2,t-dy);TX('COTES_ANGLES',ox+w/2+3*k,t-dy,TXT,'delardement >= 15° propose',0)}
+    if(T.mat==='bois'&&T.capC){const t=oy+h/2+2*k;PL('COTES_ANGLES',[[ox-w/2-2*k,t-6*k],[ox-w/2-2*k,t],[ox+w/2+2*k,t],[ox+w/2+2*k,t-6*k]],false);TX('COTES_ANGLES',ox+w/2+4*k,t,TXT,'capot',0)}};
+  const ph=D.phi;
+  const exB=({ox,oy,w})=>{const R=Math.max(w*.4,12*k);L('COTES_ANGLES',ox-R*1.2,oy,ox+R*1.5,oy);AR('COTES_ANGLES',ox,oy,R,0,ph);
+    TX('COTES_ANGLES',ox+R*1.55,oy+(ph>=0?1.5*k:-4*k),TXT,`${nf1.format(Math.abs(ph))}°`,0);
+    if(T.mat==='bois'&&Math.abs(ph)<30){const a=(ph<0?-30:30)*rad;L('COTES_ANGLES',ox,oy,ox+R*1.4*Math.cos(a),oy+R*1.4*Math.sin(a));TX('COTES_ANGLES',ox+R*1.45*Math.cos(a),oy+R*1.45*Math.sin(a),TXT,'30° mini',0)}};
+  detail('DETAIL A - SECTION DES CONSOLES (VUE DE L\'EXTERIEUR)',G.SC.out,G.SC.holes,D.pkC,D.A,exA);
+  detail('DETAIL B - SECTION D\'UNE LAME (EXTERIEUR A DROITE)',D.SLw.out,D.SLw.holes,D.pkL,D.B,exB);
   // ===== VUE EN PLAN (sous la vue de face, extérieur en bas) =====
   const PY=-(GAP+th+(withDims?14*k:0)+10*k),P=z=>PY-z;
   RC('MUR',xL,P(0),0,P(-th));RC('MUR',T.W,P(0),xR,P(-th));hatch(xL,P(0),0,P(-th));hatch(T.W,P(0),xR,P(-th));
   RC('MENUISERIE',0,P(-r),T.W,P(-r-60));L('VITRAGE',45,P(-r-30),T.W-45,P(-r-30));
   RC('SUPPORT',G.x0,P(12),G.x1,P(0));
-  RC('CONSOLES',G.x0,P(tipZ),G.x0+G.cw,P(0));RC('CONSOLES',G.x1-G.cw,P(tipZ),G.x1,P(0));
+  RC('CONSOLES',G.x0,P(tipZ),G.x0+G.SC.w,P(0));RC('CONSOLES',G.x1-G.SR.w,P(tipZ),G.x1,P(0));
   for(const s of slats){const [a,c]=rng(s,0);RC('LAMES',G.x0,P(c),G.x1,P(a))}
   TX('TEXTES',xL,P(-th)+3*k,TXT,'INTERIEUR');TX('TEXTES',xL,P(tipZ)-4*k,TXT,'EXTERIEUR');
   // nord
@@ -1315,25 +1795,25 @@ function buildDXF(den,withDims){
   if(withDims){const y1=P(tipZ)-10*k,y2=P(tipZ)-17*k;
     if(T.dg>0)dimH(G.x0,P(tipZ),0,P(tipZ),y1);dimH(0,P(tipZ),T.W,P(tipZ),y1);if(T.dd>0)dimH(T.W,P(tipZ),G.x1,P(tipZ),y1);dimH(G.x0,P(tipZ),G.x1,P(tipZ),y2,'HT '+Math.round(G.Lx));
     dimV(G.x0,P(0),G.x0,P(tipZ),G.x0-8*k,String(Math.round(tipZ)));
-    if(G.cw>0)dimH(G.x1-G.cw,P(0),G.x1,P(0),P(0)+6*k)}
+    if(G.SR.w>0)dimH(G.x1-G.SR.w,P(0),G.x1,P(0),P(0)+6*k)}
   const ylow=P(tipZ)-(withDims?17*k:0)-10*k;
   TX('TEXTES',xL,ylow,TTL,'VUE EN PLAN');
   // cartouche
-  const cart=[`OMBRAGE v${VERSION} - BRISE-SOLEIL A LAMES`,`Chantier : ${S.chantier||'-'}`,`Menuiserie : ${S.mex||'-'}`,
-    `Facade orientee ${nf1.format(S.azim)}° (${cardinal(S.azim)})`,`Echelle 1/${den} - cotes en mm - dessin en vraie grandeur`,`Edite le ${new Date().toLocaleDateString('fr-FR')}`];
+  const cart=[`OMBRAGE v${VERSION} - BRISE-SOLEIL A LAMES`,`Chantier : ${S.chantier||'-'}`,`Menuiserie : ${S.mex||'-'}`,`Materiau : ${MATN[S.mat]}`,
+    `Facade orientee ${nf1.format(S.azim)}° (${cardinal(S.azim)})`,`Echelle 1/${den} (details 1/${ech}) - cotes en mm - dessin en vraie grandeur`,`Edite le ${new Date().toLocaleDateString('fr-FR')}`];
   cart.forEach((t,i)=>TX('TEXTES',xL,ylow-(10+i*5)*k,i===0?TTL:TXT,t));
   // en-tête
-  const layers=[['MUR',8,'CONTINUOUS'],['MUR_HACHURES',9,'CONTINUOUS'],['MENUISERIE',4,'CONTINUOUS'],['VITRAGE',5,'CONTINUOUS'],['SUPPORT',30,'CONTINUOUS'],['CONSOLES',6,'CONTINUOUS'],['LAMES',7,'CONTINUOUS'],['AXES',1,'AXE'],['COTES',3,'CONTINUOUS'],['TEXTES',7,'CONTINUOUS']];
+  const layers=[['MUR',8,'CONTINUOUS'],['MUR_HACHURES',9,'CONTINUOUS'],['MENUISERIE',4,'CONTINUOUS'],['VITRAGE',5,'CONTINUOUS'],['SUPPORT',30,'CONTINUOUS'],['CONSOLES',6,'CONTINUOUS'],['LAMES',7,'CONTINUOUS'],['AXES',1,'AXE'],['COTES',3,'CONTINUOUS'],['COTES_ANGLES',1,'CONTINUOUS'],['DETAILS',7,'CONTINUOUS'],['EAU',5,'CONTINUOUS'],['TEXTES',7,'CONTINUOUS']];
   const hdr=['0','SECTION','2','HEADER','9','$ACADVER','1','AC1009','9','$INSUNITS','70','4','9','$DWGCODEPAGE','3','ANSI_1252','9','$LTSCALE','40',f(k),'9','$TEXTSIZE','40',f(TXT),'0','ENDSEC',
     '0','SECTION','2','TABLES',
     '0','TABLE','2','LTYPE','70','2',
     '0','LTYPE','2','CONTINUOUS','70','0','3','Solid line','72','65','73','0','40','0.0',
     '0','LTYPE','2','AXE','70','0','3','Axe __ . __','72','65','73','4','40','12.5','49','8.0','49','-2.0','49','0.5','49','-2.0',
     '0','ENDTAB','0','TABLE','2','LAYER','70',String(layers.length)];
-  for(const [n,c,lt] of layers)hdr.push('0','LAYER','2',n,'70','0','62',String(c),'6',lt);
+  for(const [nm,c,lt] of layers)hdr.push('0','LAYER','2',nm,'70','0','62',String(c),'6',lt);
   hdr.push('0','ENDTAB','0','TABLE','2','STYLE','70','1','0','STYLE','2','STANDARD','70','0','40','0.0','41','1.0','50','0.0','71','0','42',f(TXT),'3','txt','4','','0','ENDTAB','0','ENDSEC','0','SECTION','2','ENTITIES');
   const txt=hdr.join('\n')+'\n'+E.join('\n')+'\n0\nENDSEC\n0\nEOF\n';
-  const CP={'€':0x80,'‚':0x82,'„':0x84,'…':0x85,'‘':0x91,'’':0x92,'“':0x93,'”':0x94,'–':0x96,'—':0x97,'œ':0x9C,'Œ':0x8C,' ':0x20,' ':0x20,'−':0x2D};
+  const CP={'€':0x80,'‚':0x82,'„':0x84,'…':0x85,'‘':0x91,'’':0x92,'“':0x93,'”':0x94,'–':0x96,'—':0x97,'œ':0x9C,'Œ':0x8C,' ':0x20,' ':0x20,'−':0x2D};
   const s=txt.replace(/\n/g,'\r\n'),out=new Uint8Array(s.length);
   for(let i=0;i<s.length;i++){const c=s.charCodeAt(i),ch=s[i];out[i]=c<256?c:(CP[ch]||0x3F)}
   return out;
@@ -1347,14 +1827,16 @@ function exportDXF(){
 /* ---------- carrousel de démarrage ---------- */
 const ONB_KEY='ombrage_onboarded';
 const STEPS=[
-  {icon:'🌤',title:'Bienvenue dans Ombrage',body:'Cet outil calcule la <b>position du soleil</b> pour un lieu, une date et une heure, puis simule l’<b>ombre portée d’un brise-soleil à lames</b> sur une fenêtre.<br><br>Objectif : <b>bloquer le soleil d’été</b> et <b>laisser entrer celui d’hiver</b>. Voici en quelques étapes comment l’utiliser.'},
-  {icon:'📍',title:'Étape 1 — Trouver le site',body:'Tape une <b>adresse</b> (recherche Géoportail IGN) ou <b>colle des coordonnées GPS</b>. La photo aérienne IGN se centre sur le site.<br><br>Le bouton <b>Déplacer le point</b> permet de cliquer l’emplacement exact du bâtiment.'},
+  {icon:'🌤',title:'Bienvenue dans Ombrage',body:'Cet outil calcule la <b>position du soleil</b> pour un lieu, une date et une heure, puis simule l’<b>ombre portée d’un brise-soleil à lames</b> sur une fenêtre.<br><br>Objectif : <b>bloquer le soleil d’été</b>, <b>laisser entrer celui d’hiver</b>, et vérifier la <b>durabilité</b> des pièces. Voici en quelques étapes comment l’utiliser.'},
+  {icon:'📍',title:'Étape 1 — Site et matériau',body:'Tape une <b>adresse</b> (recherche Géoportail IGN) ou <b>colle des coordonnées GPS</b>. La photo aérienne IGN se centre sur le site.<br><br>Choisis le <b>matériau</b> du brise-soleil : <b>aluminium</b>, <b>acier protégé</b> ou <b>bois</b>, puis son environnement (essence et climat pour le bois, corrosivité pour l’acier, atmosphère pour l’aluminium).'},
   {icon:'📏',title:'Tracer le mur',body:'Clique <b>Tracer le mur</b>, puis deux points le long du <b>nu de la façade</b> sur la photo. L’orientation par rapport au nord se remplit toute seule.<br><br>La flèche bleue <b>« ext. »</b> montre le côté extérieur : si elle pointe vers le bâtiment, clique <b>Inverser l’extérieur</b>.'},
   {icon:'🪟',title:'Étape 2 — Façade et fenêtre',body:'Toutes les cotes sont en <b>millimètres</b>. Hauteur, allège et linteau sont <b>liés</b> : modifier l’un met à jour les autres.<br><br>Le <b>retrait de la menuiserie</b> ajoute l’ombre de l’embrasure.'},
-  {icon:'🔩',title:'Étape 3 — Brise-soleil',body:'Décris le <b>support</b> (altimétrie d’accroche, inclinaison, débords, longueur, consoles) puis les <b>lames</b> (nombre, largeur, épaisseur, inclinaison).<br><br>Les lames sont réparties à pas égal sur la longueur du support.'},
+  {icon:'🔩',title:'Étape 3 — Brise-soleil et profils',body:'Décris le <b>support</b> puis les <b>lames</b>. Chaque élément a un <b>profil</b> : rectangulaire, cornière, U, I ou H, T, tube. Le bouton <b>?</b> affiche les sections courantes en Europe ; un clic sur une ligne l’applique.<br><br>Pour une cornière, un U ou un T, choisis la <b>position</b>. La console droite peut être <b>symétrique</b> ou <b>identique</b> à la gauche.'},
+  {icon:'⟳',title:'Optimiser à l’instant T',body:'Le bouton <b>⟳</b> à côté d’une valeur cherche celle qui donne le <b>plus d’ombre sur le vitrage</b> à la date et à l’heure affichées, sans toucher aux autres valeurs. Parmi les résultats équivalents, il garde le plus économique : support le plus court, moins de lames…<br><br>Les boutons du support ne tiennent compte que du support, traité comme une plaque pleine. En bois, l’inclinaison des lames ne descend jamais sous <b>30°</b>.'},
+  {icon:'💧',title:'Durabilité',body:'La liste <b>Durabilité</b> signale les pentes insuffisantes, les profils qui retiennent l’eau et, pour le bois, la classe d’emploi et la longévité de l’essence. Chaque alerte renvoie à la <b>norme, au paragraphe et à la page</b>.<br><br>La coupe et le plan DXF montrent les <b>angles réels</b> des pièces et des <b>détails agrandis</b> des sections.'},
   {icon:'🎬',title:'Étapes 4 et 5 — Simuler',body:'La <b>3D</b> montre les ombres portées à la date et l’heure choisies. Fais tourner la vue à la souris, ou choisis <b>Face</b>, <b>Côté</b>, <b>Vue du soleil</b>.<br><br><b>Lecture</b> fait défiler les heures ou les jours. La <b>coupe</b> montre les rayons qui passent (orange plein) et ceux qui sont arrêtés.'},
-  {icon:'🎯',title:'Étapes 6 et 7 — Optimiser et analyser',body:'Choisis tes <b>jours de référence</b> été et hiver et règle la <b>priorité</b>. Les boutons cherchent la meilleure <b>inclinaison des lames</b>, <b>inclinaison du support</b> ou <b>longueur du support</b>.<br><br>L’<b>analyse</b> donne le pourcentage de vitrage au soleil, le profil de la journée et une carte annuelle.'},
-  {icon:'📄',title:'Étape 8 — Exporter',body:'Renseigne le <b>nom du chantier</b> (étape 1) et l’<b>indice de la fenêtre</b> (étape 2, ex. MEX 12).<br><br><b>DOCX / PDF</b> : note de synthèse A4 avec toutes les données, les résultats, les illustrations et, si la case est cochée, les réglages enregistrés à recopier pour retrouver l’étude.<br><b>DXF</b> : vue de face, profil et vue en plan en vraie grandeur, avec ou sans cotes, textes calés sur l’échelle choisie.'},
+  {icon:'📊',title:'Étape 6 — Analyser',body:'L’<b>analyse</b> donne le pourcentage de vitrage au soleil, les <b>bilans été / hiver</b> pour justifier la conception devant un architecte ou un client, le profil de la journée et une carte annuelle.'},
+  {icon:'📄',title:'Étape 7 — Exporter',body:'Renseigne le <b>nom du chantier</b> (étape 1) et l’<b>indice de la fenêtre</b> (étape 2, ex. MEX 12).<br><br><b>DOCX / PDF</b> : note de synthèse A4 avec les données, le matériau, les <b>alertes de durabilité et leurs références</b>, les résultats, les illustrations et, si la case est cochée, les réglages enregistrés.<br><b>DXF</b> : vue de face, profil, vue en plan et détails agrandis des sections, avec ou sans cotes.'},
   {icon:'✓',title:'Bonne route !',body:'Tu peux réafficher ce guide à tout moment avec le bouton <b>Revoir le guide</b>, en haut ou en bas de page.<br><br><i>Rappel : les résultats doivent toujours être vérifiés par un professionnel qualifié.</i><br><br><small>Licence Creative Commons <b>BY-NC-ND 4.0</b> · © 2026 Jean Pineau</small>'}
 ];
 function showGuide(){
@@ -1395,15 +1877,17 @@ function wire(){
   $$('.views button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
   $('#o-sum').addEventListener('change',e=>{if(e.target.value){S.sumDate=e.target.value;scheduleHeavy();save()}});
   $('#o-win').addEventListener('change',e=>{if(e.target.value){S.winDate=e.target.value;scheduleHeavy();save()}});
-  $('#o-prio').addEventListener('input',e=>{S.prio=+e.target.value;scheduleHeavy(120);save()});
-  $$('[data-opt]').forEach(b=>b.addEventListener('click',()=>runOpt(b.dataset.opt)));
+  $$('.seg [data-mat]').forEach(b=>b.addEventListener('click',()=>setMat(b.dataset.mat)));
+  document.addEventListener('click',e=>{const ob=e.target.closest('.ob');if(ob){if(!ob.disabled)runOB(ob.dataset.o);return}
+    const u=e.target.closest('[data-undo]');if(u)undoOB(u.dataset.undo)});
+  const reload=()=>{initValues();renderMat();renderProfiles();renderSing();mapCenter(S.lat,S.lon);$$('.optmsg').forEach(m=>m.hidden=true);changed();timeChanged(true)};
   $('#cfg-copy').addEventListener('click',()=>{const txt=JSON.stringify(S,null,1);
     const done=()=>{$('#cfg-msg').className='feedback ok';$('#cfg-msg').textContent='✓ Réglages copiés dans le presse-papiers.'};
     const fb=()=>{$('#cfg-txt').value=txt;$('#cfg-txt').select();$('#cfg-msg').className='feedback warn';$('#cfg-msg').textContent='Copie automatique refusée : le texte est sélectionné ci-dessus, copie-le à la main.'};
     try{navigator.clipboard.writeText(txt).then(done,fb)}catch(e){fb()}});
-  $('#cfg-load').addEventListener('click',()=>{try{const o=parseCfg($('#cfg-txt').value);if(typeof o!=='object'||o===null)throw 0;S={...DEF,...o};initValues();mapCenter(S.lat,S.lon);changed();timeChanged(true);$('#cfg-msg').className='feedback ok';$('#cfg-msg').textContent='✓ Réglages chargés.'}
+  $('#cfg-load').addEventListener('click',()=>{try{const o=parseCfg($('#cfg-txt').value);if(typeof o!=='object'||o===null)throw 0;S=migrate(o);reload();$('#cfg-msg').className='feedback ok';$('#cfg-msg').textContent='✓ Réglages chargés.'}
     catch(e){$('#cfg-msg').className='feedback err';$('#cfg-msg').textContent='Ce texte n’est pas un jeu de réglages valide. Colle exactement ce que donne « Copier les réglages ».'}});
-  $('#cfg-reset').addEventListener('click',()=>{S={...DEF};initValues();mapCenter(S.lat,S.lon);changed();timeChanged(true);$('#cfg-msg').className='feedback ok';$('#cfg-msg').textContent='✓ Valeurs d’exemple rétablies.'});
+  $('#cfg-reset').addEventListener('click',()=>{S=migrate({});reload();$('#cfg-msg').className='feedback ok';$('#cfg-msg').textContent='✓ Valeurs d’exemple rétablies.'});
   $('#guide-btn').addEventListener('click',showGuide);$('#guide-btn2').addEventListener('click',showGuide);
   $('#f-chantier').addEventListener('input',e=>{S.chantier=e.target.value.trim();updateStatus();save()});
   $('#f-mex').addEventListener('input',e=>{S.mex=e.target.value.trim();$('#mex-chip').textContent=S.mex;save()});
@@ -1416,18 +1900,19 @@ function wire(){
   $('#x-dxf').addEventListener('click',exportDXF);
 }
 function initValues(){
-  syncFields();$('#o-sum').value=S.sumDate;$('#o-win').value=S.winDate;$('#o-prio').value=S.prio;
+  syncFields();$('#o-sum').value=S.sumDate;$('#o-win').value=S.winDate;
   $('#t-mode').value=S.mode;fillSpeeds();$('#t-slider').value=Math.round(S.minutes);$('#t-date').value=S.date;
   $('#f-chantier').value=S.chantier||'';$('#f-mex').value=S.mex||'';$('#mex-chip').textContent=S.mex||'';
   $('#x-scale').value=String(S.xScale||20);$('#x-dims').checked=S.xDims!==false;$('#x-cfg').checked=S.xCfg!==false;
   $('#paste').value=S.lat+', '+S.lon;validateCoords(S.lat,S.lon);if(S.place&&!/^Exemple|^Coordonnées|^Point/.test(S.place))$('#addr').value=S.place;
 }
 
-renderFields();initValues();wire();wireMap();init3D();
-buildModel();updateHUD();drawCoupe();wallInfo();updateRefs();drawDay();drawHeat();
+renderFields();renderMat();renderProfiles();renderSing();wireProfiles();initValues();wire();wireMap();init3D();
+DUR=durability(S);buildModel();updateHUD();drawCoupe();renderDura();wallInfo();updateRefs();drawDay();drawHeat();
 requestAnimationFrame(loop);
 maybeGuide();
 })();
 </script>
+
 </body>
 </html>

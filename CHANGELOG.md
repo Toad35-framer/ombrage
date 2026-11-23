@@ -1,5 +1,39 @@
 # Changelog Ombrage
 
+## v2.0.0 — Novembre 2026 — Matériaux, profils, optimisation à l'instant T et durabilité
+
+### Matériau et environnement (étape 1)
+- Choix du matériau : **aluminium**, **acier protégé** ou **bois**
+- Bois : essence, climat d'humidification (FD P 20-651), durée de vie visée L1 à L3
+- Acier protégé : catégorie de corrosivité C1 à CX (NF EN ISO 12944-2)
+- Aluminium : atmosphère extérieure E11 à E19 (NF P 24-351)
+
+### Profils des consoles et des lames
+- Rectangulaire / plat, tube carré ou rectangulaire, tube rond, cornière, U, T, I ou H (bois : rectangulaire)
+- Champs propres à chaque profil, rotation 90° ou position (4 positions)
+- Console droite symétrique ou identique à la console gauche
+- Bouton **?** : sections courantes en Europe, un clic applique la ligne
+- Ombre, 3D, coupe et DXF calculés avec la section réelle
+
+### Optimisation à l'instant T
+- La carte « Optimisation », le curseur de priorité et l'indice d'efficacité sont supprimés
+- Bouton **⟳** à côté de 8 réglages : accroche, inclinaison, longueur et débords du support, nombre, largeur et inclinaison des lames
+- Ombre maximale sur le vitrage à la date et à l'heure affichées, valeur la plus économique, les autres réglages restant fixes
+- Support traité en plaque pleine pour les boutons du support ; lames bois bornées à 30° minimum
+- Résultat sous le champ avec **Annuler** ; optimisations reprises dans la note de synthèse
+
+### Durabilité
+- Alertes avec référence (norme, paragraphe, page) : NF DTU 31.1 P1-1, FD P 20-651, Recommandations PACTE 2020, NF EN ISO 12944-2 et -3, NF P 24-351, guide AQC 2014
+- Bois : pentes, délardement proposé, retombée, bois de bout, assemblages, 30° minimum des lames, élancement, classe d'emploi et longévité de l'essence ; points singuliers à cocher
+- Métal : détection des creux qui retiennent l'eau, faces horizontales, corps creux, protection, dilatation, corrosion galvanique
+- Coupe : angles réels α et β en couleur ; nouveau panneau **Détails de durabilité** (sections agrandies)
+- DXF : détails agrandis à 1/5, angles cotés, calques `COTES_ANGLES`, `DETAILS`, `EAU`
+
+### Analyse et exports
+- Bilans été / hiver conservés pour justifier la conception
+- Note DOCX / PDF : nouvelle section « Durabilité », matériau et profils, détails en illustration
+- Les réglages v1.x se rechargent (consoles et lames rectangulaires, bois)
+
 ## v1.2.0 — Novembre 2026 — Réglages dans les exports
 
 ### Note de synthèse DOCX / PDF

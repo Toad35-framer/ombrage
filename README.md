@@ -18,7 +18,9 @@ Un brise-soleil bien réglé arrête le soleil haut de l'été et laisse passer 
 - **Vue 3D** avec ombres portées en temps réel, animation par heures ou par jours
 - **Coupe verticale** cotée avec les rayons solaires selon l'angle de profil
 - **Pourcentage de vitrage au soleil**, à l'instant et sur la journée, en tenant compte de la largeur, de l'épaisseur, du nombre et de l'inclinaison des lames
-- **Optimisation automatique** de l'inclinaison des lames, de l'inclinaison du support et de la longueur du support
+- Choix du **matériau** (aluminium, acier protégé, bois) et du **profil** de chaque élément (rectangulaire, cornière, U, I ou H, T, tubes), avec les sections courantes en Europe
+- Boutons **⟳ d'optimisation à l'instant T** à côté de chaque réglage : ombre maximale sur le vitrage à la date et à l'heure choisies, valeur la plus économique
+- **Alertes de durabilité** (pentes insuffisantes, rétention d'eau, classe d'emploi du bois) avec renvoi à la norme, au paragraphe et à la page
 - **Export d'une note de synthèse** A4 en **DOCX** ou **PDF**, et d'un **plan DXF** (vue de face, profil, vue en plan) importable dans la plupart des logiciels de dessin
 
 L'outil tourne **intégralement dans le navigateur** : pas de serveur, pas d'inscription, pas d'envoi de données. Il suffit d'un navigateur récent et d'une connexion internet (pour la photo aérienne, la recherche d'adresse et le moteur 3D).
@@ -27,8 +29,12 @@ L'outil tourne **intégralement dans le navigateur** : pas de serveur, pas d'ins
 
 ## ✨ Fonctionnalités
 
-### ① Site
+### ① Site et matériau
 - **Nom du chantier** (repris en titre des exports)
+- **Matériau du brise-soleil** : aluminium, acier protégé ou bois
+  - bois : essence (Douglas, mélèze, pins traités, châtaignier, chêne, robinier, cumaru, ipé, tali), climat d'humidification (sec, modéré, humide), durée de vie visée (L1, L2, L3)
+  - acier protégé : catégorie de corrosivité C1 à CX
+  - aluminium : atmosphère extérieure E11 à E19
 - **Recherche par adresse** avec suggestions (API Géocodage IGN Géoplateforme)
 - Champ **« coller GPS »** (`48.1173, -1.6778`, `48,1173 ; -1,6778`…) et saisie manuelle latitude / longitude
 - **Photo aérienne IGN** (BD ORTHO) avec zoom et déplacement
@@ -45,8 +51,28 @@ L'outil tourne **intégralement dans le navigateur** : pas de serveur, pas d'ins
 - Retrait de la menuiserie (ombre de l'embrasure)
 
 ### ③ Brise-soleil
-- **Support** : altimétrie d'accroche et bandeau au-dessus du linteau (liés), inclinaison, longueur, débords gauche et droite, largeur et hauteur des consoles
-- **Lames** : nombre, largeur, épaisseur, inclinaison sur le support
+- **Support** : altimétrie d'accroche et bandeau au-dessus du linteau (liés), inclinaison, longueur, débords gauche et droite
+- **Lames** : nombre, inclinaison sur le support
+- **Profil** des consoles et des lames : rectangulaire / plat, tube carré ou rectangulaire, tube rond, cornière, U (UPN, UPE), T, I ou H (IPE, HEA, HEB). Le bois est limité au rectangulaire
+  - les champs changent selon le profil (largeur / hauteur, ailes et épaisseur, âme et ailes…)
+  - **rotation 90°** pour les sections rectangulaires, **position** (4 positions) pour les cornières, U et T
+  - console droite **symétrique** (miroir) ou **identique** à la console gauche
+  - bouton **?** : sections courantes en Europe (NF EN 10365, 10056-1, 10055, 10058, 10219-2 / 10210-2 ; sections de bois courantes), un clic applique la ligne
+- **L'ombre est calculée avec la section réelle** de chaque profil
+- **Boutons ⟳ d'optimisation à l'instant T** à côté de l'altimétrie d'accroche, de l'inclinaison et de la longueur du support, des débords gauche et droit, du nombre, de la largeur et de l'inclinaison des lames :
+  - chaque bouton n'optimise que sa valeur, les autres restant fixes
+  - il cherche l'**ombre maximale sur le vitrage** à la date et à l'heure affichées, puis retient la valeur **la plus économique** (support le plus court, moins de lames, lame la plus étroite, angle le plus proche de l'horizontale)
+  - les boutons du support ne tiennent compte que du support, traité comme une **plaque pleine**, sans les lames
+  - en bois, l'inclinaison des lames ne descend jamais sous **30°**
+  - résultat affiché sous le champ (avant → après, vitrage à l'ombre), avec **Annuler**
+
+### Durabilité
+- Liste d'alertes colorées (à corriger, à vérifier, information, conforme), chacune avec **la norme, le paragraphe et la page**
+- **Bois** : pente de la face supérieure des consoles (0–15° piégeante, 15–75° moyenne, 75–90° drainante) avec délardement de 15° proposé, retombée de 23 cm, bois de bout des abouts et des extrémités de lames, assemblage lames / consoles, inclinaison des lames d'au moins 30°, goutte d'eau, élancement selon l'essence, **classe d'emploi** (massivité, conception, climat) et **longévité de l'essence** comparée à la durée de vie visée
+  - points singuliers à cocher : consoles capotées, extrémités des lames protégées, lames désolidarisées
+- **Acier et aluminium** : détection géométrique des **creux qui retiennent l'eau** selon le profil et sa position, faces supérieures horizontales, corps creux, corrosivité (acier), finition selon l'atmosphère (aluminium), dilatation, corrosion galvanique
+- **Vitrage** : rappel du risque de casse thermique sous ombre partielle
+- Documents de référence : NF DTU 31.1 P1-1, FD P 20-651, Recommandations professionnelles PACTE « Éléments bois non structuraux rapportés en façade » (2020), NF EN ISO 12944-2 et -3, NF P 24-351, guide AQC « Brise-soleil métalliques » (2014). Seuls les références et les seuils sont repris, aucun extrait des documents.
 
 ### ④ Simulation 3D
 - Ombres portées sur la façade, le vitrage et le sol
@@ -57,35 +83,32 @@ L'outil tourne **intégralement dans le navigateur** : pas de serveur, pas d'ins
 ### ⑤ Coupe verticale
 - Coupe cotée au milieu de la fenêtre : allège, linteau, accroche, avancée, inclinaisons
 - Rayons solaires selon l'angle de profil : rayons qui atteignent le vitrage en trait plein, rayons arrêtés en pointillé
+- **Angles réels** cotés : α (pente du support) et β (inclinaison des lames par rapport à l'horizontale), en couleur selon les alertes
+- **Détails de durabilité** : sections des consoles et d'une lame agrandies, angle par rapport à l'horizontale, minimum à respecter, délardement proposé, zones où l'eau stagne, avec les références
 
-### ⑥ Optimisation
-- Jours de référence été et hiver modifiables
-- Curseur de priorité entre **apports d'hiver** et **protection d'été**
-- Optimisation de l'inclinaison des lames, de l'inclinaison du support, de la longueur du support, ou des trois ensemble
-- Courbe de l'indice selon la valeur testée et retour aux valeurs précédentes en un clic
-
-### ⑦ Analyse
+### ⑥ Analyse
 - Pourcentage de la surface vitrée au soleil à l'instant affiché
-- Bilan des jours de référence : part du rayonnement direct qui atteint le vitrage et énergie reçue en kWh/m² par ciel clair
-- **Indice d'efficacité** sur 100
+- **Bilans été / hiver** (jours de référence modifiables) : part du rayonnement direct qui atteint le vitrage et énergie reçue en kWh/m² par ciel clair, pour justifier la conception
 - Profil de la journée heure par heure
 - **Carte annuelle** (le 21 de chaque mois, de 4 h à 22 h), cliquable
 
-### ⑧ Exports
+### ⑦ Exports
 - **Note de synthèse DOCX ou PDF** (A4 portrait, charte Alti-Vent) :
   - titre = nom du chantier, sous-titre = adresse et coordonnées GPS
   - pastilles : indice de la menuiserie, orientation de la façade, date de l'étude
-  - tableaux de toutes les données saisies (site, menuiserie, support, lames)
-  - résultats : instant simulé, jours de référence été / hiver, indice d'efficacité, dernière optimisation
-  - illustrations : photo aérienne avec tracé du mur, vue 3D, coupe, profil de la journée, carte annuelle
+  - tableaux de toutes les données saisies (site, menuiserie, matériau, support et lames avec leurs profils)
+  - **durabilité** : tableau des alertes (élément, constat et préconisation, référence)
+  - résultats : instant simulé, bilans été / hiver, optimisations réalisées à l'instant T
+  - illustrations : photo aérienne avec tracé du mur, vue 3D, coupe, détails de durabilité, profil de la journée, carte annuelle
   - case **« Inclure les réglages enregistrés »** (cochée par défaut) : ajoute, entre les illustrations et la méthode, le bloc de réglages complet à recopier dans « Réglages enregistrés » → « Charger ces réglages » pour retrouver, retravailler ou vérifier l'étude
   - méthode, limites, avertissement et licence
 - **Plan DXF** (format R12, lisible par AutoCAD, DraftSight, BricsCAD, LibreCAD, ArchiCAD, Revit, SketchUp Pro…) :
-  - vue de face (depuis l'extérieur), profil (coupe au milieu de la fenêtre) et vue en plan avec flèche du nord, disposées en projection
+  - vue de face (depuis l'extérieur), profil (coupe au milieu de la fenêtre) et vue en plan avec flèche du nord, disposées en projection, avec les sections réelles des profils
+  - **détails agrandis** des sections des consoles et d'une lame (échelle 1/5), angles réels, minimum à respecter et références
   - dessin en **vraie grandeur** (1 unité = 1 mm)
   - choix de l'échelle (1/1, 1/10, 1/20, 1/25, 1/50) : elle règle la hauteur des textes (2,5 mm imprimés), des titres, des cotes et des hachures
   - case **« Avec les cotes »** : cotes de largeur, débords, hauteur, avancée, niveaux d'altimétrie et caractéristiques des lames
-  - un calque par famille : `MUR`, `MUR_HACHURES`, `MENUISERIE`, `VITRAGE`, `SUPPORT`, `CONSOLES`, `LAMES`, `AXES`, `COTES`, `TEXTES`
+  - un calque par famille : `MUR`, `MUR_HACHURES`, `MENUISERIE`, `VITRAGE`, `SUPPORT`, `CONSOLES`, `LAMES`, `AXES`, `COTES`, `COTES_ANGLES`, `DETAILS`, `EAU`, `TEXTES`
   - cartouche texte : chantier, menuiserie, orientation, échelle, date
 - Fichiers nommés d'après le chantier et la menuiserie, par exemple `Residence-Les-Pins_MEX-12_ombrage.pdf`
 
@@ -120,10 +143,11 @@ L'outil est entièrement contenu dans un seul fichier HTML : aucune installation
 | Position du soleil | Formules NOAA d'après J. Meeus, *Astronomical Algorithms* : déclinaison, équation du temps, angle horaire, azimut et hauteur |
 | Réfraction atmosphérique | Correction de Saemundsson près de l'horizon |
 | Rayonnement direct | Modèle de ciel clair de Meinel avec masse d'air de Kasten-Young, pondéré par l'incidence sur la façade |
-| Ombre sur le vitrage | Lancer de rayons depuis une grille de points sur le vitrage vers le soleil, intersection avec chaque lame, chaque console et l'embrasure |
+| Ombre sur le vitrage | Lancer de rayons depuis une grille de points sur le vitrage vers le soleil, intersection avec chaque lame et chaque console (prisme de la section réelle du profil) et avec l'embrasure |
 | Bilan journalier | Part du rayonnement direct reçu par le vitrage, comparée à la même fenêtre sans brise-soleil |
-| Indice d'efficacité | Moyenne pondérée (curseur de priorité) entre la part reçue en hiver et la part arrêtée en été |
-| Optimisation | Balayage de chaque paramètre sur sa plage, les autres réglages restant fixes |
+| Optimisation à l'instant T | Balayage d'un seul paramètre sur sa plage, les autres réglages restant fixes ; valeur la plus économique parmi celles qui donnent l'ombre maximale |
+| Rétention d'eau (métal) | Creux entre l'enveloppe convexe de la section et son contour, plus bas que leurs deux bords, dans la position réelle de la pièce |
+| Classe d'emploi (bois) | FD P 20-651, tableau 3 (pleine exposition) : massivité, conception (NF DTU 31.1 P1-1), climat d'humidification |
 
 ### Conventions
 - Cotes en **millimètres**, angles en **degrés**
@@ -140,6 +164,8 @@ L'outil est entièrement contenu dans un seul fichier HTML : aucune installation
 - Les lames sont supposées **opaques**
 - L'heure saisie est l'**heure légale du poste** : pour un site situé dans un autre fuseau horaire, régler l'heure en conséquence
 - L'outil ne fait **aucun calcul de structure** (charges, vent, fixations)
+- Les alertes de durabilité ne remplacent pas l'application des documents cités ; le climat d'humidification du bois est choisi à la main (FD P 20-651, figure 1 et annexe B)
+- Les sections normalisées sont des valeurs nominales arrondies (ailes des UPN dessinées parallèles) ; pour l'aluminium, les dimensions sont indicatives
 - Les cotes du DXF sont dessinées (lignes et textes), elles ne sont **pas associatives** : elles ne suivent pas une modification de la géométrie dans le logiciel de dessin
 - Le format **DWG** (format fermé d'Autodesk) n'est pas produit : le DXF s'ouvre et s'enregistre en DWG dans les logiciels de DAO
 - La photo aérienne et la recherche d'adresse IGN couvrent la France
@@ -150,7 +176,8 @@ L'outil est entièrement contenu dans un seul fichier HTML : aucune installation
 
 ```
 ombrage/
-├── index.html              ← l'outil complet, version en cours (autonome, ~130 KB)
+├── index.html              ← l'outil complet, version en cours (autonome, ~190 KB)
+├── ombrage-v2.0.0.html     ← archive de la version 2.0.0
 ├── ombrage-v1.2.0.html     ← archive de la version 1.2.0
 ├── ombrage-v1.1.0.html     ← archive de la version 1.1.0
 ├── ombrage-v1.0.0.html     ← archive de la version 1.0.0
