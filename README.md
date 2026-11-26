@@ -115,6 +115,7 @@ L'outil tourne **intégralement dans le navigateur** : pas de serveur, pas d'ins
 ### Confort
 - **Guide de démarrage** au premier lancement, réaffichable à tout moment
 - Réglages gardés dans le navigateur, copiables pour les transmettre à un autre poste
+- Bouton **☕ Payer un coup** (Ko-fi) dans l'en-tête ; tous les 10 lancements, un petit message de remerciement non bloquant. Le compteur de lancements reste dans le navigateur (`localStorage`), rien n'est envoyé
 
 ---
 
@@ -177,6 +178,7 @@ L'outil est entièrement contenu dans un seul fichier HTML : aucune installation
 ```
 ombrage/
 ├── index.html              ← l'outil complet, version en cours (autonome, ~190 KB)
+├── ombrage-v2.1.0.html     ← archive de la version 2.1.0
 ├── ombrage-v2.0.0.html     ← archive de la version 2.0.0
 ├── ombrage-v1.2.0.html     ← archive de la version 1.2.0
 ├── ombrage-v1.1.0.html     ← archive de la version 1.1.0

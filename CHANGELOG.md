@@ -1,5 +1,12 @@
 # Changelog Ombrage
 
+## v2.1.0 — Novembre 2026 — Soutien Ko-fi
+
+- Bouton discret **« ☕ Payer un coup »** dans l'en-tête et lien dans le pied de page, vers https://ko-fi.com/jeanpineau (nouvel onglet)
+- Compteur d'utilisations local (`nb_utilisations_ombrage` dans le localStorage du navigateur), +1 à chaque ouverture ; **aucune donnée envoyée**
+- Tous les 10 lancements, petite fenêtre de remerciement non bloquante (message tiré au hasard parmi 6), boutons « Payer un café » et « Plus tard »
+- Aucun changement du calcul ni des exports
+
 ## v2.0.0 — Novembre 2026 — Matériaux, profils, optimisation à l'instant T et durabilité
 
 ### Matériau et environnement (étape 1)

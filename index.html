@@ -32,6 +32,17 @@ header.top h1 .brand{color:var(--yellow);font-weight:700}
 header.top p{margin:0;font-size:13px;opacity:.9}
 .guide-btn{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.6);border-radius:6px;padding:7px 14px;font-size:13px;cursor:pointer;white-space:nowrap}
 .guide-btn:hover{background:rgba(255,255,255,.12)}
+/* soutien Ko-fi */
+.top-btns{display:flex;gap:8px;flex-wrap:wrap}
+a.guide-btn{text-decoration:none;display:inline-block}
+.kofi-link{color:var(--color-info);font-size:12px}
+.kofi-toast{position:fixed;z-index:8000;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(340px,calc(100vw - 32px));background:#fff;border:.5px solid var(--border);border-top:3px solid var(--yellow);border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,.18);padding:14px 16px;font-size:14px;line-height:1.45;color:var(--text);animation:kofiIn .25s ease-out}
+.kofi-toast p{margin:0 0 12px}
+.kofi-toast .kofi-act{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.kofi-toast a.b{text-decoration:none;display:inline-block;padding:8px 14px;font-size:14px;border-radius:6px;background:var(--color-info);color:#fff}
+.kofi-toast a.b:hover{background:#163759}
+@keyframes kofiIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.kofi-toast{animation:none}}
 .disclaimer{background:#FFF8E1;border-left:4px solid #F59E0B;color:#5C4400;padding:10px 18px;font-size:13px;display:flex;gap:10px;align-items:flex-start;border-radius:0 0 6px 6px}
 .disclaimer b{color:#B45309}
 
@@ -278,9 +289,12 @@ button.b.qbtn{flex:0 0 36px;height:36px;padding:0;font-weight:700;color:var(--co
   <div class="wrap">
     <div>
       <h1><span class="brand">Ombrage</span> — Simulation d’ombrage de brise-soleil à lames</h1>
-      <p>Course du soleil (formules NOAA / Meeus) — adresses et photo aérienne IGN Géoplateforme — J.Pineau + Claude · v2.0.0</p>
+      <p>Course du soleil (formules NOAA / Meeus) — adresses et photo aérienne IGN Géoplateforme — J.Pineau + Claude · v2.1.0</p>
     </div>
-    <button class="guide-btn" id="guide-btn" type="button">? Revoir le guide</button>
+    <div class="top-btns">
+      <a class="guide-btn" href="https://ko-fi.com/jeanpineau" target="_blank" rel="noopener" aria-label="Payer un coup sur Ko-fi (ouvre dans un nouvel onglet)">☕ Payer un coup</a>
+      <button class="guide-btn" id="guide-btn" type="button">? Revoir le guide</button>
+    </div>
   </div>
 </header>
 <div class="wrap">
@@ -487,6 +501,7 @@ button.b.qbtn{flex:0 0 36px;height:36px;padding:0;font-weight:700;color:var(--co
       <span class="cc-text">Licence Creative Commons <b>BY-NC-ND 4.0</b> — Attribution, Pas d’utilisation commerciale, Pas de modification · © 2026 Jean Pineau</span>
     </a>
     <button class="linkbtn" id="guide-btn2" type="button">Revoir le guide de démarrage</button>
+    <a class="kofi-link" href="https://ko-fi.com/jeanpineau" target="_blank" rel="noopener">☕ Payer un coup à l’auteur (Ko-fi)</a>
   </div>
 </footer>
 
@@ -522,7 +537,7 @@ const DEF={
   mode:'h', speed:30, wall:null,
   chantier:'', mex:'', xScale:20, xDims:true, xCfg:true
 };
-const VERSION='2.0.0';
+const VERSION='2.1.0';
 const KEY='ombrage-v3';
 /* reprend aussi les réglages v1.x (consoles cw × ch, lames lw × le, curseur de priorité) */
 function migrate(o0){
@@ -1856,6 +1871,22 @@ function showGuide(){
   ov.addEventListener('click',e=>{if(e.target===ov)close()});
   document.addEventListener('keydown',key);render();$('#onb-next').focus();
 }
+/* ---------- soutien Ko-fi : compteur local (rien n'est envoyé), remerciement tous les 10 lancements ---------- */
+const KOFI_URL='https://ko-fi.com/jeanpineau',KOFI_KEY='nb_utilisations_ombrage';
+const KOFI_MSG=['Cette app a l’air de vous plaire ! N’hésitez pas à me faire vos retours et à me payer un café ☕',
+  'Déjà plusieurs études avec Ombrage ! Vos retours m’aident à l’améliorer, et un café me fait toujours plaisir ☕',
+  'Merci d’utiliser Ombrage ! Si l’outil vous rend service, un petit café m’encourage à continuer ☕',
+  'Ombrage vous accompagne sur vos chantiers ? Dites-moi ce qui vous manque, et payez-moi un café si le cœur vous en dit ☕',
+  'Content que l’outil vous soit utile ! Une idée, un bug, un café ? Tout est bienvenu ☕',
+  'Encore une étude d’ombrage bouclée ! Si ça vous a fait gagner du temps, un café me ferait plaisir ☕'];
+function kofi(){
+  let n=0;try{n=(parseInt(localStorage.getItem(KOFI_KEY),10)||0)+1;localStorage.setItem(KOFI_KEY,String(n))}catch(e){return}
+  if(n%10!==0)return;
+  const t=document.createElement('div');t.className='kofi-toast';t.setAttribute('role','status');t.setAttribute('aria-live','polite');
+  t.innerHTML=`<p>${KOFI_MSG[Math.floor(Math.random()*KOFI_MSG.length)]}</p><div class="kofi-act"><button class="b" type="button">Plus tard</button><a class="b" href="${KOFI_URL}" target="_blank" rel="noopener">☕ Payer un café</a></div>`;
+  const close=()=>t.remove();t.querySelector('button').addEventListener('click',close);t.querySelector('a').addEventListener('click',close);
+  setTimeout(()=>document.body.appendChild(t),1500);
+}
 function maybeGuide(){let seen=false;try{seen=localStorage.getItem(ONB_KEY)==='true'}catch(e){}if(!seen)showGuide()}
 
 /* ---------- branchements ---------- */
@@ -1911,6 +1942,7 @@ renderFields();renderMat();renderProfiles();renderSing();wireProfiles();initValu
 DUR=durability(S);buildModel();updateHUD();drawCoupe();renderDura();wallInfo();updateRefs();drawDay();drawHeat();
 requestAnimationFrame(loop);
 maybeGuide();
+kofi();
 })();
 </script>
 
